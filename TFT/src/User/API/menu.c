@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "menu.h"
 #include "includes.h"
 #include "list_item.h"
@@ -7,6 +8,11 @@
 const GUI_RECT exhibitRect = {
   1*ICON_WIDTH+1*SPACE_X+START_X,  0*ICON_HEIGHT+0*SPACE_Y+ICON_START_Y,  3*ICON_WIDTH+2*SPACE_X+START_X,  1*ICON_HEIGHT+0*SPACE_Y+ICON_START_Y
 };
+//TG exhibitRectLower is 2 ICON Space in the Lower Row and 2 Center column.
+const GUI_RECT exhibitRectLower = {
+   1*ICON_WIDTH+1*SPACE_X+START_X,  1*ICON_HEIGHT-0.5*SPACE_Y+ICON_START_Y,  3*ICON_WIDTH+2*SPACE_X+START_X,  1*ICON_HEIGHT+1*SPACE_Y+ICON_START_Y
+};
+
 
 // MENU FOR A TEMPERATURE DISPLAY SCREEN (TOOL TEMP, PID, ETC...)
 const GUI_RECT rect_of_keysIN[TM_RECT_COUNT] = {
@@ -620,30 +626,53 @@ void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item)
   GUI_RestoreColorDefault();
 }  //showLiveInfo
 
-//Show live info text on icons for LevelCorner
-void showLevelCornerLiveInfo(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item)
-{
-  const GUI_RECT *rect = curRect + ITEM_PER_PAGE + index;
-  GUI_ClearPrect(rect);
-  if (item != NULL) menuDrawIconOnly(item,index);
-  GUI_DispStringInPrect(rect, liveicon->lines[Levelindex].text);
-} //showLevelCornerLiveInfo
-
-//Show text on icons (used in LevelCorner with ICON_BLTOUCH unified)
-void showTextOnIcon(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item)
-{
-  if (item != NULL) menuDrawIconOnly(item,index);
-  GUI_SetColor(ORANGE);
-  GUI_SetTextMode(GUI_TEXTMODE_TRANS);
-  GUI_POINT loc;
-  loc.x = liveicon->lines[Levelindex].pos.x + curRect[index].x0 - 4;
-  loc.y = liveicon->lines[Levelindex].pos.y + curRect[index].y0 - 6;
-  setLargeFont(VAL_LARGE_FONT);
-  GUI_DispStringCenter(loc.x, loc.y, liveicon->lines[Levelindex].text);
-  GUI_SetColor(WHITE);
-  GUI_DispStringCenter(loc.x - 2, loc.y - 2, liveicon->lines[Levelindex].text);
+//TG Show a single live info text line by index number on icons
+void showSingleLiveIconLine(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item, uint8_t linenum) {
+if (item != NULL) {
+  
+  //menuDrawIconOnly(item,index);
+  if (liveicon->enabled[linenum] == true)
+  {
+    GUI_SetColor(liveicon->lines[linenum].fn_color);
+    GUI_SetBkColor(liveicon->lines[linenum].bk_color);
+    GUI_SetTextMode(liveicon->lines[linenum].text_mode);
+    GUI_POINT loc;
+    loc.x = liveicon->lines[linenum].pos.x + curRect[index].x0;
+    if (liveicon->lines[linenum].v_align == BOTTOM)
+    {
+      loc.y = liveicon->lines[linenum].pos.y + curRect[index].y0 - BYTE_HEIGHT;
+    }
+    else if (liveicon->lines[linenum].v_align == CENTER)
+    {
+      loc.y = liveicon->lines[linenum].pos.y + curRect[index].y0 - BYTE_HEIGHT / 2;
+    }
+    else
+    {
+      loc.y = liveicon->lines[linenum].pos.y + curRect[index].y0;
+    }
+    
+    // clear the current line with new white banner if line is #1
+    GUI_FillRectColor(curRect[index].x0, loc.y, curRect[index].x1, loc.y + BYTE_HEIGHT, WHITE);
+    
+    setLargeFont(liveicon->lines[linenum].large_font);
+    switch (liveicon->lines[linenum].h_align)
+    {
+      case LEFT:
+        GUI_DispString(loc.x, loc.y, liveicon->lines[linenum].text);
+        break;
+      case CENTER:
+        GUI_DispStringCenter(loc.x, loc.y, liveicon->lines[linenum].text);
+        break;
+      case RIGHT:
+        GUI_DispStringRight(loc.x, loc.y, liveicon->lines[linenum].text);
+        break;
+      default:
+        break;
+    }
+  } // if enabled = true
   GUI_RestoreColorDefault();
-} //showTextOnIcon
+  } // if not null 
+} //showSingleLiveIconLine
 
 //When there is a button value, the icon changes color and redraws
 void itemDrawIconPress(uint8_t position, uint8_t is_press)
@@ -691,13 +720,13 @@ KEY_VALUES menuKeyGetValue(void)
     {
       tempkey = (KEY_VALUES)KEY_GetValue(COUNT(rect_of_keySS), rect_of_keySS);
     }
-    else if ((infoMenu.menu[infoMenu.cur] == menuHeat) ||
-             (infoMenu.menu[infoMenu.cur] == menuPid) ||
-             (infoMenu.menu[infoMenu.cur] == menuTuneExtruder) ||
+    else if ((infoMenu.menu[infoMenu.cur] == menuSpindle) ||
+             //(infoMenu.menu[infoMenu.cur] == menuPid) ||             //TG 2/14/21 removed Pid.c module for CNC
+             //(infoMenu.menu[infoMenu.cur] == menuTuneExtruder) ||  //TG 2/10/21 removed TuneExtruder module for CNC
              (infoMenu.menu[infoMenu.cur] == menuFan) ||
-             (infoMenu.menu[infoMenu.cur] == menuExtrude) ||
+             //(infoMenu.menu[infoMenu.cur] == menuExtrude) ||       //TG 2/8/21 removed Extrude module for CNC
              (infoMenu.menu[infoMenu.cur] == menuSpeed) ||
-             (infoMenu.menu[infoMenu.cur] == menuZOffset) ||
+              (infoMenu.menu[infoMenu.cur] == menuZOffset) ||
              (infoMenu.menu[infoMenu.cur] == menuMBL))
     {
       tempkey = (KEY_VALUES)KEY_GetValue(COUNT(rect_of_keysIN), rect_of_keysIN);
@@ -829,6 +858,10 @@ void loopBackEnd(void)
   loopCheckHeater();
   // Fan speed monitor
   loopFan();
+  // Spindle speed monitor  //TG 2/4/21
+  loopSpindle();
+  // Vacuum on/off monitor  //TG 2/17/21
+  loopVacuum();
   // Speed & flow monitor
   loopSpeed();
 #ifdef SMART_HOME
@@ -862,8 +895,8 @@ void loopBackEnd(void)
   }
 #endif
 
-#ifdef HAS_EMULATOR
-  loopCheckMode();
+#if defined(ST7920_SPI) || defined(LCD2004_simulator)
+  loopCheckMode();          // checks encoder button if user wants to switch lcd modes
 #endif
 
 #ifdef FIL_RUNOUT_PIN
@@ -871,7 +904,7 @@ void loopBackEnd(void)
 #endif
 
 #ifdef LCD_LED_PWM_CHANNEL
-  loopDimTimer();
+  loopDimTimer();           // checks if time to dim lcd, or restore brightness on key or encoder press
 #endif
 
   if (infoMachineSettings.caseLightsBrightness == ENABLED)
@@ -900,10 +933,10 @@ void loopFrontEnd(void)
 #endif
 
   // loop for popup menu
-  loopPopup();
+  loopPopup();        //TG if popup_redraw is true handle the popup
 }
 
-void loopProcess(void)
+void loopProcess(void)  //TG runs both BackEnd and FrontEnd service loops
 {
   // checks gcode from print file, parses & sends gcode queue, parses slave resp, parses received gcode of other uart's
   // checks heater temp, fan speed monitor, speed & flow monitor, calls buzzer handler, checks U-disk (SD), checks

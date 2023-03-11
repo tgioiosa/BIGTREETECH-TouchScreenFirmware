@@ -31,7 +31,7 @@ void TIM7_IRQHandler(void)
 
     setPrintTime(os_counter);
 
-    loopTouchScreen();		//TG check if lcd screen was pressed, update touchScreenIsPress
+    loopTouchScreen();    // check if lcd screen was pressed, update touchScreenIsPress
 
     if(os_counter == (uint32_t)(~0)) {
       os_counter = 0;

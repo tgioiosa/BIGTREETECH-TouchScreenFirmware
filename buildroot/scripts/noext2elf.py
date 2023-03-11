@@ -8,8 +8,8 @@ def noext2elf(source, target, env):
  #print("firmware_name: " + firmware_name)
  firmware_path = env.subst('$BUILD_DIR') + "/"
  #print("firmware_path: " + firmware_path)
- shutil.copyfile(firmware_path + firmware_name + ".bin", firmware_path + firmware_name + ".elf")
- print("bin file created.")
+ shutil.copyfile(firmware_path + firmware_name, firmware_path + firmware_name + ".elf")
+ #print("bin file created.")
  #env.Replace($PROGNAME="firmware_%s" % "elf" )
 
 env.AddPostAction("buildprog", noext2elf)

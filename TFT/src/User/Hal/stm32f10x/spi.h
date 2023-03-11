@@ -3,10 +3,12 @@
 
 #include "stm32f10x.h"
 
+
 #define _SPI1     0
 #define _SPI2     1
 #define _SPI3     2
 #define _SPI_CNT  3
+
 
 void SPI_GPIO_Init(uint8_t port);
 void SPI_Config(uint8_t port);

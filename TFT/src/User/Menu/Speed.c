@@ -4,7 +4,7 @@
 const ITEM itemPercentType[SPEED_NUM] = {
   // icon                        label
   {ICON_MOVE,                    LABEL_PERCENTAGE_SPEED},
-  {ICON_EXTRUDE,                 LABEL_PERCENTAGE_FLOW},
+  {ICON_REMOVED,                 LABEL_PERCENTAGE_FLOW},        //TG 2/10/21 was EXTRUDE, removed for CNC
 };
 
 const int16_t itemPercentTypeTitle[SPEED_NUM] = {

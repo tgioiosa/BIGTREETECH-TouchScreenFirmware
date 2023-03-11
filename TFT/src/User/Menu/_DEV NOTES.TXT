@@ -1,0 +1,5 @@
+TODO
+Change out Heat.c,h for a new Tool.c,h and define a new menu for it to have keys similar to
+heatItems except replace 4 with CW/CCW, 5 with multipler 10,100,1000, and display in center shows RPM
+If in laser mode, then top row is same, 4 is laser 2%, 5 is laser 100%, 6 is laser off, and the
+center display is % power

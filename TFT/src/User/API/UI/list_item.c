@@ -5,11 +5,8 @@
 #include "menu.h"
 #include "GUI.h"
 
-//TG 2/12/21  Dynamic arrays is a method to temporarily store and retrieve names or values of the
-// list items on one page at a time. For example the Features list first page has 5 items, the 3rd
-// item (index=2 starting from zero) can have it's value stored in dynamic_text_value[2] chars[0-9]
 char * dynamic_label[LISTITEM_PER_PAGE];
-char dynamic_text_value[LISTITEM_PER_PAGE][10]; // allow 5 list item value strings of 7 chars max
+char dynamic_text_value[LISTITEM_PER_PAGE][10];		// allow 5 list item value strings of 7 chars max
 
 const uint16_t ICON_COLOR[ICONCHAR_NUM]=
 {
@@ -270,6 +267,13 @@ void setDynamicValue(uint8_t i, float value)
     sprintf(dynamic_text_value[i], "%.2f", value);
   else
     sprintf(dynamic_text_value[i], "%.1f", value);
+}
+
+void setDynamicIntValue(uint8_t i, uint16_t value)  //TG 2/5/21 added this function to set Dynamic Integer values
+{
+  char tempstr[8];
+  sprintf(tempstr, "%d", value);
+  setDynamicTextValue(i, tempstr);
 }
 
 // get the text starting point on screen based on rectangle edges and desired icon position

@@ -75,7 +75,6 @@ void Buzzer_play(SOUND sound)
 {
   // if (infoSettings.allSound != 1)
     // return;
-  return;         //TG 1/9/20  ***** SUPRRESS BUZZER FOR DEVELOPMENT - REMOVE WHEN FINISHED *****
   switch (sound)
   {
     case sound_ok:

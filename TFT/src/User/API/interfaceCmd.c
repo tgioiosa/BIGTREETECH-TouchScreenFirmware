@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "interfaceCmd.h"
 #include "includes.h"
 
@@ -215,8 +216,8 @@ void sendDequeuedCmd(char * gcode, bool avoid_terminal)
 // Parse and send gcode cmd in infoCmd.
 void sendQueueCmd(void)
 {
-  if (infoHost.wait == true) return;
-  if (infoCmd.count == 0) return;
+  if (infoHost.wait == true)    return;    // wait to send flag set?
+  if (infoCmd.count == 0)       return;    // no commands to send?
 
   bool avoid_terminal = false;
   uint16_t  cmd = 0;
@@ -244,6 +245,10 @@ void sendQueueCmd(void)
       switch (cmd)
       {
         case 0:
+		  //TG this was in prior versions, but not in V27
+          //if (isPrinting())
+          //  setPrintPause(true,true);
+          //break;
         case 1:
           if (isPrinting() && infoMachineSettings.firmwareType != FW_REPRAPFW)  // Abort printing by "M0" in RepRapFirmware
           {
@@ -445,7 +450,7 @@ void sendQueueCmd(void)
               sendDequeuedCmd(gcode, avoid_terminal);
 
               mustStoreScript("M105\nM114\nM220\n");
-              storeCmd("M221 D%d\n", heatGetCurrentTool());  //TG 4/5/21 fixed argumentto T<index>, was D ?
+              storeCmd("M221 D%d\n", heatGetCurrentTool());
               ispolling = true;
               return;
             }
@@ -850,12 +855,12 @@ void sendQueueCmd(void)
 
         case 220:  // M220
           if (cmd_seen('S'))
-            speedSetCurPercent(0, cmd_value());  //TG set index 0 Speed
+            speedSetCurPercent(0, cmd_value());
           break;
 
         case 221:  // M221
           if (cmd_seen('S'))
-            speedSetCurPercent(1, cmd_value());  //TG set index 1 Flow
+            speedSetCurPercent(1, cmd_value());
           break;
 
         #ifdef BUZZER_PIN

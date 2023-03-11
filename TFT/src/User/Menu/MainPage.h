@@ -7,6 +7,8 @@ extern "C" {
 
 void menuMain(void);
 
+void cncMenu(void);
+
 #ifdef __cplusplus
 }
 #endif

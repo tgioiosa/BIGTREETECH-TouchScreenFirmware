@@ -66,6 +66,7 @@ const char *const lang_key_list[LABEL_NUM] =
   #undef  X_WORD
 };
 
+
 uint8_t *textSelect(uint16_t sel)
 {
   switch(infoSettings.language)

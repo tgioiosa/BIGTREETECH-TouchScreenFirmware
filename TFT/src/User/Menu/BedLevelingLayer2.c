@@ -44,12 +44,9 @@ void menuBedLevelingLayer2(void)
 
   if (infoMachineSettings.zProbe == ENABLED)
   {
-    bedLevelingLayer2Items.items[3].icon = ICON_LEVEL_CORNER;
-    bedLevelingLayer2Items.items[3].label.index = LABEL_LEVEL_CORNER;
-
     if (infoSettings.touchmi_sensor != 0)
     {
-      bedLevelingLayer2Items.items[4].icon = ICON_NOZZLE;
+      // bedLevelingLayer2Items.items[4].icon = ICON_NOZZLE;  //TG Either reinstate icon, or remove bed leveling completely!!
       bedLevelingLayer2Items.items[4].label.index = LABEL_TOUCHMI;
     }
     else
@@ -89,10 +86,6 @@ void menuBedLevelingLayer2(void)
           menuUBLLoad();
         break;
 
-      case KEY_ICON_3:
-        infoMenu.menu[++infoMenu.cur] = menuLevelCorner;
-        break;
-
       case KEY_ICON_4:
         if (infoMachineSettings.zProbe == ENABLED)
         {
@@ -105,10 +98,7 @@ void menuBedLevelingLayer2(void)
 
       case KEY_ICON_5:
         if (infoMachineSettings.zProbe == ENABLED && infoSettings.z_steppers_alignment)
-        {
           storeCmd("G34\n");
-          storeCmd("M18 S0 X Y Z\n");
-        }
         break;
 
       case KEY_ICON_7:

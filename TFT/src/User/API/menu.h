@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #ifndef _MENU_H_
 #define _MENU_H_
 
@@ -16,7 +17,7 @@ extern "C" {
 #define SS_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + infobox
 #define TM_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + tempbox
 #define LISTITEM_PER_PAGE 5
-#define LIVEICON_LINES    5
+#define LIVEICON_LINES    3
 
 #define CENTER_Y         ((exhibitRect.y1 - exhibitRect.y0) / 2 + exhibitRect.y0)
 #define CENTER_X         ((exhibitRect.x1 - exhibitRect.x0 - BYTE_WIDTH) / 2 + exhibitRect.x0)
@@ -132,16 +133,15 @@ typedef struct
 
  typedef struct
 {
-  uint8_t   enabled[LIVEICON_LINES];
-  LIVE_DATA lines[LIVEICON_LINES];
+ uint8_t   enabled[LIVEICON_LINES];
+ LIVE_DATA lines[LIVEICON_LINES];
 } LIVE_INFO;
 
-void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item);
-// Display info for Level Corner feature in ABL menu
-void showLevelCornerLiveInfo(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
-void showTextOnIcon(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
+void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item); //TG added
+void showSingleLiveIconLine(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item, uint8_t linenum); //TG added
 
 extern const GUI_RECT exhibitRect;
+extern const GUI_RECT exhibitRectLower;   //TG new
 extern const GUI_RECT rect_of_key[MENU_RECT_COUNT];
 extern const GUI_RECT rect_of_keySS[SS_RECT_COUNT];
 extern const GUI_RECT rect_of_titleBar[1];
