@@ -209,7 +209,7 @@ static inline void setupModeHardware(uint8_t mode)
 void switchMode(void)
 {
   infoMenu.cur = 0;
-  setupModeHardware(infoSettings.mode);
+  setupModeHardware(infoSettings.mode); //TG initialize USART depending on mode
 
   switch (infoSettings.mode)
   {

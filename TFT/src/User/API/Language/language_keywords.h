@@ -187,11 +187,11 @@ extern "C" {
 // Printer Tools
 //#define LANG_KEY_NOZZLE                       "label_nozzle:"     //TG 1/14/20 removed for adding Spindle
 #define LANG_KEY_BED                          "label_bed:"
-#define LANG_KEY_CHAMBER                      "label_chamber:"
+//#define LANG_KEY_CHAMBER                      "label_chamber:"    //TG 7/22/22 removed
 #define LANG_KEY_FAN                          "label_fan:"
 
-#define LANG_KEY_BLTOUCH                      "label_bltouch:"
-#define LANG_KEY_TOUCHMI                      "label_touchmi:"
+//#define LANG_KEY_BLTOUCH                      "label_bltouch:"    //TG 7/22/22 removed
+//#define LANG_KEY_TOUCHMI                      "label_touchmi:"    //TG 7/22/22 removed
 
 // Values
 #define LANG_KEY_1_DEGREE                     "label_1_degree:"
@@ -254,13 +254,13 @@ extern "C" {
 #define LANG_KEY_RGB_SETTINGS                 "label_rgb_settings:"
 #define LANG_KEY_RGB_OFF                      "label_rgb_off:"
 #define LANG_KEY_TERMINAL                     "label_terminal:"
-#define LANG_KEY_LEVELING                     "label_leveling:"
-#define LANG_KEY_POINT_1                      "label_point_1:"
-#define LANG_KEY_POINT_2                      "label_point_2:"
-#define LANG_KEY_POINT_3                      "label_point_3:"
-#define LANG_KEY_POINT_4                      "label_point_4:"
-#define LANG_KEY_POINT_5                      "label_point_5:"
-#define LANG_KEY_BED_LEVELING                 "label_bed_leveling:"
+//#define LANG_KEY_LEVELING                     "label_leveling:"             //TG 7/17/22 removed
+//#define LANG_KEY_POINT_1                      "label_point_1:"              //TG 7/17/22 removed
+//#define LANG_KEY_POINT_2                      "label_point_2:"              //TG 7/17/22 removed
+//#define LANG_KEY_POINT_3                      "label_point_3:"              //TG 7/17/22 removed
+//#define LANG_KEY_POINT_4                      "label_point_4:"              //TG 7/17/22 removed
+//#define LANG_KEY_POINT_5                      "label_point_5:"              //TG 7/17/22 removed
+//#define LANG_KEY_BED_LEVELING                 "label_bed_leveling:"         //TG 7/17/22 removed
 #define LANG_KEY_BL_COMPLETE                  "label_bl_complete:"
 #define LANG_KEY_BL_SMART_FILL                "label_bl_smart_fill:"
 #define LANG_KEY_BL_ENABLE                    "label_bl_enable:"
@@ -288,6 +288,7 @@ extern "C" {
 #define LANG_KEY_LOAD_UNLOAD_SHORT            "label_load_unload_short:"
 #define LANG_KEY_TOUCHSCREEN_ADJUST           "label_touchscreen_adjust:"
 #define LANG_KEY_MORE                         "label_more:"
+#define LANG_KEY_MORE2                        "label_more2:"  //TG 10/12/22 added
 #define LANG_KEY_SCREEN_INFO                  "label_screen_info:"
 #define LANG_KEY_BG_COLOR                     "label_bg_color:"
 #define LANG_KEY_FONT_COLOR                   "label_font_color:"
@@ -335,8 +336,8 @@ extern "C" {
 //#define LANG_KEY_TUNE_EXT_NEW_ESTEP           "label_tune_ext_new_estep:"         //TG 2/18/21 removed for CNC
 #define LANG_KEY_CONNECTION_SETTINGS          "label_connection_settings:"
 #define LANG_KEY_NOTIFICATIONS                "label_notifications:"
-#define LANG_KEY_MESH_EDITOR                  "label_mesh_editor:"
-#define LANG_KEY_MESH_TUNER                   "label_mesh_tuner:"
+//#define LANG_KEY_MESH_EDITOR                  "label_mesh_editor:"                //TG 7/17/22 removed for CNC
+//#define LANG_KEY_MESH_TUNER                   "label_mesh_tuner:"                 //TG 7/17/22 removed for CNC
 #define LANG_KEY_CASE_LIGHT                   "label_case_light:"
 #define LANG_KEY_LOAD_STARTED                 "label_load_started:"
 #define LANG_KEY_UNLOAD_STARTED               "label_unload_started:"
@@ -392,6 +393,21 @@ extern "C" {
 #define LANG_KEY_INVERT_YAXIS                 "label_invert_yaxis:"
 #define LANG_KEY_INVERT_ZAXIS                 "label_invert_zaxis:"
 #define LANG_KEY_SPINDLE_USE_PID              "label_Spindle_use_PID:"      //TG 9/27/21 new
+#define LANG_KEY_KP                           "label_KP:"                   //TG 7/17/22 new
+#define LANG_KEY_KI                           "label_KI:"                   //TG 7/17/22 new
+#define LANG_KEY_KD                           "label_KD:"                   //TG 7/17/22 new
+#define LANG_KEY_PID_ON                       "label_PID On:"               //TG 7/17/22 new
+#define LANG_KEY_PID_OFF                      "label_PID Off:"              //TG 7/17/22 new
+#define LANG_KEY_AVR_RST                      "label_AVR Reset:"            //TG 7/17/22 new
+#define LANG_KEY_AVR_DSP0                     "label_AVR Display0:"         //TG 7/17/22 new
+#define LANG_KEY_AVR_DSP1                     "label_AVR Display1:"         //TG 7/17/22 new
+#define LANG_KEY_AVR_DSP2                     "label_AVR Display2:"         //TG 7/17/22 new
+#define LANG_KEY_AVR_CTL                      "label_AVR Control:"          //TG 7/17/22 new
+#define LANG_KEY_MARLIN_INT                   "label_Marlin_Int:"           //TG 7/17/22 new
+#define LANG_KEY_PIDRUN_INT                   "label_PIDRUN_Int:"           //TG 7/17/22 new
+#define LANG_KEY_CUST_SPEED                   "label_Custom:"               //TG 7/17/22 new
+#define LANG_KEY_SHOULD_M0_PAUSE              "label_should M0 pause:"     //TG 10/3/22 new
+#define LANG_KEY_PROBE_STOCK                  "label_probe_stock    :"     //TG 10/12/22 new
 //#define LANG_KEY_Z_0                          "label_Z to 0mm:"
 //#define LANG_KEY_Z_300                        "label_Z to 300mm:"
 

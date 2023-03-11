@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "Spindle.h"
 #include "includes.h"
 #include "Numpad.h"
@@ -255,8 +256,8 @@ void menuSpindle(void)   //TODO should rename this and this file from tool to sp
     }
 
     if ( lastCurrent != actCurrent || lastTarget != actTarget )
-    { //TG 8/31/21 added next line to flag when actual speed and target speed are off by >1500    
-      if (abs(actCurrent - actTarget) > 1500) {speed_mismatch=1;} else {speed_mismatch=0;}
+    { //TG 8/31/21 added next line to flag when actual speed and target speed are off by >1000    
+      if (abs(actCurrent - actTarget) > 1000) {speed_mismatch=1;} else {speed_mismatch=0;}
       updateSpeedStatusDisplay(spIndex, true);
       lastCurrent = actCurrent;
       lastTarget = actTarget;

@@ -279,10 +279,10 @@ void menuMachineSettings(void)
   };
 
   KEY_VALUES key_num = KEY_IDLE;
-  const ITEM itemCaseLight = {ICON_CASE_LIGHT, LABEL_CASE_LIGHT};
+  //const ITEM itemCaseLight = {ICON_CASE_LIGHT, LABEL_CASE_LIGHT};   //TG 7/22/22 removed
 
-  if (infoMachineSettings.caseLightsBrightness == ENABLED)
-    machineSettingsItems.items[KEY_ICON_6] = itemCaseLight;
+  //if (infoMachineSettings.caseLightsBrightness == ENABLED)          //TG 7/22/22 removed
+  //  machineSettingsItems.items[KEY_ICON_6] = itemCaseLight;         //TG 7/22/22 removed
 
   menuDrawPage(&machineSettingsItems);
 
@@ -318,8 +318,8 @@ void menuMachineSettings(void)
       #endif
 
       case KEY_ICON_6:
-        if (infoMachineSettings.caseLightsBrightness == ENABLED)
-          infoMenu.menu[++infoMenu.cur] = menuCaseLight;
+        //if (infoMachineSettings.caseLightsBrightness == ENABLED)    //TG 7/22/22 removed
+        //  infoMenu.menu[++infoMenu.cur] = menuCaseLight;            //TG 7/22/22 removed
         break;
 
       case KEY_ICON_7:

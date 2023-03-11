@@ -9,7 +9,7 @@ extern "C" {
 #include <stdbool.h>
 #include "includes.h"
 
-#define SPEED_NUM 2
+#define SPEED_NUM 2   //TG - defines array size of 2 for {speed, flow} aka {M220, M221}
 #define SPEED_MIN 10
 #define SPEED_MAX 999
 

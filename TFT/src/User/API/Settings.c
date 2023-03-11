@@ -4,6 +4,8 @@
 
 SETTINGS infoSettings;
 MACHINESETTINGS infoMachineSettings;
+AVRINFOTYPE AVRInfoBlock;
+AVRINFOTYPE AVRInfoBlockOrg;
 
 const uint16_t default_max_temp[]      = HEAT_MAX_TEMP;
 const uint16_t default_max_fanPWM[]    = FAN_MAX_PWM;
@@ -30,8 +32,10 @@ void infoSettingsReset(void)
 
 // CNC related settings         //TG 1/12/20 new
   infoSettings.spin_dir               = SPINDLE_ROTATION;         //TG 1/12/20 new
-  infoSettings.spindle_use_pid        = SPINDLE_USE_PID;          //TG 1/12/20 new
-  storeCmd("%s S%d \n", "M7979", infoSettings.spindle_use_pid);   //TG send cmd to Marlin to update there
+  AVRInfoBlock.PIDFLAG  = SPINDLE_USE_PID;       //TG 1/12/20 new - get value from config file
+  //TG 7/22/22 AVRInfoBlock.spindle_use_pid commented out, don't send this to Marlin, Marlin has precedence
+  // and will send to TFT to override the config file value if Marlin's value is different!
+  //storeCmd("%s S%d \n", "M7979", AVRInfoBlock.spindle_use_pid);   //TG send cmd to Marlin to update there
   infoSettings.laser_mode             = LASER_MODE;               //TG 1/12/20 new
   infoSettings.touchplate_on          = ENABLED;                  //TG 1/12/20 new
   infoSettings.touchplate_height      = TOUCHPLATE_OFFSET;        //TG 1/12/20 new
@@ -45,6 +49,7 @@ void infoSettingsReset(void)
     infoSettings.spindle_pwm_max[i]   = default_max_spindlePWM[i];  //TG 2/5/21 new
     infoSettings.spindle_rpm_max[i]   = default_max_spindleRPM[i];  //TG 2/5/21 new
   }
+  infoSettings.should_M0_pause        = SHOULD_M0_PAUSE;           //TG 10/3/22 new parameter
 
 // General Settings
   infoSettings.title_bg_color         = lcd_colors[TITLE_BACKGROUND_COLOR];
@@ -63,6 +68,7 @@ void infoSettingsReset(void)
   infoSettings.persistent_info        = ENABLED;
   infoSettings.file_listmode          = ENABLED;
   infoSettings.ack_notification       = ACK_NOTIFICATION_STYLE;
+  infoSettings.notification_m117      = DISABLED;               //TG 8/1/22 added
   infoSettings.emulate_m600           = EMULATE_M600;
 
 // Marlin Mode Settings
@@ -206,6 +212,7 @@ void initMachineSetting(void)
   infoMachineSettings.long_filename_support   = DISABLED;
   infoMachineSettings.babyStepping            = DISABLED;
   infoMachineSettings.softwareEndstops        = ENABLED;
+  infoMachineSettings.active_workspace        = -1;
 
   fanControlInit();
   spindleControlInit();   //TG 2/4/21 added
@@ -228,8 +235,8 @@ void setupMachine(void)
     #elif ENABLE_BL_VALUE == 5
         infoMachineSettings.leveling = BL_MBL;
     #endif
-  #endif
 
+  #endif
   if (infoMachineSettings.leveling != BL_DISABLED && infoMachineSettings.EEPROM == 1 && infoSettings.auto_load_leveling == 1)
   {
     storeCmd("M420 S1\n");

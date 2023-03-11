@@ -93,6 +93,7 @@ void _GUI_DispLabelInRect(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint16
 void _GUI_DispLabelInPrect(const GUI_RECT *rect, uint16_t index);
 void _GUI_DispLabelInRectEOL(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint16_t index);
 void _GUI_DispLabelInPrectEOL(const GUI_RECT *rect, uint16_t index);
+void RADIO_Create_Single(uint16_t sx, uint16_t sy, uint16_t color, char* text, uint16_t txtdir);  //TG 12/23/22 added
 //
 
 //macros for selecting right function based on variable type

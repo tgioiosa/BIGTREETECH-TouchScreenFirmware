@@ -1,6 +1,8 @@
 #include "PreheatMenu.h"
 #include "includes.h"
+//TG modified
 
+/*  //TG 7/22/22 removed, menuPreHeat will not be called from menUnifiedHeat
 const GUI_POINT preheat_title = {ICON_WIDTH / 2, PREHEAT_TITLE_Y };
 const GUI_POINT preheat_val_tool = {ICON_WIDTH - BYTE_WIDTH / 2, PREHEAT_TOOL_Y};
 const GUI_POINT preheat_val_bed = {ICON_WIDTH - BYTE_WIDTH / 2, PREHEAT_BED_Y};
@@ -140,3 +142,4 @@ void menuPreheat(void)
     loopProcess();
   }
 }
+*/

@@ -136,7 +136,7 @@
     #define STRING_READY                  "Ready"
     #define STRING_BUSY                   "Busy processing, please wait..."
     #define STRING_LOADING                "Loading..."
-    #define STRING_UNCONNECTED            "No printer attached!"
+    #define STRING_UNCONNECTED            " Waiting for CNC Controller!"
 
     // Process Info
     #define STRING_INFO                   "Info" //Info Sign
@@ -180,11 +180,11 @@
     // Printer Tools
     #define STRING_NOZZLE                 "Nozzle"
     #define STRING_BED                    "Hotbed"
-    #define STRING_CHAMBER                "Chamber"
+    //#define STRING_CHAMBER                "Chamber"   //TG 7/22/22 removed
     #define STRING_FAN                    "Fan"
 
-    #define STRING_BLTOUCH                "BLTouch"
-    #define STRING_TOUCHMI                "TouchMi"
+    //#define STRING_BLTOUCH                "BLTouch"   //TG 7/22/22 removed
+    //#define STRING_TOUCHMI                "TouchMi"   //TG 7/22/22 removed
 
     // Values
     //#define STRING_1_DEGREE               "1℃"        //TG 2/18/21 removed
@@ -247,14 +247,14 @@
     #define STRING_RGB_SETTINGS           "LED Color"
     #define STRING_RGB_OFF                "LED Off"
     #define STRING_TERMINAL               "Terminal"
-    #define STRING_LEVELING               "Leveling"
-    #define STRING_POINT_1                "Point 1"
-    #define STRING_POINT_2                "Point 2"
-    #define STRING_POINT_3                "Point 3"
-    #define STRING_POINT_4                "Point 4"
-    #define STRING_POINT_5                "Point 5"
-    #define STRING_BED_LEVELING           "Bed Level"
-    #define STRING_BL_COMPLETE            "Bed Leveling Complete"
+    //#define STRING_LEVELING               "Leveling"              //TG 7/17/21 removed for CNC
+    //#define STRING_POINT_1                "Point 1"               //TG 7/17/21 removed for CNC
+    //#define STRING_POINT_2                "Point 2"               //TG 7/17/21 removed for CNC
+    //#define STRING_POINT_3                "Point 3"               //TG 7/17/21 removed for CNC
+    //#define STRING_POINT_4                "Point 4"               //TG 7/17/21 removed for CNC
+    //#define STRING_POINT_5                "Point 5"               //TG 7/17/21 removed for CNC
+    //#define STRING_BED_LEVELING           "Bed Level"             //TG 7/17/21 removed for CNC
+    #define STRING_BL_COMPLETE            "Bed Leveling Complete" //TG 7/17/21 removed for CNC
     #define STRING_BL_SMART_FILL          "Missing probe points\nhave been smart filled.\n \nNote: remember to save!"
     #define STRING_BL_ENABLE              "BL: on"
     #define STRING_BL_DISABLE             "BL: off"
@@ -281,12 +281,13 @@
     #define STRING_LOAD_UNLOAD_SHORT      "(Un)Load"
     #define STRING_TOUCHSCREEN_ADJUST     "TSC Adjust"
     #define STRING_MORE                   "More"
+    #define STRING_MORE2                  "More2"                       //TG 10/12/22 added
     #define STRING_SCREEN_INFO            "Info"
     #define STRING_BG_COLOR               "Background color"
     #define STRING_FONT_COLOR             "Font color"
     #define STRING_PERCENTAGE             "Percentage"
     #define STRING_PERCENTAGE_SPEED       "Speed"
-    #define STRING_PERCENTAGE_FLOW        "Flow"
+    //#define STRING_PERCENTAGE_FLOW        "Flow"                      //TG 10/12/22 removed LABEL_PERCENTAGE_FLOW
     #define STRING_BABYSTEP               "BabyStep"
     #define STRING_X_INC                  "X+"
     #define STRING_Y_INC                  "Y+"
@@ -309,11 +310,11 @@
     #define STRING_EEPROM_SETTINGS        "EEPROM"
     #define STRING_LEVELING_EDGE_DISTANCE "Bed edge distance"
     #define STRING_TUNING                 "Tuning"
-    #define STRING_PID                    "PID"
-    #define STRING_PID_TITLE              "PID autotune"
-    #define STRING_PID_START_INFO         "PID autotune may take\nsome time to complete.\nContinue?"
-    #define STRING_PID_START_INFO_2       "PID autotune in progress!"
-    #define STRING_PID_START_INFO_3       "Do not touch the screen until completed (green LED ON)!"
+    //#define STRING_PID                    "PID"                       //TG 7/17/21 removed for CNC
+    //#define STRING_PID_TITLE              "PID autotune"              //TG 7/17/21 removed for CNC
+    //#define STRING_PID_START_INFO         "PID autotune may take\nsome time to complete.\nContinue?"  //TG 7/17/21 removed for CNC
+    //#define STRING_PID_START_INFO_2       "PID autotune in progress!" //TG 7/17/21 removed for CNC
+    //#define STRING_PID_START_INFO_3       "Do not touch the screen until completed (green LED ON)!"   //TG 7/17/21 removed for CNC
     //#define STRING_TUNE_EXTRUDER          "Tune steps"                //TG 2/10/21 removed for CNC
     //#define STRING_TUNE_EXT_EXTRUDE_100   "Ext. 100mm"                //TG 2/10/21 removed for CNC
     //#define STRING_TUNE_EXT_TEMP          "Extruder tuning | Heat"    //TG 2/10/21 removed for CNC
@@ -328,8 +329,8 @@
     //#define STRING_TUNE_EXT_NEW_ESTEP     "New e-steps: %0.2f"
     #define STRING_CONNECTION_SETTINGS    "Connection"
     #define STRING_NOTIFICATIONS          "Notifications"
-    #define STRING_MESH_EDITOR            "Mesh edit"
-    #define STRING_MESH_TUNER             "Mesh tuner"
+    //#define STRING_MESH_EDITOR            "Mesh edit"               //TG 7/17/21 removed for CNC
+    //#define STRING_MESH_TUNER             "Mesh tuner"              //TG 7/17/21 removed for CNC
     #define STRING_CASE_LIGHT             "Case light"
     #define STRING_LOAD_STARTED           "Loading filament.\nPlease wait for the process\nto complete."
     #define STRING_UNLOAD_STARTED         "Unloading filament.\nPlease wait for the process\nto complete."
@@ -387,5 +388,19 @@
     #define STRING_SPINDLE_USE_PID        "Spindle use PID"         //TG 9/27/21 new
     //#define STRING_Z_0                    "Z to 0mm"
     //#define STRING_Z_300                  "Z to 300mm"
-
+    #define STRING_KP                     "Kp"                      //TG 7/17/22 new
+    #define STRING_KI                     "Ki"                      //TG 7/17/22 new
+    #define STRING_KD                     "Kd"                      //TG 7/17/22 new
+    #define STRING_PID_ON                 "PID On"                  //TG 7/17/22 new
+    #define STRING_PID_OFF                "PID Off"                 //TG 7/17/22 new
+    #define STRING_AVR_RST                "Restart AVR"             //TG 7/17/22 new
+    #define STRING_AVR_DSP0               "AVR LCD pg 0"            //TG 7/17/22 new
+    #define STRING_AVR_DSP1               "AVR LCD pg 1"            //TG 7/17/22 new
+    #define STRING_AVR_DSP2               "AVR LCD pg 2"            //TG 7/17/22 new
+    #define STRING_AVR_CTL                "AVR Control"             //TG 7/17/22 new
+    #define STRING_MARLIN_INT             "Marlin_Int"              //TG 7/17/22 new
+    #define STRING_PIDRUN_INT             "PIDRUN_Int"              //TG 7/17/22 new
+    #define STRING_CUST_SPEED             "Custom"                  //TG 7/17/22 new
+    #define STRING_SHOULD_M0_PAUSE        "Should M0 Pause"         //TG 7/17/22 new
+    #define STRING_PROBE_STOCK            "Probe Stk"               //TG 10/12/22 new
 #endif

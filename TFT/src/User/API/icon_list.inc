@@ -9,24 +9,24 @@
 */
 
 
-X_ICON (HEAT)
+//X_ICON (HEAT)               //TG 7/17/22 removed 
 X_ICON (MOVE)
 X_ICON (HOME)
 X_ICON (DISABLE_STEPPERS)
 X_ICON (PRINT)
-//X_ICON (EXTRUDE)		//TG 2/18/21 removed
+//X_ICON (EXTRUDE)		        //TG 2/18/21 removed
 X_ICON (FAN)
 X_ICON (SETTINGS)
-X_ICON (LEVELING)
-X_ICON (Z_FADE)
+//X_ICON (LEVELING)           //TG 7/17/22 removed
+//X_ICON (Z_FADE)             //TG 7/17/22 removed
 X_ICON (INC)
 X_ICON (DEC)
-//X_ICON (NOZZLE)		//TG 2/18/21 removed
-//X_ICON (BED)			//TG 2/18/21 removed
-X_ICON (CHAMBER)
-//X_ICON (1_DEGREE)     //TG 2/18/21 removed
-//X_ICON (5_DEGREE)     //TG 2/18/21 removed
-//X_ICON (10_DEGREE)    //TG 2/18/21 removed
+//X_ICON (NOZZLE)		          //TG 2/18/21 removed
+//X_ICON (BED)			          //TG 2/18/21 removed
+//X_ICON (CHAMBER)            //TG 7/17/22 removed 
+//X_ICON (1_DEGREE)           //TG 2/18/21 removed
+//X_ICON (5_DEGREE)           //TG 2/18/21 removed
+//X_ICON (10_DEGREE)          //TG 2/18/21 removed
 X_ICON (APPLY)
 X_ICON (STOP)
 X_ICON (BACK)
@@ -78,20 +78,20 @@ X_ICON (001_MM)
 X_ICON (ONBOARD_SD)
 X_ICON (ONTFT_SD)
 X_ICON (U_DISK)
-X_ICON (POINT_1)
-X_ICON (POINT_2)
-X_ICON (POINT_3)
-X_ICON (POINT_4)
-X_ICON (POINT_5)
+//X_ICON (POINT_1)              //TG 7/17/22 removed 
+//X_ICON (POINT_2)              //TG 7/17/22 removed 
+//X_ICON (POINT_3)              //TG 7/17/22 removed 
+//X_ICON (POINT_4)              //TG 7/17/22 removed 
+//X_ICON (POINT_5)              //TG 7/17/22 removed 
 X_ICON (MARLIN)
 X_ICON (BIGTREETECH)
 X_ICON (GCODE)
-X_ICON (BLTOUCH)
-X_ICON (BLTOUCH_DEPLOY)
-X_ICON (BLTOUCH_STOW)
-X_ICON (BLTOUCH_TEST)
-X_ICON (BLTOUCH_REPEAT)
-X_ICON (BLTOUCH_RESET)
+//X_ICON (BLTOUCH)              //TG 7/17/22 removed
+//X_ICON (BLTOUCH_DEPLOY)       //TG 7/17/22 removed
+//X_ICON (BLTOUCH_STOW)         //TG 7/17/22 removed
+//X_ICON (BLTOUCH_TEST)         //TG 7/17/22 removed
+//X_ICON (BLTOUCH_REPEAT)       //TG 7/17/22 removed
+//X_ICON (BLTOUCH_RESET)        //TG 7/17/22 removed
 X_ICON (SCREEN_SETTINGS)
 X_ICON (MACHINE_SETTINGS)
 X_ICON (FEATURE_SETTINGS)
@@ -110,14 +110,14 @@ X_ICON (RGB_OFF)
 X_ICON (PREHEAT_BOTH)
 X_ICON (PREHEAT)
 X_ICON (CUSTOM)
-X_ICON (MANUAL_LEVEL)
+//X_ICON (MANUAL_LEVEL)         //TG 7/17/22 removed
 X_ICON (PARAMETER)
 X_ICON (RESET_VALUE)
-X_ICON (GLOBAL_CHAMBER)
+//X_ICON (GLOBAL_CHAMBER)       //TG 7/22/22 removed
 X_ICON (GLOBAL_BED)
 X_ICON (GLOBAL_NOZZLE)
-//X_ICON (PRINTING_NOZZLE)		//TG 2/18/21 removed
-//X_ICON (PRINTING_BED)			//TG 2/18/21 removed
+//X_ICON (PRINTING_NOZZLE)		  //TG 2/18/21 removed
+//X_ICON (PRINTING_BED)			    //TG 2/18/21 removed
 X_ICON (PRINTING_FAN)
 X_ICON (PRINTING_TIMER)
 X_ICON (PRINTING_ZLAYER)
@@ -125,55 +125,69 @@ X_ICON (PRINTING_SPEED)
 X_ICON (PRINTING_FLOW)
 X_ICON (MAINMENU)
 X_ICON (HOME_MOVE)
-X_ICON (HEAT_FAN)
-//X_ICON (COOLDOWN)             //TG 2/18/21 removed
+//X_ICON (HEAT_FAN)             //TG 7/17/22 removed
+//X_ICON (COOLDOWN)             //TG 2/18/21 removed
 //X_ICON (STATUS_NOZZLE)        //TG 1/14/20 replacing with SPINDLE
 //X_ICON (STATUS_BED)           //TG 1/14/20 replacing with VACUUM
 X_ICON (STATUS_FAN)
 X_ICON (STATUS_SPEED)
 X_ICON (STATUS_FLOW)
-X_ICON (LEVELING_OFF)
-X_ICON (LEVELING_ON)
+//X_ICON (LEVELING_OFF)         //TG 7/17/22 removed 
+//X_ICON (LEVELING_ON)          //TG 7/17/22 removed 
 X_ICON (NOZZLE_DOWN)
 X_ICON (NOZZLE_UP)
-X_ICON (LEVEL_EDGE_DISTANCE)
+//X_ICON (LEVEL_EDGE_DISTANCE)  //TG 7/17/22 removed 
 X_ICON (TUNING)
 X_ICON (PID)
-X_ICON (TUNE_EXTRUDER)
+//X_ICON (TUNE_EXTRUDER)        //TG 7/17/22 removed 
 X_ICON (CONNECTION_SETTINGS)
 X_ICON (CASE_LIGHT)
-X_ICON (Z_ALIGN)
-X_ICON (MESH_EDITOR)
+//X_ICON (Z_ALIGN)              //TG 7/17/22 removed    
+//X_ICON (MESH_EDITOR)          //TG 7/17/22 removed
 X_ICON (BRIGHTNESS)
-X_ICON (TGMENU)             //TG 1/12/20 new
-X_ICON (M503)               //TG 1/12/20 new
-X_ICON (GLOBAL_VACUUM)       //TG 1/12/20 new
-X_ICON (GLOBAL_SPINDLE)     //TG 1/12/20 new
-X_ICON (GLOBAL_LASER)       //TG 1/12/20 new
-X_ICON (PRINTING_VACUUM)     //TG 1/12/20 new
-X_ICON (PRINTING_SPINDLE)   //TG 1/12/20 new
-X_ICON (PRINTING_LASER)     //TG 1/12/20 new
-X_ICON (STATUS_VACUUM)       //TG 1/12/20 new
-X_ICON (STATUS_SPINDLE)     //TG 1/12/20 new
-X_ICON (STATUS_LASER  )     //TG 1/12/20 new
-X_ICON (SPINDLE)            //TG 1/12/20 new
-X_ICON (VACUUM)              //TG 1/12/20 new
-X_ICON (LASER)              //TG 1/12/20 new
-X_ICON (LASER_2)            //TG 1/12/20 new
-X_ICON (LASER_100)          //TG 1/12/20 new
-X_ICON (LASER_OFF)          //TG 1/12/20 new
-X_ICON (ZERO_X)             //TG 1/12/20 new
-X_ICON (ZERO_Y)             //TG 1/12/20 new
-X_ICON (ZERO_Z)             //TG 1/12/20 new
-X_ICON (500_RPM)            //TG 2/10/21 new
-X_ICON (1000_RPM)           //TG 2/10/21 new
-X_ICON (5000_RPM)           //TG 2/10/21 new
-X_ICON (10000_RPM)          //TG 2/10/21 new
-X_ICON (SSTART)             //TG 2/10/21 new
-X_ICON (SSTOP)              //TG 2/10/21 new
-X_ICON (AUTO_MODE)          //TG 2/18/21 new
-X_ICON (AUTO_ON)            //TG 2/18/21 new
-X_ICON (REMOVED)            //TG 2/18/21 new
+X_ICON (TGMENU)                 //TG 1/12/20 new
+X_ICON (M503)                   //TG 1/12/20 new
+X_ICON (GLOBAL_VACUUM)          //TG 1/12/20 new
+X_ICON (GLOBAL_SPINDLE)         //TG 1/12/20 new
+X_ICON (GLOBAL_LASER)           //TG 1/12/20 new
+X_ICON (PRINTING_VACUUM)        //TG 1/12/20 new
+X_ICON (PRINTING_SPINDLE)       //TG 1/12/20 new
+X_ICON (PRINTING_LASER)         //TG 1/12/20 new
+X_ICON (STATUS_VACUUM)          //TG 1/12/20 new
+X_ICON (STATUS_SPINDLE)         //TG 1/12/20 new
+X_ICON (STATUS_LASER  )         //TG 1/12/20 new
+X_ICON (SPINDLE)                //TG 1/12/20 new
+X_ICON (VACUUM)                 //TG 1/12/20 new
+X_ICON (LASER)                  //TG 1/12/20 new
+X_ICON (LASER_2)                //TG 1/12/20 new
+X_ICON (LASER_100)              //TG 1/12/20 new
+X_ICON (LASER_OFF)              //TG 1/12/20 new
+X_ICON (ZERO_X)                 //TG 1/12/20 new
+X_ICON (ZERO_Y)                 //TG 1/12/20 new
+X_ICON (ZERO_Z)                 //TG 1/12/20 new
+X_ICON (500_RPM)                //TG 2/10/21 new
+X_ICON (1000_RPM)               //TG 2/10/21 new
+X_ICON (5000_RPM)               //TG 2/10/21 new
+X_ICON (10000_RPM)              //TG 2/10/21 new
+X_ICON (SSTART)                 //TG 2/10/21 new
+X_ICON (SSTOP)                  //TG 2/10/21 new
+X_ICON (AUTO_MODE)              //TG 2/18/21 new
+X_ICON (AUTO_ON)                //TG 2/18/21 new
+X_ICON (REMOVED)                //TG 2/18/21 new
 //X_ICON (Z_0)
 //X_ICON (Z_300)
+X_ICON (KP)                     //TG 7/17/22 new
+X_ICON (KI)                     //TG 7/17/22 new
+X_ICON (KD)                     //TG 7/17/22 new
+X_ICON (PID_ON)                 //TG 7/17/22 new
+X_ICON (PID_OFF)                //TG 7/17/22 new
+X_ICON (AVR_RST)                //TG 7/17/22 new
+X_ICON (AVR_DSP0)               //TG 7/17/22 new
+X_ICON (AVR_CTL)                //TG 7/17/22 new
+X_ICON (AVR_DSP1)               //TG 7/17/22 new
+X_ICON (AVR_DSP2)               //TG 7/17/22 new
+X_ICON (MARLIN_INT)             //TG 7/17/22 new
+X_ICON (PIDRUN_INT)             //TG 7/17/22 new
+X_ICON (CUST_SPEED)             //TG 7/17/22 new
+X_ICON (PROBE_STOCK)            //TG 10/12/22 new
 //after changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

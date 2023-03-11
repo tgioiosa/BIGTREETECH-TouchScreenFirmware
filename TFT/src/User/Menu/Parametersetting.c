@@ -1,5 +1,6 @@
 #include "Parametersetting.h"
 #include "includes.h"
+//TG modified
 
 static uint8_t ps_cur_page = 0;
 static uint8_t cur_parameter = 0;
@@ -446,11 +447,12 @@ int16_t drawTemperatureStatus(void)
     tmpHeater[tmpIndex++] = BED;
   }
 
-  if (infoSettings.chamber_en)
-  { // global chamber
-    tmpIcon[tmpIndex] = ICON_GLOBAL_CHAMBER;
-    tmpHeater[tmpIndex++] = CHAMBER;
-  }
+  //TG 7/22/22 removed this icon so took this out
+  //if (infoSettings.chamber_en)
+  //{ // global chamber
+  //  tmpIcon[tmpIndex] = ICON_GLOBAL_CHAMBER;
+  //  tmpHeater[tmpIndex++] = CHAMBER;
+  //}
 
   uint16_t start_y = (TITLE_END_Y - BYTE_HEIGHT) / 2;
 

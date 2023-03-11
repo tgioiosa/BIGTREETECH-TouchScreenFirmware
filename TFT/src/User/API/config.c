@@ -537,7 +537,7 @@ void parseConfigKey(uint16_t index)
       infoSettings.spin_dir = getOnOff();
       break;
     case C_INDEX_SPINDLE_USE_PID: //TG 9/27/21 new
-      infoSettings.spindle_use_pid = getOnOff();
+      AVRInfoBlock.PIDFLAG = getOnOff();
       break;
     case C_INDEX_LASERMODE: //TG 1/12/20 new
       infoSettings.laser_mode = getOnOff();
@@ -568,7 +568,9 @@ void parseConfigKey(uint16_t index)
       infoSettings.touchplate_on = getOnOff();                                          
       break;
     
-    
+    case C_INDEX_SHOULD_M0_PAUSE:                   
+      infoSettings.should_M0_pause = getOnOff();    
+      break;
 
     case C_INDEX_UART_BAUDRATE:
       SET_VALID_INT_VALUE(infoSettings.baudrate, 0, BAUDRATE_COUNT - 1);
@@ -648,6 +650,10 @@ void parseConfigKey(uint16_t index)
     case C_INDEX_ACK_NOTIFICATION:
       SET_VALID_INT_VALUE(infoSettings.ack_notification, 0, 2);
       break;
+
+    case C_INDEX_NOTIFICATION_M117:                               //TG 8/1/22 added
+      infoSettings.notification_m117 = getOnOff();
+      break;  
 
     case C_INDEX_EMULATE_M600:
       infoSettings.emulate_m600 = getOnOff();

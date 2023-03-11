@@ -70,6 +70,7 @@ const char *const itemNotificationType[ITEM_NOTIFICATION_TYPE_NUM] =
 typedef enum
 {
   SKEY_TERMINAL_ACK = 0,
+  SKEY_SHOULD_M0_PAUSE,   //TG 10/3/22 new
   SKEY_PERSISTENT_INFO,
   SKEY_FILE_LIST_MODE,
   SKEY_SPIN,              //TG 1/12/20 new
@@ -135,6 +136,7 @@ int fe_cur_page = 0;
 LISTITEM settingPage[SKEY_COUNT] = {
   // .icon                 .itemType          .titlelabel                      .valueLabel
   {ICONCHAR_TOGGLE_ON,   LIST_TOGGLE,        LABEL_TERMINAL_ACK,           LABEL_BACKGROUND},
+  {ICONCHAR_TOGGLE_ON,   LIST_TOGGLE,        LABEL_SHOULD_M0_PAUSE,        LABEL_BACKGROUND},
   {ICONCHAR_TOGGLE_ON,   LIST_TOGGLE,        LABEL_PERSISTENT_INFO,        LABEL_BACKGROUND},
   {ICONCHAR_TOGGLE_ON,   LIST_TOGGLE,        LABEL_FILE_LIST_MODE,         LABEL_BACKGROUND},
   {ICONCHAR_BLANK,       LIST_CUSTOMVALUE,   LABEL_SPINDLE_ROTATION,         LABEL_CW},          //TG 1/12/20 new
@@ -211,6 +213,11 @@ void updateFeatureSettings(uint8_t key_val)
       infoSettings.terminalACK = (infoSettings.terminalACK + 1) % ITEM_TOGGLE_NUM;
       settingPage[item_index].icon = iconToggle[infoSettings.terminalACK];
       break;
+    
+    case SKEY_SHOULD_M0_PAUSE:
+      infoSettings.should_M0_pause = (infoSettings.should_M0_pause + 1) % ITEM_TOGGLE_NUM;
+      settingPage[item_index].icon = iconToggle[infoSettings.should_M0_pause];
+      break;
 
     case SKEY_PERSISTENT_INFO:
       infoSettings.persistent_info = (infoSettings.persistent_info + 1) % ITEM_TOGGLE_NUM;
@@ -259,9 +266,11 @@ void updateFeatureSettings(uint8_t key_val)
      }
 
     case SKEY_SPINDLE_USE_PID:    //TG 1/12/20 new
-      infoSettings.spindle_use_pid = (infoSettings.spindle_use_pid + 1) % TOGGLE_NUM;
-      settingPage[item_index].icon = toggleitem[infoSettings.spindle_use_pid];
-      storeCmd("%s S%d \n", "M7979", infoSettings.spindle_use_pid);
+      //TG 7/22/22 don't modify spindle_use_pid, Marlin has precedence, we're basically disabling this Feature Setting
+      //AVRInfoBlock.spindle_use_pid = (AVRInfoBlock.spindle_use_pid + 1) % TOGGLE_NUM;
+      settingPage[item_index].icon = toggleitem[AVRInfoBlock.PIDFLAG];
+      //TG 7/22/22 don't send this to Marlin, Marlin has precedence, we're basically disabling this Feature Setting
+      //storeCmd("%s S%d \n", "M7979", AVRInfoBlock.spindle_use_pid);
      break;
 
     case SKEY_LASER:    //TG 1/12/20 new
@@ -449,6 +458,10 @@ void loadFeatureSettings()
           settingPage[item_index].icon = iconToggle[infoSettings.terminalACK];
           break;
 
+        case SKEY_SHOULD_M0_PAUSE:
+          settingPage[item_index].icon = iconToggle[infoSettings.should_M0_pause];
+          break;
+
         case SKEY_PERSISTENT_INFO:
           settingPage[item_index].icon = iconToggle[infoSettings.persistent_info];
           break;
@@ -479,8 +492,9 @@ void loadFeatureSettings()
           break;
           
         case SKEY_SPINDLE_USE_PID:    //TG 9/27/21 new
-          settingPage[item_index].icon = toggleitem[infoSettings.spindle_use_pid];
-          storeCmd("%s S%d \n", "M7979", infoSettings.spindle_use_pid);
+          settingPage[item_index].icon = toggleitem[AVRInfoBlock.PIDFLAG];
+          //TG 7/22/22 don't send this to Marlin, Marlin has precedence, we're basically disabling this Feature Setting
+          //storeCmd("%s S%d \n", "M7979", AVRInfoBlock.spindle_use_pid);
           break;
 
         case SKEY_LASER:          //TG 1/12/20 new

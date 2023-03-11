@@ -21,6 +21,7 @@ extern uint8_t currentTool;
 extern uint8_t currentFan;
 extern uint8_t currentSpeedID;
 uint8_t currentSpindleSpeedID; //TG 2/24/21 new
+extern bool nextWCSupdate;     //TG 10/4/22 - added flag, it gets set whenever parseAck.c gets a workspace change msg from Marlin
 
 extern const ITEM itemTool[MAX_TOOL_COUNT];
 extern const ITEM itemSpindle[MAX_TOOL_COUNT];
@@ -73,6 +74,9 @@ extern const int16_t editIntValue(int16_t minValue, int16_t maxValue, int16_t re
 
 // Edit a float value in a standard menu
 extern const float editFloatValue(float minValue, float maxValue, float resetValue, float value);
+
+// Show/draw Active Workspace in title bar RH side
+void drawWCSinfo();    //TG 10/4/22 - added new to support displaying active WCS in upper right of titlebar
 
 #ifdef __cplusplus
 }

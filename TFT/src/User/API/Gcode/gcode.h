@@ -23,6 +23,13 @@ typedef struct
 
 extern REQUEST_COMMAND_INFO requestCommandInfo;
 
+void resetRequestCommandInfo(
+  const char *string_start,   // The magic to identify the start
+  const char *string_stop,    // The magic to identify the stop
+  const char *string_error0,  // The first magic to identify the error response
+  const char *string_error1,  // The second error magic
+  const char *string_error2   // The third error magic
+);
 void clearRequestCommandInfo(void);
 bool requestCommandInfoIsRunning(void);
 bool request_M21(void);

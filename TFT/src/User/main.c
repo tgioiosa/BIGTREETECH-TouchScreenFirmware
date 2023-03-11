@@ -48,6 +48,7 @@ void Hardware_GenericInit(void)
   scanUpdates();            // scan icon, fonts and config files for updates (boot.c)
   checkflashSign();         // check font/icon/config signature in SPI flash for update if needed
   initMachineSetting();     // load default machine settings, sets infoMachineSettings.isMarlinFirmware = -1
+  //readMarlinAVRInfoBlock(400); // initial read of settings from AVR Triac controller
 
   #ifdef LED_COLOR_PIN
     knob_LED_Init();
@@ -94,16 +95,24 @@ void Hardware_GenericInit(void)
   #ifdef LCD_LED_PWM_CHANNEL
     Set_LCD_Brightness(LCD_BRIGHTNESS[infoSettings.lcd_brightness]);
   #endif
+  
   switchMode();
 }
 
 int main(void)
-{
+{ //TG 12/23/22 tried this to stop GDB 'jtag status contains invalid mode value - communication failure' errors
+  DBGMCU_Config(DBGMCU_SLEEP | DBGMCU_STOP | DBGMCU_STANDBY, ENABLE); 
   SystemClockInit();
 
   SCB->VTOR = VECT_TAB_FLASH;
 
   Hardware_GenericInit();
+
+  #ifdef USING_AVR_TRIAC_CONTROLLER
+    //TG 8/5/22 try to reset AVR controller to sync to current stored presets
+    mustStoreCmd("%s \n", "M7980");         //TG send cmd to Marlin to request AVR reset
+    TFTtoMARLIN_wait(comp_7980);            //wait for command acknoledgement
+  #endif
 
   for(;;)                                 // infinite loop on whatever menu is currently at the top
   {                                       // of infoMenu.menu stack, after restart this will be menuStatus

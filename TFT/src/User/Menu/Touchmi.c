@@ -1,6 +1,8 @@
 #include "Touchmi.h"
 #include "includes.h"
+//TG modified
 
+/*  //TG 7/22/22 removed, menuTouchMi will not be called from BedLevelingLayer2.c
 const MENUITEMS touchmiItems = {
   // title
   LABEL_TOUCHMI,
@@ -70,3 +72,4 @@ void menuTouchMi(void)
     loopProcess();
   }
 }
+*/

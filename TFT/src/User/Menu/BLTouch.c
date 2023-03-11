@@ -1,5 +1,7 @@
 #include "includes.h"
+//TG modified
 
+/*  //TG 7/22/22 removed, menuBLTouch will not be called from BedLevelingLayer2.c
 const MENUITEMS BLTouchItems = {
   // title
   LABEL_BLTOUCH,
@@ -59,3 +61,4 @@ void menuBLTouch(void)
     loopProcess();
   }
 }
+*/

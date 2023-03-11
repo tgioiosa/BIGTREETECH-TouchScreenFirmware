@@ -101,13 +101,13 @@ void menuDialog(void)
     switch (key_num)
     {
       case KEY_POPUP_CONFIRM:
-        infoMenu.cur--;
+        infoMenu.cur--;           //TG this sets back to previous menu before popup, basically clearing the popup
         if (action_ok != NULL)
           action_ok();
         break;
 
       case KEY_POPUP_CANCEL:
-        infoMenu.cur--;
+        infoMenu.cur--;           //TG this sets back to previous menu before popup, basically clearing the popup
         if (action_cancel != NULL)
           action_cancel();
         break;
@@ -189,7 +189,7 @@ void _setDialogCancelTextLabel(int16_t index)
   popup_strcpy(popup_cancel, tempstr, sizeof(popup_cancel));
 }
 
-/** Show save setting dialog. Set dialog text before calling showDialog
+/** Show dialog. Set dialog text before calling showDialog, if actions are NULL button press just clears the dialog box.
  * @param ok_action - pointer to a function to perform if ok is pressed. (pass NULL if no action need to be performed)
  * @param cancel_action - pointer to a function to perform if Cancel is pressed.(pass NULL if no action need to be performed)
 */

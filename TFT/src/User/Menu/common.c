@@ -1,13 +1,14 @@
+//TG MODIFIED*****
 #include "common.h"
 #include "includes.h"
 
 // indexes for status icon toggles
-uint8_t currentTool = TOOL0;
-uint8_t currentFan = 0;
-uint8_t currentSpeedID = 0;
-uint8_t currentSpindleSpeedID = 0;  //TG 2/24/21 new
+uint8_t currentTool = TOOL0;        //TG for CNC will always be just the one tool
+uint8_t currentFan = 0;             //TG for multiple fan indices
+uint8_t currentSpeedID = 0;         //TG for speed or flow, 2 indices
+uint8_t currentSpindleSpeedID = 0;  //TG 2/24/21 new for CNC will always be just the one tool
 static uint32_t lastTime = 0;
-
+bool nextWCSupdate = false;         //TG 10/4/22 - added flag, it gets set whenever parseAck.c gets a workspace change msg from Marlin
 
 //Icons list for tool change  //TG 1/16/20 changed to just 4 tools //TODO can be removed after removing PreHeat.c, Pid.c, Heat.c
 const ITEM itemTool[MAX_TOOL_COUNT] =
@@ -16,7 +17,7 @@ const ITEM itemTool[MAX_TOOL_COUNT] =
   {ICON_SPINDLE,               LABEL_SPINDLE},
   {ICON_LASER,                 LABEL_LASER},
   {ICON_VACUUM,                LABEL_VACUUM},
-  {ICON_CHAMBER,               LABEL_CHAMBER},
+  {ICON_REMOVED,				       LABEL_REMOVED},  //TG 7/17/22 removed, was CHAMBER for use in Heat.c and pid.c
 };
 
 //Icons list for spindle change  //TG 1/16/20 changed to just 4 tools
@@ -303,7 +304,7 @@ const void percentageReDraw(uint8_t itemIndex, bool skipHeader)
     if (itemIndex == 0)
       sprintf(tempstr, "%-15s", textSelect(LABEL_PERCENTAGE_SPEED));
     else
-      sprintf(tempstr, "%-15s", textSelect(LABEL_PERCENTAGE_FLOW));
+      sprintf(tempstr, "%-15s", textSelect(LABEL_REMOVED)); //TG 10/12/22 removed LABEL_PERCENTAGE_FLOW
 
     GUI_DispString(exhibitRect.x0, exhibitRect.y0, (uint8_t *) tempstr);
     setLargeFont(true);
@@ -342,3 +343,16 @@ const float editFloatValue(float minValue, float maxValue, float resetValue, flo
 
   return val;
 }
+
+//TG 10/4/22 - added new - put this in common.c so it can be used by several menus
+// displays the active WCS in upper right of title bar on select menus
+void drawWCSinfo()
+{
+  char mmsg[8];
+  GUI_SetColor(WHITE);
+  sprintf(mmsg, "WCS:%2d", infoMachineSettings.active_workspace);
+  GUI_DispStringInPrect(&rect_of_titleBar_RHS, (u8 *)mmsg);
+  //GUI_DispLenString(LCD_WIDTH-(7*BYTE_WIDTH), (TITLE_END_Y-BYTE_HEIGHT)/2, (u8*)mmsg, (8*BYTE_WIDTH), true);
+  GUI_RestoreColorDefault();
+}
+

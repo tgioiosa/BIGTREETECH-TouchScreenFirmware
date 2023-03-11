@@ -3,6 +3,7 @@
 #include "includes.h"
 #include "list_item.h"
 #include "Notification.h"
+#include "Configuration.h"
 
 // exhibitRect is 2 ICON Space in the Upper Row and 2 Center column.
 const GUI_RECT exhibitRect = {
@@ -148,6 +149,11 @@ const GUI_RECT rect_of_keyListView[ITEM_PER_PAGE + 1] = {
 // titlebar touch area
 const GUI_RECT rect_of_titleBar[] = {
   {0 ,0 ,LCD_WIDTH, ICON_START_Y}
+};
+
+//TG 10/4/22 - added titlebar area of 8 characters at Right Hand Side of title
+const GUI_RECT rect_of_titleBar_RHS = {
+  LCD_WIDTH - (7*BYTE_WIDTH) , (TITLE_END_Y - BYTE_HEIGHT)/2 , LCD_WIDTH - (1*BYTE_WIDTH), (TITLE_END_Y - BYTE_HEIGHT/4)
 };
 
 //Clean up the gaps outside icons
@@ -346,6 +352,13 @@ void reminderMessage(int16_t inf, SYS_STATUS status)
 {
   if (toastRunning()) return;
 
+  //TG TAKE OUT BEFORE RELEASE!!!!
+  if(status == STATUS_BUSY)
+  {
+    __NOP();
+  }
+
+
   reminder.inf = inf;
   reminder.status = status;
   reminder.time = OS_GetTimeMs() + 2000;  // 2 seconds
@@ -393,10 +406,10 @@ void loopReminderClear(void)
 {
   switch (reminder.status)
   {
-    case STATUS_IDLE:
+    case STATUS_IDLE:     //TG if idle, nothing to do, just exit
       return;
 
-    case STATUS_BUSY:
+    case STATUS_BUSY:     //TG if still busy and command queue still full just exit
       if (infoCmd.count == CMD_MAX_LIST)
         return;
       break;
@@ -406,7 +419,7 @@ void loopReminderClear(void)
         return;
       break;
 
-    case STATUS_NORMAL:
+    case STATUS_NORMAL:   //TG if status has returned to normal, and time reached, //Clear status message
       if (OS_GetTimeMs() < reminder.time)
         return;
       break;
@@ -514,14 +527,16 @@ void menuReDrawCurTitle(void)
   {
     if (curMenuItems == NULL) return;
     menuDrawTitle(labelGetAddress(&curMenuItems->title));
+    drawWCSinfo();  //TG 10/4/22 - added to redraw WCS after a Toast msg drew over it
   }
   else if (menuType == MENU_TYPE_FULLSCREEN)
   {
     if (curMenuRedrawHandle != NULL) curMenuRedrawHandle();
   }
-  else if (menuType == MENU_TYPE_OTHER)
+  else if (menuType == MENU_TYPE_OTHER || menuType == MENU_TYPE_DIALOG) //TG 10/4/22 - added MENU_TYPE_DIALOG condition
   {
-    menuDrawTitle(labelGetAddress(curTitle));
+    menuDrawTitle(labelGetAddress(&curMenuItems->title));
+    drawWCSinfo();  //TG 10/4/22 - added to redraw WCS after a Toast msg drew over it 
   }
 }
 
@@ -544,6 +559,13 @@ void menuDrawPage(const MENUITEMS *menuItems)
     menuDrawItem(&menuItems->items[i], i);
     RAPID_PRINTING_COMM()  // perform backend printing loop between drawing icons to avoid printer idling
   }
+  
+  if(
+    #ifdef USING_AVR_TRIAC_CONTROLLER
+        infoMenu.menu[infoMenu.cur] != menuTriac && 
+    #endif
+      infoMenu.menu[infoMenu.cur] != menuScreenSettings)
+    drawWCSinfo();  //TG 10/4/22 - when redrawing menus, add WCS display (except menuavrTriac & menuScreenSettings menus)
 }
 
 //Draw the entire interface
@@ -721,7 +743,11 @@ KEY_VALUES menuKeyGetValue(void)
       tempkey = (KEY_VALUES)KEY_GetValue(COUNT(rect_of_keySS), rect_of_keySS);
     }
     else if ((infoMenu.menu[infoMenu.cur] == menuSpindle) ||
-             //(infoMenu.menu[infoMenu.cur] == menuPid) ||             //TG 2/14/21 removed Pid.c module for CNC
+             #ifdef USING_AVR_TRIAC_CONTROLLER
+             (infoMenu.menu[infoMenu.cur] == menuTriac) ||           //TG 7/17/22 added so numpad will work
+             #endif
+             (infoMenu.menu[infoMenu.cur] == menuPrinting) ||        //TG added so that infobox area can be used as a key
+             //(infoMenu.menu[infoMenu.cur] == menuPid) ||           //TG 2/14/21 removed Pid.c module for CNC
              //(infoMenu.menu[infoMenu.cur] == menuTuneExtruder) ||  //TG 2/10/21 removed TuneExtruder module for CNC
              (infoMenu.menu[infoMenu.cur] == menuFan) ||
              //(infoMenu.menu[infoMenu.cur] == menuExtrude) ||       //TG 2/8/21 removed Extrude module for CNC

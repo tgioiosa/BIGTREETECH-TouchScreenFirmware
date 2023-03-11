@@ -8,7 +8,7 @@ extern "C" {
 #include "stdint.h"
 #include "stdbool.h"
 
-#define CMD_MAX_LIST 20
+#define CMD_MAX_LIST 30   //TG 8/1/22 increased from 20
 #define CMD_MAX_CHAR 100
 
 typedef struct

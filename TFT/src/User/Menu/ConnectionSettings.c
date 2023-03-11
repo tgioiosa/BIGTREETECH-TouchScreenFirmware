@@ -145,7 +145,7 @@ void menuConnectionSettings(void)
         break;
 
       case KEY_ICON_3:
-        storeCmd("M81\n");
+        storeCmd("M81\n");    //TG turn off power supply (Requires PSU_CONTROL) 
         break;
 
       case KEY_ICON_7:

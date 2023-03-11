@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "SettingsMenu.h"
 #include "includes.h"
 
@@ -11,7 +12,14 @@ const MENUITEMS settingsItems = {
     {ICON_FEATURE_SETTINGS,        LABEL_FEATURE_SETTINGS},
     {ICON_SCREEN_INFO,             LABEL_SCREEN_INFO},
     {ICON_CONNECTION_SETTINGS,     LABEL_CONNECTION_SETTINGS},
+    #ifdef USING_AVR_TRIAC_CONTROLLER
+    {ICON_AVR_CTL,                 LABEL_AVR_CTL},
+    #endif
+    #ifdef USING_VFD_CONTROLLER
+    {ICON_AVR_CTL,                 LABEL_AVR_CTL},
+    #else
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
+    #endif
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
     {ICON_BACK,                    LABEL_BACK},
   }
@@ -25,7 +33,7 @@ const MENUITEMS settingsItems = {
 //   {1 * LCD_WIDTH / 3, 1 * BYTE_HEIGHT},
 //   {2 * LCD_WIDTH / 3, 1 * BYTE_HEIGHT},};
 
-static uint8_t firmare_name[64] = "Unknow system";  // Marlin firmware version
+static uint8_t firmare_name[64] = "Unknown system";  // Marlin firmware version
 uint8_t machine_type[64] = "3D Printer";  // Marlin machine type
 uint8_t access_point[64] = "Connecting...";  // Access point for RepRapFirmware
 uint8_t ip_address[20] = "0.0.0.0";  // IP address for RepRapFirmware
@@ -139,8 +147,8 @@ void menuInfo(void)
 
   //draw info
   GUI_SetColor(0xDB40);
-  GUI_DispStringInPrectEOL(&version[0], firmare_name);
-  GUI_DispStringInPrectEOL(&version[1], machine_type);
+  GUI_DispStringInPrectEOL(&version[0], firmare_name);  //TG gets set by receipt of M115 in parseAck.c
+  GUI_DispStringInPrectEOL(&version[1], machine_type);  //TG gets set by receipt of M115 in parseAck.c
   GUI_DispStringInPrectEOL(&version[2], (uint8_t *)hardware);
   GUI_DispStringInPrectEOL(&version[3], (uint8_t *)firmware);
   GUI_DispStringInPrectEOL(&version[4], (uint8_t *)buf);
@@ -193,6 +201,15 @@ void menuSettings(void)
 
       case KEY_ICON_4:
         infoMenu.menu[++infoMenu.cur] = menuConnectionSettings;
+        break;
+
+      case KEY_ICON_5:
+        #ifdef USING_AVR_TRIAC_CONTROLLER
+          infoMenu.menu[++infoMenu.cur] = menuTriac;
+        #endif
+        #ifdef USING_VFD_CONTROLLER
+          infoMenu.menu[++infoMenu.cur] = menuVFD;    //TG 12/23/22 added
+        #endif
         break;
 
       case KEY_ICON_7:

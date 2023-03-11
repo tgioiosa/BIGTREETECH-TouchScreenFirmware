@@ -22,6 +22,7 @@ void caseLightBrightnessReDraw()
   setLargeFont(false);
 }
 
+/*  //TG 7/22/22 removed CaseLight and it's menu
 void menuCaseLight(void)
 {
   // 1 title, ITEM_PER_PAGE items (icon + label)
@@ -113,3 +114,4 @@ void menuCaseLight(void)
     loopProcess();
   }
 }
+*/

@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "LoadUnload.h"
 #include "includes.h"
 
@@ -16,7 +17,7 @@ const MENUITEMS loadUnloadItems = {
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
     {ICON_LOAD,                    LABEL_LOAD},
     {ICON_SPINDLE,                 LABEL_SPINDLE},
-    {ICON_HEAT,                    LABEL_HEAT},
+    {ICON_REMOVED,                 LABEL_REMOVED},    //TG 7/17/22 was HEAT
     {ICON_REMOVED,                 LABEL_REMOVED},    //TG 2/18/21 was COOLDOWN
     {ICON_BACK,                    LABEL_BACK},
   }

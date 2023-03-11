@@ -12,4 +12,5 @@ void menuVacuum(void);
 uint8_t getVacuumState(void);
 void loopVacuum(void);
 void vacuum_set (uint8_t state);
+
 #endif

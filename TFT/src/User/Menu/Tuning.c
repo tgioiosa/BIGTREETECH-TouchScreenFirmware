@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "Tuning.h"
 #include "includes.h"
 
@@ -7,7 +8,7 @@ const MENUITEMS TuningItems = {
   // icon                          label
   {
     {ICON_REMOVED,                 LABEL_REMOVED},          //TG 8/22/21 removed for CNC, was LABEL_PID
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},   //TG 2/10/21 removed for CNC, was TUNE_EXTRUDER
+    {ICON_REMOVED,                 LABEL_REMOVED},          //TG 2/10/21 removed for CNC, was TUNE_EXTRUDER
     {ICON_PROBE_OFFSET,            LABEL_H_OFFSET},
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
     {ICON_BACKGROUND,              LABEL_BACKGROUND},

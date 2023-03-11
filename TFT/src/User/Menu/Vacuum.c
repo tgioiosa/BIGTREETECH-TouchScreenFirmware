@@ -1,4 +1,5 @@
 #include "includes.h"
+#include "SpindleControl.h"
 
 const char *const  vacuumID[MAX_VACUUM_COUNT]         = VACUUM_SIGN_ID;
 const char *const  vacuumDisplayID[MAX_VACUUM_COUNT]  = VACUUM_DISPLAY_ID;
@@ -76,6 +77,7 @@ void loopVacuum(void)    //TG this is called by loopBackEnd() in menu.c to updat
     else
       vacuum_set(0);
     nextVacuumTime = OS_GetTimeMs() + NEXT_VACUUM_WAIT; // avoid rapid fire, clogging the queue
+    lastvacuumState = vacuumState;  // update vacuum state here only, not in spindleControl.c 
   } // if value changed and time to send
 }// loopSpindle
 
@@ -86,6 +88,10 @@ void vacuum_set (uint8_t state) {
   if (storeCmd("%s I1 M1 P%i S%i\n", vacuumCmd[0], vac_pin, state))
     {
       vacuumState = (state > 0) ? (vacuumState | 1) : (vacuumState & ~1); // adjust state
-      lastvacuumState = vacuumState;  // update vacuum state here only, not in spindleControl.c 
     }
 }
+
+
+
+
+

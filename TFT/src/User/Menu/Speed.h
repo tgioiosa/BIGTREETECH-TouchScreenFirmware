@@ -16,6 +16,7 @@ typedef struct
 
 void setSpeedItemIndex(uint8_t index);
 void menuSpeed(void);
+uint8_t checkFlowRateAllowed();
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,5 @@
 #include "StatusScreen.h"
+#include "common.h"   //TG 10/4/22 - added for workspace display support
 
 #ifdef TFT70_V3_0
 #define KEY_SPEEDMENU         KEY_ICON_3
@@ -129,7 +130,7 @@ void drawAllLiveIconData(void)
   char tempstr[45];
 
   LIVE_INFO lvIcon;
-  lvIcon.enabled[0] = true;                         // 1st item
+  lvIcon.enabled[0] = true;                         // 1st item   (S0, V0, F0, Sp. white text in upper right corner of icon)
   lvIcon.lines[0].h_align = RIGHT;                  // right-justified
   lvIcon.lines[0].v_align = TOP;                    // top aligned
   lvIcon.lines[0].fn_color = SSICON_NAME_COLOR;     // white
@@ -137,7 +138,7 @@ void drawAllLiveIconData(void)
   lvIcon.lines[0].pos = ss_title_point;             // name location
   lvIcon.lines[0].large_font = NAME_LARGE_FONT;     // false
 
-  lvIcon.enabled[1] = true;                         // 2nd item
+  lvIcon.enabled[1] = true;                         // 2nd item   (Black text in white bar on bottom of icon)
   lvIcon.lines[1].h_align = CENTER;                 // center justified
   lvIcon.lines[1].v_align = CENTER;                 // center aligned
   lvIcon.lines[1].fn_color = SSICON_VAL_COLOR;      // black
@@ -145,7 +146,7 @@ void drawAllLiveIconData(void)
   lvIcon.lines[1].pos = ss_val_point;               // value location
   lvIcon.lines[1].large_font = VAL_LARGE_FONT;      // false
 
-  lvIcon.lines[2].h_align = LEFT;                   //TG 2/22/21 for "Set/Act" text on spindle speed
+  lvIcon.lines[2].h_align = LEFT;                   //TG 2/22/21 for white "Set/Act" text on spindle speed
   lvIcon.lines[2].v_align = TOP;
   lvIcon.lines[2].fn_color = SSICON_NAME_COLOR;
   lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;
@@ -188,14 +189,14 @@ void drawAllLiveIconData(void)
     lvIcon.lines[2].text = currentSpindleSpeedID ? (u8*)"Set" : (u8*)"Act";
     
     lvIcon.enabled[2] = true; // only show line[2] for spindle/laser icon (0)
-    showLiveInfo(0, &lvIcon, &StatusItems.items[0]);
+    showLiveInfo(0, &lvIcon, &StatusItems.items[0]);    // map onto Spindle icon items[0]
     lvIcon.enabled[2] = false;// turn off for other icons
 
     //VACUUM //TG 2/17/21 updated for Vacuum, was for BED
     lvIcon.lines[0].text = (u8 *)vacuumDisplayID[0];
     sprintf(tempstr, "%s %s", (vacuumState & 2) == 2 ? (char*)"Auto" : (char*)"", (vacuumState & 1) == 1 ? (char*)"On" : (char*)"Off");
     lvIcon.lines[1].text = (u8 *)tempstr;
-    showLiveInfo(1, &lvIcon, &StatusItems.items[1]);
+    showLiveInfo(1, &lvIcon, &StatusItems.items[1]);    // map onto Vacuum icon items[1]
 
   #endif
 
@@ -210,7 +211,7 @@ void drawAllLiveIconData(void)
     sprintf(tempstr, "%d", fanGetCurSpeed(currentFan));
   }
   lvIcon.lines[1].text = (u8 *)tempstr;
-  showLiveInfo(2, &lvIcon, &StatusItems.items[2]);
+  showLiveInfo(2, &lvIcon, &StatusItems.items[2]);    // map onto Fan icon items[0]
 
   #ifdef TFT70_V3_0
     //SPEED
@@ -234,6 +235,7 @@ void drawAllLiveIconData(void)
       sprintf(tempstr, "%d%%", speedGetCurPercent(currentSpeedID));  
     }
     //TG 2/24/21 don't alternate plot/spindle speed by keeping currentSpeedID=0 in toggleTool(), makes the display confusing
+    //so for CNC version we always get here with currentSpeedID == 0
     else
     { // show spindle speed
       sprintf(tempstr, infoSettings.cutter_disp_unit == MPCT ? "%d%%" : "%d", 
@@ -242,9 +244,10 @@ void drawAllLiveIconData(void)
     }
     
     lvIcon.lines[1].text = (u8 *)tempstr;
-    showLiveInfo(3, &lvIcon, &SpeedItems[currentSpeedID]);
+    showLiveInfo(3, &lvIcon, &SpeedItems[currentSpeedID]);  // map onto ICON_STATUS_SPEED SpeedItems[0]
   #endif
 
+  // Gantry X,Y,Z position above status area
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRYLBL_COLOR);
   GUI_SetBkColor(infoSettings.status_xyz_bg_color);
@@ -329,13 +332,14 @@ static inline void toggleTool(void)
     nextToolTime = OS_GetTimeMs() + UPDATE_TOOL_TIME;
     drawAllLiveIconData();
 
-    // gcode queries must be call after drawTemperature
-    coordinateQuery();
-    speedQuery();
-    fanSpeedQuery();
+    // gcode queries must be called after drawTemperature
+    coordinateQuery();    // send an M114 coordinate query
+    speedQuery();         // send an M220 speed query
+    fanSpeedQuery();      // send an M710 fan speed query
   }
 }
 
+//TG ***** OPENING SCREEN after RESET *****
 void menuStatus(void)   // shows the status screen menu, this is the first menu that comes up after reset unless in Classic Menu mode
 {
    //TG 1/12/20 added this code to modify menu for laser option
@@ -353,6 +357,7 @@ void menuStatus(void)   // shows the status screen menu, this is the first menu 
   GUI_FillPrect(&RecGantry);                        // draws gray rect across screen center for x,y,z coords status
   drawAllLiveIconData();                            // fills in speeds and coords on status screen
   drawStatusScreenMsg();                            // draws the status screen message center
+ 
   while (infoMenu.menu[infoMenu.cur] == menuStatus) // loop here until the current menu changes
   {
     if (infoHost.connected != lastConnection_status)
@@ -363,6 +368,11 @@ void menuStatus(void)   // shows the status screen menu, this is the first menu 
     if (msgNeedRefresh)                             // time to update the status area?
     {
       drawStatusScreenMsg();                        // draws "Status" on message center
+    }
+    if(nextWCSupdate){
+      drawWCSinfo();                                  //TG 10/4/22 put workspace info in Upper Right title area
+      nextWCSupdate = false;
+      RAPID_PRINTING_COMM()  // perform backend printing loop between drawing icons to avoid printer idling
     }
     scrollMsg();                                    // scrolls current message
     key_num = menuKeyGetValue();                    // look for a key press (KEY_IDLE = no press), this just

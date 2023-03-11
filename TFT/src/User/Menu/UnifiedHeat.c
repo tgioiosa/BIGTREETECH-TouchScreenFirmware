@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "UnifiedHeat.h"
 #include "includes.h"
 
@@ -6,12 +7,12 @@ const MENUITEMS UnifiedHeatItems = {
   LABEL_UNIFIEDHEAT,
   // icon                          label
   {
-    {ICON_HEAT,                    LABEL_PREHEAT},
-    {ICON_HEAT,                    LABEL_HEAT},
+    {ICON_REMOVED,                 LABEL_REMOVED},      //TG 7/17/22 was HEAT-PREHEAT    
+    {ICON_REMOVED,                 LABEL_REMOVED},      //TG 7/17/22 was HEAT-HEAT
     {ICON_FAN,                     LABEL_FAN},
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-   {ICON_REMOVED,                 LABEL_REMOVED},       //TG 2/18/21 was COOLDOWN
+    {ICON_REMOVED,                 LABEL_REMOVED},       //TG 2/18/21 was COOLDOWN
     {ICON_BACKGROUND,              LABEL_BACKGROUND},
     {ICON_BACK,                    LABEL_BACK},
   }
@@ -29,7 +30,7 @@ void menuUnifiedHeat(void)
     switch (key_num)
     {
       case KEY_ICON_0:
-        infoMenu.menu[++infoMenu.cur] = menuPreheat;
+        //infoMenu.menu[++infoMenu.cur] = menuPreheat;  //TG 7/17/22 removed
         break;
 
       case KEY_ICON_1:
@@ -41,7 +42,7 @@ void menuUnifiedHeat(void)
         break;
 
       case KEY_ICON_5:
-        //heatCoolDown();
+        //heatCoolDown();                               //TG 7/17/22 removed
         break;
 
       case KEY_ICON_7:

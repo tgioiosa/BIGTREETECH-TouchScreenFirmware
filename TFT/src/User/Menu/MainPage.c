@@ -1,6 +1,8 @@
+//TG MODIFIED*****
 #include "MainPage.h"
 #include "includes.h"
 
+//TG ***** This is OPENING MENU only is Classic Mode is selected in selectMode.c *****
 void menuMain(void)
 {
   // 1 title, ITEM_PER_PAGE items (icon + label)
@@ -116,8 +118,8 @@ void cncMenu(void){                               //TG 1/12/20  this entire func
     key_num = menuKeyGetValue();
     switch(key_num)
     {
-      case KEY_ICON_0: infoMenu.menu[++infoMenu.cur] = menuHome;        break;
-      case KEY_ICON_1: infoMenu.menu[++infoMenu.cur] = menuMove;        break;
+      case KEY_ICON_0: infoMenu.menu[++infoMenu.cur] = menuHome;       break;
+      case KEY_ICON_1: infoMenu.menu[++infoMenu.cur] = menuMove;       break;
       case KEY_ICON_2: infoMenu.menu[++infoMenu.cur] = menuTerminal;   break;
       case KEY_ICON_3: storeCmd("M112\n"); break;     // Emergency Stop : Used for emergency stopping, a reset is required to return to operational m
                                                       // it may need to wait for a space to open up in the command queue.

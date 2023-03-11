@@ -173,13 +173,13 @@ void drawXYZ(void)
   GUI_SetColor(INFOBOX_ICON_COLOR);
 
   sprintf(tempstr, "X:%.2f  ", coordinateGetAxisActual(X_AXIS));
-  GUI_DispString(START_X + 1 * SPACE_X + 1 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
+  GUI_DispString( 1 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
 
   sprintf(tempstr, "Y:%.2f  ", coordinateGetAxisActual(Y_AXIS));
-  GUI_DispString(START_X + 2 * SPACE_X + 2 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
+  GUI_DispString( 2 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
 
   sprintf(tempstr, "Z:%.2f  ", coordinateGetAxisActual(Z_AXIS));
-  GUI_DispString(START_X + 3 * SPACE_X + 3 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
+  GUI_DispString(3 * ICON_WIDTH, (ICON_START_Y - BYTE_HEIGHT) / 2, (uint8_t *)tempstr);
 
   GUI_SetColor(infoSettings.font_color);
 }

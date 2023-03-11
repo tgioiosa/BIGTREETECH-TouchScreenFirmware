@@ -123,7 +123,7 @@ void loopToast(void)
       _toastRunning = false;
       GUI_ClearPrect(&toastIconRect);
       GUI_ClearPrect(&toastRect);
-      menuReDrawCurTitle();
+      menuReDrawCurTitle();   //TG 10/4/22 - added to redraw title and WCS that a Toast may have clobbered
     }
   }
 }

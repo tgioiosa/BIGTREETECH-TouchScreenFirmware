@@ -17,6 +17,8 @@ static bool spindleQueryEnable = false;
 static uint32_t nextSpindleTime = 0;
 #define NEXT_SPINDLE_WAIT 500  // in msec, this is rate at which spindle speed commands are sent to Marlin
 
+float stockTopZaxis;    // holds the top of the work stock, sent by Marlin via M7986 during printing
+uint8_t maxNativeMachineZ; // holds the maximum native machine Z position from Marlin
 //uint8_t spindleGetTypID(uint8_t startIndex, uint8_t type)     //TG Can be deleted, not needed as spindles aren't typed
 //{
 //  for (uint8_t i = startIndex; i < MAX_SPINDLE_COUNT; i++)
@@ -292,12 +294,18 @@ void spindleQuerySetWait(bool wait)
   spindleQueryWait = wait;
 }
 
-//TG 8/31/21 not used
-//void spindleSpeedQuery(void)
-//{
-//  if (infoHost.connected && !infoHost.wait && !spindleQueryWait && spindleQueryEnable)
-//  {
-//    spindleQueryWait = storeCmd("M710\n");
-//  }
-//}
-
+//TG 9/25/22 - added this function to be called on a Print Abort
+void disableSpindleandVacuum()
+{
+  //spindleSetSpeed(0, 0);
+  //spindleSetCurSpeed(0,0);
+  //spindleState = 0;
+  //vacuumState = 0;
+  //vacuum_set(0);
+  uint8_t clearanceHeight = (stockTopZaxis + 30) < maxNativeMachineZ ? stockTopZaxis + 30 : maxNativeMachineZ;
+  mustStoreCmd("%s\n", "G53");                      // reset to native workspace 
+  mustStoreCmd("%s%d\n", "G1 Z", clearanceHeight);  // move Z up 30mm if possible, maxNativeMachineZ max
+  mustStoreCmd("%s\n", "M05");                      // force stop spindle
+  mustStoreCmd("%s\n", "M42 I1 M1 P122 S0");        // force stop vacuum
+  //loopProcess(); 
+}

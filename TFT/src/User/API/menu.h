@@ -145,6 +145,7 @@ extern const GUI_RECT exhibitRectLower;   //TG new
 extern const GUI_RECT rect_of_key[MENU_RECT_COUNT];
 extern const GUI_RECT rect_of_keySS[SS_RECT_COUNT];
 extern const GUI_RECT rect_of_titleBar[1];
+extern const GUI_RECT rect_of_titleBar_RHS;  //TG 10/4/22 - added
 
 void setMenuType(MENU_TYPE type);
 MENU_TYPE getMenuType(void);

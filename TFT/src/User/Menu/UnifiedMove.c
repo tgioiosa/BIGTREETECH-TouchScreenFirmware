@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "UnifiedMove.h"
 #include "includes.h"
 
@@ -10,11 +11,10 @@ void menuUnifiedMove(void)
     {
       {ICON_HOME,                    LABEL_HOME},
       {ICON_MOVE,                    LABEL_MOVE},
-      //{ICON_EXTRUDE,                 LABEL_EXTRUDE},  //TG 2/10/21 was EXTRUDE, removed for CNC
-      {ICON_REMOVED,				 LABEL_REMOVED},
-	  {ICON_DISABLE_STEPPERS,        LABEL_DISABLE_STEPPERS},
+      {ICON_REMOVED,				         LABEL_REMOVED},            //TG 2/10/21 was EXTRUDE, removed for CNC
+	    {ICON_DISABLE_STEPPERS,        LABEL_DISABLE_STEPPERS},
       {ICON_BABYSTEP,                LABEL_BABYSTEP},
-      {ICON_MANUAL_LEVEL,            LABEL_LEVELING},
+      {ICON_REMOVED,				         LABEL_REMOVED},           //TG 7/17/22 removed, was MANUAL_LEVEL-LEVELING
       {ICON_BACKGROUND,              LABEL_BACKGROUND},
       {ICON_BACK,                    LABEL_BACK},
     }
@@ -22,11 +22,11 @@ void menuUnifiedMove(void)
 
   KEY_VALUES key_num = KEY_IDLE;
 
-  if (infoMachineSettings.leveling != BL_DISABLED)
-  {
-    UnifiedMoveItems.items[6].icon = ICON_LEVELING;
-    UnifiedMoveItems.items[6].label.index = LABEL_BED_LEVELING;
-  }
+  //if (infoMachineSettings.leveling != BL_DISABLED)      //TG 7/17/22 removed next 4 lines since Leveling.c removed
+  //{
+  //  UnifiedMoveItems.items[6].icon = ICON_LEVELING;
+  //  UnifiedMoveItems.items[6].label.index = LABEL_BED_LEVELING;
+  //}
 
   menuDrawPage(&UnifiedMoveItems);
 
@@ -56,12 +56,12 @@ void menuUnifiedMove(void)
         break;
 
       case KEY_ICON_5:
-        infoMenu.menu[++infoMenu.cur] = menuManualLeveling;
+      //  infoMenu.menu[++infoMenu.cur] = menuManualLeveling;     //TG 7/17/22 menuManualLeveling.c was removed
         break;
 
       case KEY_ICON_6:
-        if (infoMachineSettings.leveling != BL_DISABLED)
-          infoMenu.menu[++infoMenu.cur] = menuBedLeveling;
+      //  if (infoMachineSettings.leveling != BL_DISABLED)        //TG 7/17/22 menuBedLeveling.c was removed
+      //    infoMenu.menu[++infoMenu.cur] = menuBedLeveling;
         break;
 
       case KEY_ICON_7:

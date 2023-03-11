@@ -4,12 +4,12 @@
 const ITEM itemPercentType[SPEED_NUM] = {
   // icon                        label
   {ICON_MOVE,                    LABEL_PERCENTAGE_SPEED},
-  {ICON_REMOVED,                 LABEL_PERCENTAGE_FLOW},        //TG 2/10/21 was EXTRUDE, removed for CNC
+  {ICON_REMOVED,                 LABEL_REMOVED},        //TG 10/12/22 removed LABEL_PERCENTAGE_FLOW
 };
 
 const int16_t itemPercentTypeTitle[SPEED_NUM] = {
   LABEL_PERCENTAGE_SPEED,
-  LABEL_PERCENTAGE_FLOW
+  LABEL_REMOVED,
 };
 
 static uint8_t item_index = 0;
@@ -42,7 +42,11 @@ void menuSpeed(void)
   KEY_VALUES key_num = KEY_IDLE;
   LASTSPEED lastSpeed;
 
+#if EXTRUDER_NUM > 0    //TG 9/1/22 added this test 
   storeCmd("M220\nM221\n");
+#else
+  storeCmd("M220\n");
+#endif
 
   speedSetPercent(item_index, speedGetCurPercent(item_index));
   lastSpeed = (LASTSPEED) {speedGetCurPercent(item_index), speedGetSetPercent(item_index)};
@@ -64,8 +68,11 @@ void menuSpeed(void)
     switch (key_num)
     {
       case KEY_ICON_0:
-        if (speedGetSetPercent(item_index) > SPEED_MIN)
-          speedSetPercent(item_index, speedGetSetPercent(item_index) - percentSteps[percentSteps_index]);
+        if(checkFlowRateAllowed())
+        {
+          if (speedGetSetPercent(item_index) > SPEED_MIN)
+            speedSetPercent(item_index, speedGetSetPercent(item_index) - percentSteps[percentSteps_index]);
+        }
         break;
 
       case KEY_INFOBOX:
@@ -81,8 +88,11 @@ void menuSpeed(void)
       }
 
       case KEY_ICON_3:
-        if (speedGetSetPercent(item_index) < SPEED_MAX)
+        if(checkFlowRateAllowed())
+        {
+           if (speedGetSetPercent(item_index) < SPEED_MAX)
           speedSetPercent(item_index, speedGetSetPercent(item_index) + percentSteps[percentSteps_index]);
+        }
         break;
 
       case KEY_ICON_4:
@@ -103,7 +113,10 @@ void menuSpeed(void)
         break;
 
       case KEY_ICON_6:
-        speedSetPercent(item_index, 100);
+        if(checkFlowRateAllowed())
+        {
+          speedSetPercent(item_index, 100);
+        }
         break;
 
       case KEY_ICON_7:
@@ -133,4 +146,16 @@ void menuSpeed(void)
 
     loopProcess();
   }
+}
+
+// check if Flow Rate is enabled (EXTRUDER_NUM > 0), return 1 if OK, else show msg and return 0
+uint8_t checkFlowRateAllowed()
+{
+  if(item_index>0 && infoSettings.ext_count==0)   //TG 9/1/22 added for case of no extruders/no flow
+  {  
+    popupReminder(DIALOG_TYPE_ERROR,(uint8_t *)"Warning", 
+      (uint8_t *)"Flow control disabled when\nExruder(s) are not present!"); // msg with OK only
+    return 0;
+  }
+  return 1;
 }

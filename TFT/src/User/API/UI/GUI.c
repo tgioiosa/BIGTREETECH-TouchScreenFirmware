@@ -841,6 +841,22 @@ void RADIO_Create(RADIO *radio)       //TG radio button green or white for list 
   GUI_SetColor(tmp);
 }
 
+//TG 12/23/22 draw a single radio button of color with text, specify text pos as RIGHT or BOTTOM
+void RADIO_Create_Single(uint16_t sx, uint16_t sy, uint16_t color, char *text, uint16_t txtdir)       
+{
+  uint16_t tmp = GUI_GetColor();
+  GUI_SetColor(0x4248);
+  GUI_FillCircle(sx+BYTE_HEIGHT/2, sy+BYTE_HEIGHT/2, BYTE_HEIGHT/3);  // create large filled circle
+  GUI_SetColor(color);
+  GUI_FillCircle(sx+BYTE_HEIGHT/2, sy+BYTE_HEIGHT/2, BYTE_HEIGHT/4);  // create smaller inside filled circle
+  GUI_SetColor(tmp);
+  if(txtdir == RIGHT)
+    _GUI_DispString(sx + BYTE_HEIGHT,   sy, (uint8_t*)text);
+  else if(txtdir == BOTTOM)
+    _GUI_DispString(sx - BYTE_WIDTH/2,   sy + BYTE_HEIGHT, (uint8_t*)text);
+  GUI_SetColor(tmp);
+}
+
 void RADIO_Select(RADIO *radio, uint8_t select)
 {
   uint16_t tmp = GUI_GetColor();

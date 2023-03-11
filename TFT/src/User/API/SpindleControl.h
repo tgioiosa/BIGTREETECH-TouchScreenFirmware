@@ -20,6 +20,8 @@ extern char* spindleCmd[MAX_SPINDLE_COUNT];
 
 extern uint8_t spindleType[MAX_SPINDLE_COUNT];
 uint16_t lastSetSpindleSpeed[MAX_SPINDLE_COUNT];
+extern float stockTopZaxis;
+extern uint8_t maxNativeMachineZ;
 
 typedef enum  {
   MRPM = 0,
@@ -50,6 +52,7 @@ void    loopSpindle(void);
 bool    SpindleChanged(uint8_t i);
 void    spindleSpeedQuery(void);
 void    spindleQuerySetWait(bool wait);
+void    disableSpindleandVacuum();
 
 #ifdef __cplusplus
 }

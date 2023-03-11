@@ -40,7 +40,7 @@ void breakAndContinue(void)
 {
   setRunoutAlarmFalse();
   clearCmdQueue();
-  Serial_Puts(SERIAL_PORT, "M108\n");
+  Serial_Puts(SERIAL_PORT, "M108\n"); // M108 stops Marlin waiting for heaters in M109, M190, M303
 }
 
 void resumeAndPurge(void)
@@ -336,6 +336,10 @@ void printEnd(void)
   infoPrinting.printing = infoPrinting.pause = false;
   preparePrintSummary();  // update print summary. infoPrinting are used
 
+  //TG 9/25/22 - added this to guarantee spindle and vacuum are turned OFF at end of print abort or complete
+  //note: if send_cancel_gcode is set=1 then those Gcodes will send before getting here, so best to leave that disabled!!
+  disableSpindleandVacuum();
+  
   if (infoSettings.send_end_gcode == 1)
   {
     sendPrintCodes(1);
@@ -399,7 +403,7 @@ void printAbort(void)
       //while (infoHost.printing == true)  // wait for the printer to settle down
       do
       {
-        loopProcess();  // NOTE: it must be executed at leat one time to print the above dialog and avoid a freeze
+        loopProcess();  // NOTE: it must be executed at least one time to print the above dialog and avoid a freeze
       }
       while (infoHost.printing == true);  // wait for the printer to settle down
 
@@ -428,11 +432,11 @@ bool printPause(bool is_pause, bool is_m0pause)
   static bool loopDetected = false;
 
   if (loopDetected)                   return false;
-  if (!infoPrinting.printing)         return false;
-  if (infoPrinting.pause == is_pause) return false;
+  if (!infoPrinting.printing)         return false;   //TG - not Printing??
+  if (infoPrinting.pause == is_pause) return false;   //TG - already Paused??
 
-  loopDetected = true;
-  infoPrinting.pause = is_pause;
+  loopDetected = true;                                //TG - set flag that we came here
+  infoPrinting.pause = is_pause;                      //TG - set pause to input parameter
 
   switch (infoFile.source)
   {
@@ -446,7 +450,7 @@ bool printPause(bool is_pause, bool is_m0pause)
 
     case TFT_UDISK:
     case TFT_SD:
-      if (infoPrinting.pause == true && is_m0pause == false)
+      if (infoPrinting.pause == true && is_m0pause == false)  // are we being put in Pause but not M0 pause?
       {
         while (infoCmd.count != 0) {loopProcess();}
       }
@@ -455,10 +459,10 @@ bool printPause(bool is_pause, bool is_m0pause)
       bool isCoorRelative = coorGetRelative();
       bool isExtrudeRelative = eGetRelative();
 
-      if (infoPrinting.pause)  // pause
+      if (infoPrinting.pause)  // GOING INTO PAUSE
       {
         // restore status before pause
-        // if pause was triggered through M0/M1 then break
+        // if pause was triggered through M0/M1 then pop up Pause message and break
         if (is_m0pause == true)
         {
           infoPrinting.m0_pause = is_m0pause;
@@ -487,12 +491,12 @@ bool printPause(bool is_pause, bool is_m0pause)
         if (isCoorRelative == true)    mustStoreCmd("G91\n");
         if (isExtrudeRelative == true) mustStoreCmd("M83\n");
       }
-      else  // resume
+      else  // RESUMING FROM PAUSE
       {
-        if (infoPrinting.m0_pause == true)
+        if (infoPrinting.m0_pause == true)  // if M0 pause
         {
-          infoPrinting.m0_pause = is_m0pause;
-          breakAndContinue();  // clear the queue and send a break and continue
+          infoPrinting.m0_pause = is_m0pause; // update with entry parameter
+          breakAndContinue();  // clear queue and send a break and continue to end Marlin wait_for_user_response
           break;
         }
 

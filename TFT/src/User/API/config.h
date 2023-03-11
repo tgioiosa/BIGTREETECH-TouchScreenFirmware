@@ -29,6 +29,7 @@ extern "C" {
 #define CONFIG_LCD_POWER_UNIT       "lcd_power_unit:"         //TG 2/4/21
 #define CONFIG_CUTTER_POWER_UNIT    "cutter_power_unit:"      //TG 2/14/21
 #define CONFIG_VACUUM_CTL_PIN       "vacuum_ctl_pin:"         //TG 2/17/21
+#define CONFIG_SHOULD_M0_PAUSE      "should_M0_pause:"        //TG 10/3/22
 
 //-----------------------------Z min Touch Plate              //TG 1/12/20 new
 #define CONFIG_TOUCHPLATE_ON        "touchplate_on:"          //TG 1/12/20 new 
@@ -53,6 +54,7 @@ extern "C" {
 #define CONFIG_PERSISTENT_TEMP        "persistent_info:"
 #define CONFIG_LIST_MODE              "files_list_mode:"
 #define CONFIG_ACK_NOTIFICATION       "ack_notification:"
+#define CONFIG_NOTIFICATION_M117      "notification_m117:"  //TG 8/1/22 added
 #define CONFIG_EMULATE_M600           "emulate_m600:"
 //-----------------------------Marlin Mode Settings (only for TFT24_V1.1 & TFT28/TFT35/TFT43/TFT50/TFT70_V3.0)
 #define CONFIG_MODE                   "default_mode:"

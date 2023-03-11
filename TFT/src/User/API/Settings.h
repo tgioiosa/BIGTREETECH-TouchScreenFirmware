@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
@@ -21,12 +22,12 @@ typedef enum
 // Config version support
 // change if new elements/keywords are added/removed/changed in the configuration.h Format YYYYMMDD
 // this number should match CONFIG_VERSION in configuration.h
-#define CONFIG_SUPPPORT 20210927
+#define CONFIG_SUPPPORT 20221015        //TG 9/25/22 updated
 
 #define FONT_FLASH_SIGN       20210829  //(YYYYMMDD) change if fonts require updating
-#define CONFIG_FLASH_SIGN     20210927  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		//TG 1/12/20 updated
-#define LANGUAGE_FLASH_SIGN   20210927  //(YYYYMMDD) change if any keyword(s) in language pack is added or removed	//TG 1/12/20 updated
-#define ICON_FLASH_SIGN       20210829  //(YYYYMMDD) change if any icon(s) is added or removed						//TG 1/12/20 updated
+#define CONFIG_FLASH_SIGN     20221015  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		//TG 10/03/22 updated
+#define LANGUAGE_FLASH_SIGN   20221015  //(YYYYMMDD) change if any keyword(s) in language pack is added or removed	//TG 7/29/22 updated
+#define ICON_FLASH_SIGN       20221015  //(YYYYMMDD) change if any icon(s) is added or removed						//TG 7/29/22 updated
 
 #define FONT_CHECK_SIGN       (FONT_FLASH_SIGN + WORD_UNICODE)
 #define CONFIG_CHECK_SIGN     (CONFIG_FLASH_SIGN + STRINGS_STORE_ADDR)
@@ -103,6 +104,7 @@ typedef struct    // defines storage for all settings THAT CAN SAVE/RECALL FROM 
   uint8_t  cutter_disp_unit;    //TG 2/14/21
   uint8_t  cutter_power_unit;   //TG 2/14/21 new
   uint8_t  vacuum_ctl_pin;      //TG 2/17/21 new
+  uint8_t  should_M0_pause;     //TG 10/3/22 new
 
 // General Settings  
   uint16_t title_bg_color;
@@ -122,6 +124,7 @@ typedef struct    // defines storage for all settings THAT CAN SAVE/RECALL FROM 
   uint8_t persistent_info;
   uint8_t file_listmode;
   uint8_t ack_notification;
+  uint8_t notification_m117;    //TG 8/1/22
   uint8_t emulate_m600;
 
   // Marlin Mode Settings
@@ -275,8 +278,25 @@ typedef struct
   uint8_t long_filename_support;
   uint8_t babyStepping;
   uint8_t softwareEndstops;
+  int8_t active_workspace;   //TG 10/4/22 - added setting for active workspace
 } MACHINESETTINGS;
 
+typedef struct
+{
+  uint8_t PIDFLAG;
+  uint8_t Reset_Flag;
+  uint8_t Display_Page;
+  uint8_t PID_Speed;
+  uint8_t Data_Interval;
+  uint8_t PID_Interval;
+  float K[3];               // for Kp, Ki, Kd
+  uint8_t Update_EEPROM;
+  uint8_t Reload_Preset;
+  uint16_t EE_chksum;
+  } __attribute__ ((packed)) AVRINFOTYPE;
+
+extern AVRINFOTYPE AVRInfoBlock;
+extern AVRINFOTYPE AVRInfoBlockOrg;
 extern SETTINGS infoSettings;   //TG all settings saved in EEPROM
 extern MACHINESETTINGS infoMachineSettings;
 
@@ -300,6 +320,7 @@ void setupMachine(void);
 float flashUsedPercentage(void);
 void checkflashSign(void);
 bool getFlashSignStatus(int index);
+
 
 #ifdef __cplusplus
 }

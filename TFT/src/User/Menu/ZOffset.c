@@ -58,13 +58,13 @@ void zOffsetDrawValue(bool status, float val)
 
 void zOffsetSetMenu(bool probeOffset)
 {
-  probeOffsetMenu = probeOffset;
+  probeOffsetMenu = probeOffset;    //TG set probeOffsetMenu to true or false
 }
 
-void menuZOffset(void)
+void menuZOffset(void)    //TG this menu can use HomeOffsetMenu or ProbeOffsetMenu, depending on probeOffsetMenu(set by calling zOffsetSetMenu)
 {
-  ITEM itemZOffsetSubmenu[ITEM_Z_OFFSET_SUBMENU_NUM] = {
-    // icon                        label
+  ITEM itemZOffsetSubmenu[ITEM_Z_OFFSET_SUBMENU_NUM] = {  //TG - this is a submenu of icons for zOffsetItems.items[KEY_ICON_6], which gets toggled
+    // icon                        label                         by pressing the NEXT button(KEY_ICON_5)
     {ICON_01_MM,                   LABEL_01_MM},
     {ICON_RESET_VALUE,             LABEL_RESET},
     {ICON_EEPROM_SAVE,             LABEL_SAVE},
@@ -100,7 +100,8 @@ void menuZOffset(void)
   float now, z_offset;
   float unit;
   float ablState;
-  bool (* offsetGetStatus)(void);                       // get current status
+  //TG - these are a bunch of function pointers, used to be able to be pointed to different functions for HomeOffsetMenu or ProbeOffsetMenu
+  bool (* offsetGetStatus)(void);                       // get current status     
   void (* offsetEnable)(bool, float);                   // enable Z offset
   void (* offsetDisable)(void);                         // disable Z offset
   float (* offsetDecreaseValue)(float);                 // decrease current Z offset
@@ -116,7 +117,7 @@ void menuZOffset(void)
     storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 S0\n" : "G29 S2\n");
 
   if (probeOffsetMenu)
-  { // use Probe Offset menu
+  { // use Probe Offset menu, set function pointers to probeOffset functions
     zOffsetItems.title.index = LABEL_PROBE_OFFSET;
     offsetGetStatus = probeOffsetGetStatus;
     offsetEnable = probeOffsetEnable;
@@ -128,7 +129,7 @@ void menuZOffset(void)
     offsetUpdateValueByEncoder = probeOffsetUpdateValueByEncoder;
   }
   else
-  { // use Home Offset menu
+  { // use Home Offset menu, set function pointers to homeOffset functions
     zOffsetItems.title.index = LABEL_HOME_OFFSET;
     offsetGetStatus = homeOffsetGetStatus;
     offsetEnable = homeOffsetEnable;

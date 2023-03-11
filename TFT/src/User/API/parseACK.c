@@ -69,7 +69,7 @@ static char ack_seen(const char * str)  //TG return true if *str found in dmaL2c
   return false;
 }
 
-static bool ack_continue_seen(const char * str)
+static bool ack_continue_seen(const char * str) //TG continues at point after last ack_seen index
 {
   uint16_t i;
   for (; ack_index < ACK_MAX_SIZE && dmaL2Cache[ack_index] != 0; ack_index++)
@@ -85,6 +85,7 @@ static bool ack_continue_seen(const char * str)
   return false;
 }
 
+//TG return true only if *str exactly equals the entire dmaL2Cache
 static bool ack_cmp(const char *str)
 {
   uint16_t i;
@@ -228,6 +229,7 @@ void syncL2CacheFromL1(uint8_t port)  // copies dmaL1Data to dmaL2Cache until ne
 //process M0 message strings correctly. If there are problems with it not
 //working refer to this same code (hostActionCommands(void)) in V26 where
 //I modified it to work with V26.
+//Get here from parseAck when "//action:" has been seen
 void hostActionCommands(void)
 {
   char *find = strchr(dmaL2Cache + ack_index, '\n');
@@ -235,8 +237,13 @@ void hostActionCommands(void)
 
   if (ack_seen(":notification "))
   {
-   
-	statusScreen_setMsg((uint8_t *)echomagic, (uint8_t *)dmaL2Cache + ack_index);  // always display the notification on status screen
+    strcpy(hostAction.prompt_begin, dmaL2Cache + ack_index);  //TG -copy notification message text for later use in ":prompt_begin"
+	  statusScreen_setMsg((uint8_t *)echomagic, (uint8_t *)dmaL2Cache + ack_index);  // always display the notification on status screen
+
+  if (infoSettings.notification_m117 == ENABLED)    //TG 8/1/22 added
+    {
+      addNotification(DIALOG_TYPE_INFO, (char*)echomagic, (char*)dmaL2Cache + ack_index, false);
+    }  
 
     if (infoMenu.menu[infoMenu.cur] != menuStatus)  // don't show it when in menuStatus
     {
@@ -246,7 +253,8 @@ void hostActionCommands(void)
         addToast(DIALOG_TYPE_INFO, dmaL2Cache + index);
     }
   }
-  else if (ack_seen(":paused") || ack_seen(":pause"))
+  //TG was else if
+  if (ack_seen(":paused") || ack_seen(":pause"))
   {
     // pass value "false" to let Marlin report when the host is not
     // printing (when notification ack "Not SD printing" is caught)
@@ -261,10 +269,24 @@ void hostActionCommands(void)
   {
     setPrintAbort();
   }
-  else if (ack_seen(":prompt_begin "))
+  //TG was else if
+  if (ack_seen(":prompt_begin "))
   {
-    strcpy(hostAction.prompt_begin, dmaL2Cache + ack_index);
-    hostAction.button = 0;
+    //TG 3/17/21 added if *hostAction.begin is empty just copy action:prompt_begin text as message to display
+    //but if there is already a msg from action:notification, append the prompt_begin text to it on new line
+    //This allows the notification text for an M0 command to be displayed.
+    if(*hostAction.prompt_begin == '\0') // will not be empty if there was a previous notification text
+    {
+        strcpy(hostAction.prompt_begin, dmaL2Cache + ack_index);  // only show "M0 Stop" for example
+    }
+    else
+    {
+      char *replace = strchr(hostAction.prompt_begin, '\r');      // replace carriage return with newline
+      *replace = '\n';
+      strcat(hostAction.prompt_begin, dmaL2Cache + ack_index);    // add the "M0 Stop" after the notification Text
+    }
+
+    hostAction.button = 0;  // 0 = show message
     hostAction.prompt_show = true;
 
     if (ack_seen("Resuming"))  // resuming from onboard SD or TFT
@@ -303,7 +325,8 @@ void hostActionCommands(void)
       strcpy(hostAction.prompt_button2, dmaL2Cache + ack_index);
     }
   }
-  else if (ack_seen(":prompt_show") && hostAction.prompt_show)
+  //TG was else if
+  if (ack_seen(":prompt_show") && hostAction.prompt_show)
   {
     switch (hostAction.button)
     {
@@ -338,16 +361,17 @@ void hostActionCommands(void)
    After pasring, if the source of the message was not the printer(SERIAL_PORT], echo the dmaL2Cache on to all  
    other active serial ports (up to _UART_CNT which is currently 6).
 */
-void parseACK(void)  // ***** this is the main msg parser for received serial data from host
-
+void parseACK(void)  // ***** this is the main msg parser for RECEIVED serial data from host
 {
-  if (infoHost.rx_ok[SERIAL_PORT] != true) return; //not get response data, nothing was received
+  if (infoHost.rx_ok[SERIAL_PORT] != true) 
+     return; //not get response data, nothing was received
 
   while (dmaL1NotEmpty(SERIAL_PORT))
   {
     bool avoid_terminal = false;
     syncL2CacheFromL1(SERIAL_PORT);  // copies dmaL1Data to dmaL2Cache until newline character
     infoHost.rx_ok[SERIAL_PORT] = false;
+
     if (infoHost.connected == false) //not connected to Marlin yet, keep looking for @, T, T0, or B in message
     {
       // parse error information even though not connected to printer
@@ -395,6 +419,7 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
     }
 
     // Process Onboard sd Gcode command response
+    //TG only if using resetRequestCommandInfo() to wait for a response
 
     if (requestCommandInfo.inWaitResponse)
     {
@@ -440,13 +465,14 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
     }
     // Onboard sd Gcode command response end
 
-    if (ack_cmp("ok\n"))
+    
+    if (ack_cmp("ok\n"))    //TG ok\n seen and nothing else?, don't parse
     {
       infoHost.wait = false;
     }
     else
     {
-      if (ack_seen("ok"))
+      if (ack_seen("ok"))   //TG at least one "ok" and possibly other strings seen?
         infoHost.wait = false;
 
       //----------------------------------------
@@ -479,6 +505,18 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
         if (ack_seen("S0:")) {   //TG 2/20/21 added this to read actual speed from Marlin RPM sensor
            spindleSetCurSpeed(0,ack_second_value() + 0.5f);
            //drawSingleLiveIconLine();  //TG 2/21/21 update the StatusScreen spindle speed immediately
+        }
+
+        //TG 10/4/22 - parse and store WCS from Temperature AutoReport - modified Marlin AutoReportTemp::report()
+        // to send this at end of line (can also use G39 to get active workspace and G39 T to get all worspaces).      
+        if (ack_seen("WCS:"))
+        {
+          if (infoMachineSettings.active_workspace != ack_value())
+          { 
+            infoMachineSettings.active_workspace = ack_value();
+            nextWCSupdate = true;
+            //infoHost.wait = false;
+          }
         }
         avoid_terminal = !infoSettings.terminalACK;
         updateNextHeatCheckTime();
@@ -748,24 +786,29 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
         caseLightSetBrightness(ack_value());
         caseLightQuerySetWait(false);
       }
-      // parse and store M420 V1 T1, Mesh data (e.g. from Mesh Editor menu)
-      //
-      // IMPORTANT: It must be placed before the following keys:
-      //            1) echo:Bed Leveling
-      //            2) mesh. Z offset:
-      //
-      else if (meshIsWaitingData())
-      {
-        meshUpdateData(dmaL2Cache);  // update mesh data
-      }
-      // parse and store M420 V1 T1 or M420 Sxx or M503, ABL state (e.g. from Bed Leveling menu)
-      else if (ack_seen("echo:Bed Leveling"))
-      {
-        if (ack_seen("ON"))
-          setParameter(P_ABL_STATE, 0, ENABLED);
-        else
-          setParameter(P_ABL_STATE, 0, DISABLED);
-      }
+      
+      //TG 7/17/22 Removed MeshTuner.c and MeshEditor.c, so following commented out
+      //// parse and store M420 V1 T1, Mesh data (e.g. from Mesh Editor menu)
+      ////
+      //// IMPORTANT: It must be placed before the following keys:
+      ////            1) echo:Bed Leveling
+      ////            2) mesh. Z offset:
+      ////
+      //else if (meshIsWaitingData())
+      //{
+      //  meshUpdateData(dmaL2Cache);  // update mesh data
+      //}
+      
+      //TG 7/17/22 Removed BedLeveling.c, so following commented out
+      //// parse and store M420 V1 T1 or M420 Sxx or M503, ABL state (e.g. from Bed Leveling menu)
+      //else if (ack_seen("echo:Bed Leveling"))
+      //{
+      //  if (ack_seen("ON"))
+      //    setParameter(P_ABL_STATE, 0, ENABLED);
+      //  else
+      //    setParameter(P_ABL_STATE, 0, DISABLED);
+      //}
+      
       // parse and store M420 V1 T1 (mesh. Z offset:) or M503 (G29 S4 Zxx), MBL Z offset value (e.g. from Babystep menu)
       else if (ack_seen("mesh. Z offset:") || ack_seen("G29 S4 Z"))
       {
@@ -1095,7 +1138,7 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
 
         infoSetFirmwareName(string, string_end - string_start);  // Set firmware name
 
-        if (ack_seen("MACHINE_TYPE:"))
+       if (ack_seen("MACHINE_TYPE:"))
         {
           string = (uint8_t *)&dmaL2Cache[ack_index];
           string_start = ack_index;
@@ -1248,9 +1291,12 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
             setParameter(P_FILAMENT_SETTING, 0, 0);  // filament_diameter<=0.01 to disable volumetric extrusion
         }
       }
+      
+      //TG******************************* CUSTOM ADDED G Codes ************************************************************************************
+      //*******************************************************************************************************************************************
       //TG 9/24/21 - added this code to check for custom message from spindle speed report, we use it to sync menuSpindle() in Spindle.c
       //if Marlin got a Spindle M3/4/5 command from it's USB serial port (like with Repetier Host or Pronterface). Marlin has been modified
-      //so that REPORTSPINDLECHANGE will output the message "Spindle Pn A:actual speed T:target speed" on M3/4/5 receipt.
+      //at set_spindle_speed() so that report_spindle_speed() will output the message "Spindle Pn A:actual speed T:target speed" on M3/4/5 receipt.
       else if (ack_seen("Spindle")){                  
         if (ack_seen("T:")){
           actTarget = ack_value() + 0.5f;                                     // get the new target speed
@@ -1277,20 +1323,124 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
           }
          
         } // end of 9/24/21 TG addition 
-
       }
-      //TG - 10/3/21 - added this code to read initial value of spindle_use_pid stored in Marlin
+
+      //TG - 10/3/21 - this code reads initial value at boot for spindle_use_pid stored in Marlin
       //  the Marlin setting takes precedence over the TFT setting, so update TFT if they differ
-      //  Marlin's setting will be changed when the FeatureSettings menu changes the TFT setting,
-      //  but Marlin will not store it to EEPROM automatically. Use M500 to save to EPROM.
-      else if(ack_seen("M7979")){
-        uint8_t marlin_value;
-        marlin_value = ack_value();
-        if(marlin_value != infoSettings.spindle_use_pid){   // if values differ, update TFT and store to TFT EEPROM
-          infoSettings.spindle_use_pid = ack_value();
-          storePara();
+      //  Marlin's setting will be updated when the TFT settings change, but Marlin will not store
+      //  them to EEPROM automatically. Use M500 to save to EPROM.
+      
+      // New Marlin Commands TFT <> Marlin exchange
+      // M7979  - spindle_use_pid flag, pid on/off
+      // M7980  - send reset AVR cmd to Marlin
+      // M7981  - P,I,D constants Kp, Ki, Kd
+      // M7982  - send AVR LCD display page # to Marlin
+      // M7984  - change the selected AVR PID speed
+      // M7985  - Vacuum Enable state changed in Marlin
+      // M7986  - Sent during Printing Stock Top Z-axis value
+      // M7900  - receive/send AVRInfoBlock.PIDFLAG, AVRInfoBlock.Reset_Flag, AVRInfoBlock.Display_Page, AVRInfoBlock.PID_Speed,
+      //                       AVRInfoBlock.Update_EEPROM, AVRInfoBlock.EE_chksum, AVRInfoBlock.dummy_pad_byte
+            // receive entire AVRInfoBlock
+#ifdef USING_AVR_TRIAC_CONTROLLER
+      else if(ack_seen("M7900")){
+        if(ack_seen("F")) {
+                            AVRInfoBlock.PIDFLAG = ack_value(); 
+          if(ack_seen("R")) AVRInfoBlock.Reset_Flag = ack_value(); 
+          if(ack_seen("N")) AVRInfoBlock.Display_Page = ack_value(); 
+          if(ack_seen("S")) AVRInfoBlock.PID_Speed= ack_value();
+          if(ack_seen("U")) AVRInfoBlock.Update_EEPROM = ack_value(); 
+          if(ack_seen("C")) AVRInfoBlock.EE_chksum = ack_value(); 
+          if(ack_seen("B")) AVRInfoBlock.Reload_Preset = ack_value();
+          if(ack_seen("D")) AVRInfoBlock.Data_Interval = ack_value();
+          if(ack_seen("P")) AVRInfoBlock.PID_Interval = ack_value();
+        }
+        msg_complete |= comp_7900;  // set flag on any M7900 ack_seen
+      }
+      else if(ack_seen("M7979 OK")){
+        msg_complete |= comp_7979;
+      }
+      
+      else if(ack_seen("M7980 OK")){
+        msg_complete |= comp_7980;
+      }
+
+      // respond to a M7981 PID constants msg from Marlin (this is Marlin's response to a M7981 R(equest) msg from TFT)
+      // the M7981 R msgs are generated in the avrTriac.c menu system
+      else if(ack_seen("M7981")){
+        if(ack_seen("P")) {
+                            AVRInfoBlock.K[0] = ack_value();
+          if(ack_seen("I")) AVRInfoBlock.K[1] = ack_value();
+          if(ack_seen("D")) AVRInfoBlock.K[2] = ack_value();
+        }
+        msg_complete |= comp_7981;    // set flag on any M7981 ack_seen
+      } 
+            
+      else if(ack_seen("M7982 OK")){
+         msg_complete |= comp_7982;
+      }
+      
+      else if(ack_seen("M7983 OK")){
+         msg_complete |= comp_7983;   
+      }
+
+      else if(ack_seen("M7984 OK")){
+         msg_complete |= comp_7984;   
+      }
+
+      else if(ack_seen("M7985")){
+        if(ack_seen("S")){
+          volatile uint8_t vv = ack_value();
+          vacuumState = vv>0 ? (vacuumState | 1) : (vacuumState & ~1); // adjust state
         }
       }
+#endif
+      // this one is ALWAYS needed for spindle in ALL contoller cases
+      else if(ack_seen("M7986")){   
+        if(ack_seen("T")){
+          stockTopZaxis = ack_value();  // get value
+          if(ack_seen("Z"))
+            maxNativeMachineZ = ack_value();  // get value
+        }
+      }
+
+#ifdef USING_VFD_CONTROLLER
+      else if(ack_seen("M7987")){   //TG 12/23/22 added for receiving VFD Input Registers, status, and decimal precision 
+        if(ack_seen("OF")) {
+                           inputReg.freq_out = ack_value(); 
+        if(ack_seen("SF")) inputReg.freq_set = ack_value(); 
+        if(ack_seen("OC")) inputReg.current_out = ack_value(); 
+        if(ack_seen("OR")) inputReg.speed_out= ack_value();
+        if(ack_seen("DC")) inputReg.dc_voltage = ack_value(); 
+        if(ack_seen("AC")) inputReg.ac_voltage = ack_value(); 
+        if(ack_seen("TP")) inputReg.temperature = ack_value();
+        if(ack_seen("LF")) inputReg.fault_code = ack_value();
+        if(ack_seen("RH")) inputReg.total_hours= ack_value();
+        if(ack_seen("ST")) vfdStatus = ack_value();
+        if(ack_seen("DP")) vfdP = ack_value();
+        }
+        // no msg_complete set here since M7987 is never requested, it comes automatically from Marlin
+      }
+  
+      else if(ack_seen("M7988")){   //TG 12/23/22 added added for receiving VFD S/W ver, CPU ver, F164, and F165
+        if(ack_seen("SW")) {                            
+                           sw_ver = ack_value();  
+        if(ack_seen("CP")) cpu_ver = ack_value(); 
+        if(ack_seen("BR")) f164 = ack_value(); 
+        if(ack_seen("FT")) f165 = ack_value();
+        }
+        msg_complete |= comp_7988;  // this is here since TFT requests for an M7988 from Marlin
+      }
+
+      else if(ack_seen("M7989")){   //TG 12/23/22 added added for receiving VFD present flag
+        if(ack_seen("VFD")) VFDpresent = ack_value();
+        msg_complete |= comp_7989;  // this is here since TFT requests for an M7989 from Marlin
+      }
+      
+
+#endif  // #ifdef USING_VFD_CONTROLLER
+
+      //TG******************************* END CUSTOM ADDED G Codes ********************************************************************************
+      //*******************************************************************************************************************************************
     }
 
   parse_end:
@@ -1318,19 +1468,46 @@ void parseACK(void)  // ***** this is the main msg parser for received serial da
   } // while dma not empty
 }
 
-void parseRcvGcode(void)
+/*//TG           name          device    connected to      index
+*               -----------   --------  ---------------   -----
+*               SERIAL_PORT_2 _USART1   WiFi expansion    0
+*               SERIAL_PORT   _USART2   printer(Marlin)   1 
+*               SERIAL_PORT_3 _USART3   ??                2
+*               SERIAL_PORT_4 _UART4    ??                3
+*                             _UART5    ??                4
+*/
+
+char* SPort[] = {"SERIAL2 WiFi", "SERIAL1 Prtr", "SERIAL3", "SERIAL4", "SERIAL5", "Unknown"};
+void parseRcvGcode(void)  // should never get here as TFT only uses USART_2
 {
   #ifdef SERIAL_PORT_2    // the other serial port (USB) not the printer
     uint8_t i = 0;
+    uint8_t s = 0;
+
     for (i = 0; i < _UART_CNT; i++)
     {
-      if (i != SERIAL_PORT && infoHost.rx_ok[i] == true)
+      if ((i != SERIAL_PORT) & (infoHost.rx_ok[i] == true))
       {
         infoHost.rx_ok[i] = false;
         while (dmaL1NotEmpty(i))
         {
           syncL2CacheFromL1(i);
           storeCmdFromUART(i, dmaL2Cache);
+
+          char TMsg[] = "Got Command from ";
+          strcat(TMsg, SPort[i]);
+          strcat(TMsg,"!\n");
+          s = strlen(infoCmd.queue[infoCmd.index_r].gcode);
+          if(strlen(infoCmd.queue[infoCmd.index_r].gcode) > 25) {s = 25;}  // limit to 25 chars
+          strncat(TMsg, infoCmd.queue[infoCmd.index_r].gcode , s);          // append to string
+          strncat(TMsg, "\n\000",6);                                        // CR and terminator
+          
+          // remove unwanted cmd from queue so it doesn't overflow
+          infoCmd.count--;
+          infoCmd.index_r = (infoCmd.index_r + 1) % CMD_MAX_LIST;
+          
+          setDialogText((u8*)"ALERT!", (u8*)TMsg, LABEL_CONFIRM, LABEL_BACKGROUND);     // sets the strings
+          showDialog(DIALOG_TYPE_INFO, NULL, NULL, NULL);  // draws the dialog box
         }
       }
     }

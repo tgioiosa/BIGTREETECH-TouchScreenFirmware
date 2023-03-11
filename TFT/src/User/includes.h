@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #ifndef _INCLUDES_H_
 #define _INCLUDES_H_
 
@@ -107,9 +108,9 @@
 #include "MachineSettings.h"
 #include "FeatureSettings.h"
 #include "SendGcode.h"
-#include "Leveling.h"
-#include "BedLeveling.h"
-#include "BedLevelingLayer2.h"
+//#include "Leveling.h"           //TG 7/17/22  removing BedLeveling module         
+//#include "BedLeveling.h"        //TG 7/17/22  removing BedLeveling module
+//#include "BedLevelingLayer2.h"  //TG 7/17/22  removing BedLeveling module
 #include "MBL.h"
 #include "ABL.h"
 #include "BLTouch.h"
@@ -125,12 +126,18 @@
 //#include "Pid.h"              //TG 2/14/21 removed for CNC
 //#include "TuneExtruder.h"     //TG 2/10/21 removed for CNC
 #include "ConnectionSettings.h"
-#include "MeshTuner.h"
-#include "MeshEditor.h"
+//#include "MeshTuner.h"        //TG 7/17/22  removing MeshTuner module
+//#include "MeshEditor.h"       //TG 7/17/22  removing MeshEditor module
 #include "CaseLight.h"
 
 #include "Laser.h"              //TG 1/12/20 new
 #include "Spindle.h"            //TG 2/4/21 new
+#ifdef USING_AVR_TRIAC_CONTROLLER
+  #include "avrTriac.h"           //TG 7/17/22 new
+#endif
+#ifdef USING_VFD_CONTROLLER
+  #include "vfd.h"              //TG 12/23/22 new
+#endif
 
 //#include "SpindleSpeed.h"       //TG 8/31/21 not needed unless trying to use spindle on fan PWM
 #include "Vacuum.h"        //TG 1/12/20 new

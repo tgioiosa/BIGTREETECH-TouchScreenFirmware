@@ -1,3 +1,4 @@
+//TG MODIFIED*****
 #include "includes.h"
 #include "More.h"
 
@@ -15,7 +16,7 @@ MENUITEMS moreItems = {  //TG removed const so this menu can be dynamically chan
     #ifdef LOAD_UNLOAD_M701_M702
       {ICON_LOAD,                 LABEL_LOAD_UNLOAD_SHORT}, //TG 8/21/21 NEED TO CHECK THIS ICON!!
     #else
-      {ICON_GCODE,                   LABEL_TERMINAL},
+      {ICON_MORE,                LABEL_MORE},
     #endif
     {ICON_BACK,                    LABEL_BACK},
   }
@@ -48,7 +49,7 @@ void menuMore(void)
     switch (key_num)
     {
       case KEY_ICON_0:	//TG modified this
-        if (isPrinting() && !isPaused())  // need paused before extrude
+        if (isPrinting() && !isPaused())  // need paused before spindle
         {
           setDialogText(LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL);
           showDialog(DIALOG_TYPE_ALERT, isPauseExtrude, NULL, NULL);
@@ -91,7 +92,7 @@ void menuMore(void)
             infoMenu.menu[++infoMenu.cur] = menuLoadUnload;
           }
         #else
-          infoMenu.menu[++infoMenu.cur] = menuTerminal;
+          infoMenu.menu[++infoMenu.cur] = menu2More;  //TG 10/12/22 this was menuTerminal
         #endif
         break;
 

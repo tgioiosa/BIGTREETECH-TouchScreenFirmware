@@ -1,6 +1,6 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
-#define CONFIG_VERSION 20210927
+#define CONFIG_VERSION 20221015
 
 //===========================================================================
 //============================= General Settings ============================
@@ -77,6 +77,25 @@
 //===========================================================================
 //=========================== Marlin Mode Settings ==========================
 //===========================================================================
+
+/**
+ * Marlin can be using one of three spindle control methods, be sure to select the correct one below.
+ * note: regardless of spindle control method, the TFT sends target speed to Marlin via M3,4,5 commands.
+ *       (an exception is if Marlin receives those from another source like Repetier or Octopi, in that
+ *        case TFT gets a message "Spindle Pn A:actual speed T:target speed" from Marlin and uses it)
+ *       Also, the TFT always gets the Actual current speed from the periodic Marlin "S0:" command.
+ *
+ * Therefore the only reason for the different defines below is to insert or remove custom code
+ * that might be needed by each controller method (for example the custom Triac Menu buttons, etc.)
+ **/
+
+// Enable if Marlin is using AVR Triac Controller for spindle control
+//#define USING_AVR_TRIAC_CONTROLLER
+// Enable if Marlin is using a VFD Controller for spindle control
+#define USING_VFD_CONTROLLER
+// Enable if Marlin is using built-in PWM for spindle control
+//#define USING_MARLIN_PWM_CONTROLLER
+
 
 /**
  * Default UI Mode
@@ -156,8 +175,9 @@
 #define HEAT_WAIT_CMD    {"M109 T0", "M109 T1", "M190",    "M191"};         //TODO change for RPM reads
 
 #define TOOL_CHANGE      {"T0",      "T1",      "T2",      "T3"}
-#define EXTRUDER_ID      {"E0",      "E1",      "E2",      "E3"}
-
+#if EXTRUDER_NUM > 0  //TG 9/1/22 added this
+  #define EXTRUDER_ID      {"E0",      "E1",      "E2",      "E3"}
+#endif
 // Prevent extrusion if the temperature is below set temperature
 #define PREVENT_COLD_EXTRUSION_MINTEMP 180
 
@@ -341,7 +361,7 @@
  * FILAMENT_LOAD_UNLOAD_GCODES option on Marlin configuration_adv.h need to be uncommented.
  * Adds a submenu to the movement menu for selecting load and unload actions.
  */
-#define LOAD_UNLOAD_M701_M702
+//#define LOAD_UNLOAD_M701_M702   //TG 10/12/22 commented out not needed, when out menuMore will have menuTriac instead of menuUnload
 
 
 //===========================================================================
@@ -445,6 +465,11 @@
  */
 #define ACK_NOTIFICATION_STYLE 1  // Default: 1
 
+/** M0 Pause Handling
+* Control Pause Popup display on M0 command
+*   Options: [enable: 1, disable: 0]
+*/
+#define SHOULD_M0_PAUSE 1
 
 /**
  * Mesh Editor Keyboard on left side
@@ -611,13 +636,16 @@
  * Enable Start & End G-code in SETTINGS -> FEATURE menu.
  */
 // Start G-code - run this G-code before starting print
-#define PRINT_START_GCODE "G28 XY R10\n"  // Raise Z 10mm before homing X & Y
+#define PRINT_START_GCODE "G28\n"  // home XYZ (MPCNC Home Z is always up to ZMAX)
 
 // End G-code - run this G-code after finishing print
-#define PRINT_END_GCODE "G90\nG1 E-4\nG92 E0\nM18\n"  // Switch to absolute positioning, reduce filament pressure by
-                                                      // performing small retract, reset extruder position, disable steppers
+// Raise Z 20mm and home XY, switch to absolute positioning, reduce filament pressure by
+// performing small retract, reset extruder position, and fans OFF
+#define PRINT_END_GCODE "G28 XY R20\nG90\nG1 E-4\nG92 E0\nM107\n"  
+                                                      
 
 // Cancel G-code - run this G-code after canceling print
-#define PRINT_CANCEL_GCODE "M104 S0\nM140 S0\nG28 XY R10\nM107\nM18\n"  // Home XY and raise Z 10mm
+//TG 5/5/21 no hotend don't send M104, no Bed don't send M140, leave steppers ON, no M18
+#define PRINT_CANCEL_GCODE "G28 XY R20\nM107\n"  // Home XY and raise Z 20mm
 
 #endif
