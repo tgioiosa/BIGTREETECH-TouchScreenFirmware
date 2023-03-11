@@ -201,10 +201,11 @@ void updateNextHeatCheckTime(void)
   nextHeatCheckTime = OS_GetTimeMs() + heat_update_seconds * 1000;
 }
 
-void loopCheckHeater(void)
+void loopCheckHeater(void) //TG this gets called from loopBackEnd()
 {
   // Send M105 to query the temperatures, if motherboard does not supports M155 (AUTO_REPORT_TEMPERATURES) feature
   // to automatically report the temperatures.
+  //TG This gets sent the very first time the backEnd loop runs after startup so first code sent to printer is M105
   if (!infoMachineSettings.autoReportTemp)
   {
     do

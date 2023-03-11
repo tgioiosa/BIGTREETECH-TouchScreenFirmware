@@ -21,7 +21,7 @@ uint16_t foundkeys = 0;
 
 CONFIGFILE * CurConfigFile;
 char * cur_line = NULL;
-static uint16_t c_index = 0;
+static uint16_t c_index = 0;  //TG remember....static also means only visible in this file!
 
 uint8_t customcode_index = 0;
 uint8_t customcode_good[CUSTOM_GCODES_COUNT];

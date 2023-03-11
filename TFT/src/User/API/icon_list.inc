@@ -16,6 +16,7 @@ X_ICON (EXTRUDE)
 X_ICON (FAN)
 X_ICON (SETTINGS)
 X_ICON (LEVELING)
+X_ICON (LEVEL_CORNER)
 X_ICON (Z_FADE)
 X_ICON (INC)
 X_ICON (DEC)
@@ -143,5 +144,9 @@ X_ICON (CASE_LIGHT)
 X_ICON (Z_ALIGN)
 X_ICON (MESH_EDITOR)
 X_ICON (BRIGHTNESS)
-
+X_ICON (MESH_VALID)
+X_ICON (TGMENU)             //TG 1/12/20 new
+X_ICON (Z_0)
+X_ICON (Z_300)
+X_ICON (M503)               //TG 1/12/20 new
 //after changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

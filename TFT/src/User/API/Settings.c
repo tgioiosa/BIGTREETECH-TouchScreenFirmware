@@ -263,10 +263,10 @@ void checkflashSign(void)
   bool statuslang = getFlashSignStatus(lang_sign);
   bool statusicon = getFlashSignStatus(icon_sign);
 
-  if (!statuslang)
+  if (!statuslang)  								// if language signs don't match
     infoSettings.language = LANG_DEFAULT;
 
-  if (!statusfont || !statusicon || !statusconfig)
+  if (!statusfont || !statusicon || !statusconfig) 	// if any of these differ?
   {
     int ypos = BYTE_HEIGHT + 5;
     GUI_Clear(BLACK);
@@ -299,7 +299,7 @@ void checkflashSign(void)
     ypos += BYTE_HEIGHT;
     GUI_DispStringInRectEOL(10, ypos + 10, LCD_WIDTH, LCD_HEIGHT, (uint8_t *)"Insert the SD card with the required\n"
                                                                              "files and press the reset button\nto update.");
-    while (1);
+    while (1);  // loop forever - requires hard reset
   }
 }
 

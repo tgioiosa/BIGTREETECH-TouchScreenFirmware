@@ -396,14 +396,11 @@ void printAbort(void)
       setDialogText(LABEL_SCREEN_INFO, LABEL_BUSY, LABEL_BACKGROUND, LABEL_BACKGROUND);
       showDialog(DIALOG_TYPE_INFO, NULL, NULL, NULL);
 
-      //while (infoHost.printing == true)  // wait for the printer to settle down
       do
       {
-        loopProcess();  // NOTE: it must be executed at leat one time to print the above dialog and avoid a freeze
+        loopProcess();  // NOTE: it is executed at leat one time to print the above splash screen
       }
       while (infoHost.printing == true);  // wait for the printer to settle down
-
-      infoMenu.cur--;
       break;
 
     case TFT_UDISK:
@@ -544,8 +541,11 @@ void setPrintHost(bool isPrinting)
 
 void setPrintAbort(void)
 {
-  // if printing from onboard SD or remote host
+  // always reset the flag reporting the host is printing (even if the TFT didn't intercept it yet)
+  // due to no further notifications will be sent by the host to notify it is no more printing
   infoHost.printing = false;
+
+  // if printing from onboard SD or remote host
   if (infoPrinting.printing && infoFile.source >= BOARD_SD)
   {
     if (infoMachineSettings.autoReportSDStatus == 1)

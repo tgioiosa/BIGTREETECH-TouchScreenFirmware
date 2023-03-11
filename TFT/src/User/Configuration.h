@@ -1,6 +1,6 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
-#define CONFIG_VERSION 20210311
+#define CONFIG_VERSION 20210629     //TG - this must match the value in Settings.h
 
 //===========================================================================
 //============================= General Settings ============================
@@ -22,7 +22,7 @@
  */
 #define SMART_HOME
 
-// Enable Status Screen
+// Enable Status Screen  //TG 1/12/20 new
 // Enable this to show status screen as the default home screen. Disabling it will show a static menu.
 #define ENABLE_STATUS_SCREEN true  // To enabled: true | To disabled: false (Default: true)
 
@@ -34,7 +34,7 @@
  *
  * Options: [2400: 0, 9600: 1, 19200: 2, 38400: 3, 57600: 4, 115200: 5, 250000: 6, 500000: 7, 1000000: 8]
  */
-#define BAUDRATE 5  // Default: 5
+#define BAUDRATE 6  // Default: 5
 
 /**
  * Default Primary Language (for Touch-Mode only)
@@ -137,9 +137,9 @@
 #define MIXING_EXTRUDER 0  // Default: 0. For mixing_extruder set to 1 (This option turns off autodetection
                            // of the number of extruders)
 
-#define PREHEAT_LABELS   {"PLA", "PETG", "ABS", "WOOD", "TPU", "NYLON"}
-#define PREHEAT_HOTEND   {200,   240,    230,   170,    220,   250}
-#define PREHEAT_BED      {60,    70,     90,    50,     50,    90}
+#define PREHEAT_LABELS   {"PLA", "PETG", "ABS", "TPE", "TPU", "NYLON"}
+#define PREHEAT_HOTEND   {210,   240,    245,   230,    220,   257}
+#define PREHEAT_BED      {65,    78,     100,    50,     50,    75}
 
 #define HEAT_MAX_TEMP    {275,       275,       275,       275,       275,       275,       150,    60}
 #define HEAT_SIGN_ID     {"T0:",     "T1:",     "T2:",     "T3:",     "T4:",     "T5:",     "B:",   "C:"}
@@ -177,9 +177,9 @@
 #define SPEED_XY_FAST   5000
 
 // Default Z speed (mm/min)
-#define SPEED_Z_SLOW   500
-#define SPEED_Z_NORMAL 1000
-#define SPEED_Z_FAST   2000
+#define SPEED_Z_SLOW   300  //TG 6/30/21
+#define SPEED_Z_NORMAL 420  //TG 6/30/21
+#define SPEED_Z_FAST   600  //TG 6/30/21
 
 // Extrude speed (mm/min)
 #define EXTRUDE_SLOW_SPEED     60
@@ -190,9 +190,9 @@
 #define X_MIN_POS   0
 #define Y_MIN_POS   0
 #define Z_MIN_POS   0
-#define X_MAX_POS 235
-#define Y_MAX_POS 235
-#define Z_MAX_POS 250
+#define X_MAX_POS 310	//TG 6/30/21
+#define Y_MAX_POS 310	//TG 6/30/21
+#define Z_MAX_POS 390	//TG 6/30/21
 
 /**
  * Raised Z height for probing

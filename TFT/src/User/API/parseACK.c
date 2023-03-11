@@ -23,7 +23,7 @@ const ECHO knownEcho[] = {
   {ECHO_NOTIFY_NONE, "busy: processing"},
   {ECHO_NOTIFY_NONE, "Now fresh file:"},
   {ECHO_NOTIFY_NONE, "Now doing file:"},
-  {ECHO_NOTIFY_NONE, "Probe Offset"},
+  // {ECHO_NOTIFY_NONE, "Probe Offset"},
   {ECHO_NOTIFY_NONE, "Flow:"},
   {ECHO_NOTIFY_NONE, "echo:;"},                   // M503
   {ECHO_NOTIFY_NONE, "echo:  G"},                 // M503
@@ -134,7 +134,7 @@ void ackPopupInfo(const char *info)
   else if (info == echomagic && infoSettings.ack_notification == 1)
     BUZZER_PLAY(sound_notify);
 
-  // set echo message in status screen
+  // set echo message in status screen, echomagic is char array "echo:"
   if (info == echomagic || info == messagemagic)
   {
     // ignore all messages if parameter settings is open
@@ -162,7 +162,7 @@ void ackPopupInfo(const char *info)
 //  forceIgnore[msgId] = state;
 //}
 
-bool processKnownEcho(void)
+bool processKnownEcho(void) // returns true for known echo msgs found in knownEcho array
 {
   bool isKnown = false;
   uint8_t i;
@@ -202,7 +202,7 @@ bool dmaL1NotEmpty(uint8_t port)
   return dmaL1Data[port].rIndex != dmaL1Data[port].wIndex;
 }
 
-void syncL2CacheFromL1(uint8_t port)
+void syncL2CacheFromL1(uint8_t port) // copies dmaL1Data to dmaL2Cache until newline character
 {
   uint16_t i = 0;
 
@@ -317,6 +317,13 @@ void hostActionCommands(void)
   }
 }
 
+/* 
+   Look for any incoming message in dmaL2Cache(RAM) and then parse each token found (ending with \n) until the
+   UART Rx DMA buffer is empty. Error msgs will be handled if the word "Error:" is seen, but none of the other
+   parsed tokens is processed yet till one these cases are detected: "@" and "T:" or  "@" and "B:" or just "T0:"
+   After pasring, if the source of the message was not the printer(SERIAL_PORT], echo the dmaL2Cache on to all  
+   other active serial ports (up to _UART_CNT which is currently 6).
+*/
 void parseACK(void)
 {
   if (infoHost.rx_ok[SERIAL_PORT] != true) return;  // not get response data
@@ -324,9 +331,9 @@ void parseACK(void)
   while (dmaL1NotEmpty(SERIAL_PORT))
   {
     bool avoid_terminal = false;
-    syncL2CacheFromL1(SERIAL_PORT);
+    syncL2CacheFromL1(SERIAL_PORT); // copies dmaL1Data to dmaL2Cache until newline character
     infoHost.rx_ok[SERIAL_PORT] = false;
-    if (infoHost.connected == false)  // Not connected to printer
+    if (infoHost.connected == false)  //not connected to Marlin yet, keep looking for @, T, T0 in message
     {
       // parse error information even though not connected to printer
       if (ack_seen(errormagic)) ackPopupInfo(errormagic);
@@ -363,7 +370,7 @@ void parseACK(void)
         storeCmd("M115\n");
         storeCmd("M211\n");  // retrieve the software endstops state
       }
-      infoHost.connected = true;
+      infoHost.connected = true; // if we saw any of the above strings in msg, then set connected flag!
     }
 
     // Onboard sd Gcode command response
@@ -426,6 +433,10 @@ void parseACK(void)
       //----------------------------------------
 
       // parse and store temperatures
+      //TG 1/9/20 depending on # extruders/hotends we will see from Marlin:
+      //  0 hotends = no T: or T0:      1 hotend = T: but not T0:     >1 hotend = T: and T0:, T1:, T2:,......
+      //  B: or C: if they are defined will be present
+      //  The heaterID[] array will be adjusted according to HOTEND_NUM size in Configuration.h 
       if ((ack_seen("@") && ack_seen("T:")) || ack_seen("T0:"))
       {
         heatSetCurrentTemp(NOZZLE0, ack_value() + 0.5f);
@@ -658,7 +669,9 @@ void parseACK(void)
         tmpMsg[6] = '\0';
         if (strcmp(tmpMsg, "Mean: ") == 0)
         {
-          sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", (char *)getDialogMsgStr(), ack_value());
+          SetLevelCornerPosition(5, ack_value());
+          SetLevelCornerPosition(0, 5);
+          sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", (char *)getDialogMsgStr(), GetLevelCornerPosition(5));
           setDialogText((u8* )"Repeatability Test", (uint8_t *)tmpMsg, LABEL_CONFIRM, LABEL_BACKGROUND);
           showDialog(DIALOG_TYPE_INFO, NULL, NULL, NULL);
         }
@@ -723,14 +736,22 @@ void parseACK(void)
         else
           setParameter(P_ABL_STATE, 0, DISABLED);
       }
-      // parse and store M420 V1 T1 (mesh. Z offset:) or M503 (G29 S4 Zxx), MBL Z offset value (e.g. from Babystep menu)
+      // parse and store M420 V1 T1 or G29 S0 (mesh. Z offset:) or M503 (G29 S4 Zxx), MBL Z offset value (e.g. from Babystep menu)
       else if (ack_seen("mesh. Z offset:") || ack_seen("G29 S4 Z"))
       {
         setParameter(P_MBL_OFFSET, 0, ack_value());
       }
-      // parse and store M851, Probe Z offset value (e.g. from Babystep menu)
+      // parse and store M851, Probe Z offset value (e.g. from Babystep menu) and X an Y probe Offset for LevelCorner position limit to be fixed see ABL.c
       else if (ack_seen("Probe Offset"))
       {
+        if (ack_seen("X"))
+        {
+          setParameter(P_PROBE_OFFSET, X_STEPPER, ack_value());
+        }
+        if (ack_seen("Y"))
+        {
+          setParameter(P_PROBE_OFFSET, Y_STEPPER, ack_value());
+        }
         if (ack_seen("Z:") || (ack_seen("Z")))
         {
           setParameter(P_PROBE_OFFSET, Z_STEPPER, ack_value());
@@ -745,6 +766,45 @@ void parseACK(void)
       else if (ack_seen("Mesh probing done"))
       {
         mblUpdateStatus(true);
+      }
+      // G30 feedback to get the 4 corners Z value returned by Marlin for LevelCorner function
+      else if (ack_seen("Bed X: "))
+      {
+        float valy = 0;
+        float valx = ack_value();
+        if (ack_seen("Y: ")) valy = ack_value();
+        if ((valx < 100) && (valy < 100))
+        {
+          if (ack_seen("Z: "))
+          {
+            SetLevelCornerPosition(1,ack_value());
+            SetLevelCornerPosition(0, 1);
+          }
+        }
+        else if ((valx > 100) && (valy < 100))
+        {
+          if (ack_seen("Z: "))
+          {
+            SetLevelCornerPosition(2,ack_value());
+            SetLevelCornerPosition(0, 2);
+          }
+        }
+        else if ((valx > 100) && (valy > 100))
+        {
+          if (ack_seen("Z: "))
+          {
+            SetLevelCornerPosition(3,ack_value());
+            SetLevelCornerPosition(0, 3);
+          }
+        }
+        else if ((valx < 100) && (valy > 100))
+        {
+          if (ack_seen("Z: "))
+          {
+            SetLevelCornerPosition(4,ack_value());
+            SetLevelCornerPosition(0, 4);
+          }
+        }
       }
 
       //----------------------------------------
@@ -1138,7 +1198,7 @@ void parseACK(void)
       //----------------------------------------
 
       // parse error messages
-      else if (ack_seen(errormagic))
+      else if (ack_seen(errormagic)) // msg starts with "Error:"
       {
         ackPopupInfo(errormagic);
       }
@@ -1224,16 +1284,16 @@ void parseACK(void)
       }
     }
 
-    if (avoid_terminal != true)
+    if (avoid_terminal != true)  // should we copy the msg to the Gcode Terminal cache?
     {
       terminalCache(dmaL2Cache, TERMINAL_ACK);
     }
   }
 }
 
-void parseRcvGcode(void)
+void parseRcvGcode(void)  //TG this parses received codes from other UART's
 {
-  #ifdef SERIAL_PORT_2
+  #ifdef SERIAL_PORT_2    // the other serial port (USB) not the printer
     uint8_t i = 0;
     for (i = 0; i < _UART_CNT; i++)
     {

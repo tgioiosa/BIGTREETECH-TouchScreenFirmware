@@ -445,7 +445,7 @@ void sendQueueCmd(void)
               sendDequeuedCmd(gcode, avoid_terminal);
 
               mustStoreScript("M105\nM114\nM220\n");
-              storeCmd("M221 D%d\n", heatGetCurrentTool());
+              storeCmd("M221 D%d\n", heatGetCurrentTool());  //TG 4/5/21 fixed argumentto T<index>, was D ?
               ispolling = true;
               return;
             }
@@ -850,12 +850,12 @@ void sendQueueCmd(void)
 
         case 220:  // M220
           if (cmd_seen('S'))
-            speedSetCurPercent(0, cmd_value());
+            speedSetCurPercent(0, cmd_value());  //TG set index 0 Speed
           break;
 
         case 221:  // M221
           if (cmd_seen('S'))
-            speedSetCurPercent(1, cmd_value());
+            speedSetCurPercent(1, cmd_value());  //TG set index 1 Flow
           break;
 
         #ifdef BUZZER_PIN

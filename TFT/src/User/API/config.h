@@ -11,7 +11,7 @@ extern "C" {
 #include "ff.h"
 
 //after changing/adding/removing a keyword, change the CONFIG_FLASH_SIGN in Settings.h and PARA_SIGN in flashStore.c
-
+//TG These strings are what is searched for in the config.ini file set by the user, these strings map to the defines
 #define LINE_MAX_CHAR                 100
 #define CONFIG_FILE_PATH              "0:config.ini"
 #define LANG_FILE_PATH                "0:language.ini"

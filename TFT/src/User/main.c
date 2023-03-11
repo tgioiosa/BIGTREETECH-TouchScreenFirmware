@@ -34,20 +34,20 @@ void Hardware_GenericInit(void)
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);  //disable JTAG & SWD
   #endif
 
-  #if defined(MKS_32_V1_4) || defined (MKS_28_V1_0)
+  #if defined(MKS_TFT32_V1_3) ||defined(MKS_TFT32_V1_4) || defined (MKS_TFT28_V3_0) || defined (MKS_TFT28_V4_0)
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
     GPIO_PinRemapConfig(GPIO_Remap_USART2, ENABLE);
   #endif
 
-  XPT2046_Init();
+  XPT2046_Init();		   //TG init Touchscreen controller
   OS_TimerInitMs();        // System clock timer, cycle 1ms, called after XPT2046_Init()
-  W25Qxx_Init();
-  LCD_Init();
+  W25Qxx_Init();		   //TG init W25Q64 - 64Mbit flash chip for fonts, icons, names storage
+  LCD_Init();			   //TG init LCD to rgb, set screen black, and enable backlight
   readStoredPara();        // Read settings parameter
   LCD_RefreshDirection();  // refresh display direction after reading settings
-  scanUpdates();           // scan icon, fonts and config files
-  checkflashSign();        // check font/icon/config signature in SPI flash for update
-  initMachineSetting();    // load default machine settings
+  scanUpdates();           // scan icon, fonts and config files for updates (boot.c)
+  checkflashSign();        // check font/icon/config signature in SPI flash for update if needed
+  initMachineSetting();    // load default machine settings, sets infoMachineSettings.isMarlinFirmware = -1
 
   #ifdef LED_COLOR_PIN
     knob_LED_Init();
@@ -57,7 +57,7 @@ void Hardware_GenericInit(void)
     Buzzer_Config();
   #endif
 
-  #if !defined(MKS_32_V1_4) && !defined (MKS_28_V1_0)
+  #if !defined(MKS_TFT32_V1_3) && !defined(MKS_TFT32_V1_4) && !defined (MKS_TFT28_V3_0) && !defined (MKS_TFT28_V4_0)
     //causes hang if we deinit spi1
     SD_DeInit();
   #endif
@@ -101,12 +101,12 @@ int main(void)
 {
   SystemClockInit();
 
-  SCB->VTOR = VECT_TAB_FLASH;
+  SCB->VTOR = VECT_TAB_FLASH;	//TG VECT_TAB_FLASH is set in Platformio.ini
 
   Hardware_GenericInit();
 
-  for (; ;)
-  {
+  for(;;)                                 // infinite loop on whatever menu is currently at the top
+  {                                       // of infoMenu.menu stack, after restart this will be menuStatus
     (*infoMenu.menu[infoMenu.cur])();
   }
 }

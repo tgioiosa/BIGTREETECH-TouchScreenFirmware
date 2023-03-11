@@ -620,6 +620,31 @@ void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, const ITEM * item)
   GUI_RestoreColorDefault();
 }  //showLiveInfo
 
+//Show live info text on icons for LevelCorner
+void showLevelCornerLiveInfo(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item)
+{
+  const GUI_RECT *rect = curRect + ITEM_PER_PAGE + index;
+  GUI_ClearPrect(rect);
+  if (item != NULL) menuDrawIconOnly(item,index);
+  GUI_DispStringInPrect(rect, liveicon->lines[Levelindex].text);
+} //showLevelCornerLiveInfo
+
+//Show text on icons (used in LevelCorner with ICON_BLTOUCH unified)
+void showTextOnIcon(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item)
+{
+  if (item != NULL) menuDrawIconOnly(item,index);
+  GUI_SetColor(ORANGE);
+  GUI_SetTextMode(GUI_TEXTMODE_TRANS);
+  GUI_POINT loc;
+  loc.x = liveicon->lines[Levelindex].pos.x + curRect[index].x0 - 4;
+  loc.y = liveicon->lines[Levelindex].pos.y + curRect[index].y0 - 6;
+  setLargeFont(VAL_LARGE_FONT);
+  GUI_DispStringCenter(loc.x, loc.y, liveicon->lines[Levelindex].text);
+  GUI_SetColor(WHITE);
+  GUI_DispStringCenter(loc.x - 2, loc.y - 2, liveicon->lines[Levelindex].text);
+  GUI_RestoreColorDefault();
+} //showTextOnIcon
+
 //When there is a button value, the icon changes color and redraws
 void itemDrawIconPress(uint8_t position, uint8_t is_press)
 {
@@ -880,6 +905,14 @@ void loopFrontEnd(void)
 
 void loopProcess(void)
 {
+  // checks gcode from print file, parses & sends gcode queue, parses slave resp, parses received gcode of other uart's
+  // checks heater temp, fan speed monitor, speed & flow monitor, calls buzzer handler, checks U-disk (SD), checks
+  // LCD encoder button, checks for SD or USB print running, checks LCD mode, checks filament runout, checks if LCD
+  // should be dimmed, and checks case light
   loopBackEnd();
+ 
+ // checks if SD or U-disk inserted, loops to check and run toast messages, checks timed clear of status bar
+ // and Disk Inserted messages, checks and clears the busy indicator, checks and updates temperature status,
+ // and checks filament runout
   loopFrontEnd();
 }

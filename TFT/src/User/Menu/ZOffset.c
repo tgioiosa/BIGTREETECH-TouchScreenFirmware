@@ -34,7 +34,7 @@ void zOffsetDrawStatus(bool status)
   }
   else
   {
-    sprintf(tempstr, "shim:%.2f  ", infoSettings.level_z_pos);
+    sprintf(tempstr, "Shim:%.2f  ", infoSettings.level_z_pos);
     GUI_SetColor(infoSettings.sd_reminder_color);
   }
 
@@ -107,7 +107,10 @@ void menuZOffset(void)
   float (* offsetIncreaseValue)(float);                 // increase current Z offset
   float (* offsetResetValue)(void);                     // reset current Z offset
   float (* offsetGetValue)(void);                       // get current Z offset
-  float (* offsetUpdateValueByEncoder)(float, int8_t);  // update current Z offset by encoder
+
+  #if LCD_ENCODER_SUPPORT
+    float (* offsetUpdateValueByEncoder)(float, int8_t);  // update current Z offset by encoder
+  #endif
 
   ablState = getParameter(P_ABL_STATE, 0);
   
@@ -125,7 +128,10 @@ void menuZOffset(void)
     offsetIncreaseValue = probeOffsetIncreaseValue;
     offsetResetValue = probeOffsetResetValue;
     offsetGetValue = probeOffsetGetValue;
-    offsetUpdateValueByEncoder = probeOffsetUpdateValueByEncoder;
+
+    #if LCD_ENCODER_SUPPORT
+      offsetUpdateValueByEncoder = probeOffsetUpdateValueByEncoder;
+    #endif
   }
   else
   { // use Home Offset menu
@@ -137,7 +143,10 @@ void menuZOffset(void)
     offsetIncreaseValue = homeOffsetIncreaseValue;
     offsetResetValue = homeOffsetResetValue;
     offsetGetValue = homeOffsetGetValue;
-    offsetUpdateValueByEncoder = homeOffsetUpdateValueByEncoder;
+
+    #if LCD_ENCODER_SUPPORT
+      offsetUpdateValueByEncoder = homeOffsetUpdateValueByEncoder;
+    #endif
   }
 
   now = z_offset = offsetGetValue();
