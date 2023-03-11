@@ -2,11 +2,17 @@
 #include "common.h"
 #include "includes.h"
 
+#define DUAL_VAL_FORMAT "%4d/%-4d"
+
+// scrolling text line
+SCROLL scrollLine;
+
 // indexes for status icon toggles
 uint8_t currentTool = TOOL0;        //TG for CNC will always be just the one tool
 uint8_t currentFan = 0;             //TG for multiple fan indices
-uint8_t currentSpeedID = 0;         //TG for speed or flow, 2 indices
+uint8_t currentSpeedFlowID = 0;     //TG renamed for speed or flow, 2 indices
 uint8_t currentSpindleSpeedID = 0;  //TG 2/24/21 new for CNC will always be just the one tool
+uint8_t currentBCIndex = 0;
 static uint32_t lastTime = 0;
 bool nextWCSupdate = false;         //TG 10/4/22 - added flag, it gets set whenever parseAck.c gets a workspace change msg from Marlin
 
@@ -16,16 +22,12 @@ const ITEM itemTool[MAX_TOOL_COUNT] =
 // icon                       label
   {ICON_SPINDLE,               LABEL_SPINDLE},
   {ICON_LASER,                 LABEL_LASER},
-  {ICON_VACUUM,                LABEL_VACUUM},
-  {ICON_REMOVED,				       LABEL_REMOVED},  //TG 7/17/22 removed, was CHAMBER for use in Heat.c and pid.c
 };
 
 //Icons list for spindle change  //TG 1/16/20 changed to just 4 tools
 const ITEM itemSpindle[MAX_TOOL_COUNT] =
 {
 // icon                       label
-  {ICON_SPINDLE,               LABEL_SPINDLE},
-  {ICON_SPINDLE,               LABEL_SPINDLE},
   {ICON_SPINDLE,               LABEL_SPINDLE},
   {ICON_SPINDLE,               LABEL_SPINDLE},
 };
@@ -36,16 +38,12 @@ const ITEM itemLaser[MAX_TOOL_COUNT] =
 // icon                       label
   {ICON_LASER,               LABEL_LASER},
   {ICON_LASER,               LABEL_LASER},
-  {ICON_LASER,               LABEL_LASER},
-  {ICON_LASER,               LABEL_LASER},
 };
 
 //Icons list for dustcontrol change  //TG 1/16/20 changed to just 4 tools
 const ITEM itemVacuum[MAX_TOOL_COUNT] =
 {
 // icon                       label
-  {ICON_VACUUM,               LABEL_VACUUM},
-  {ICON_VACUUM,               LABEL_VACUUM},
   {ICON_VACUUM,               LABEL_VACUUM},
   {ICON_VACUUM,               LABEL_VACUUM},
 };
@@ -149,8 +147,8 @@ const LABEL itemToggle[ITEM_TOGGLE_NUM] =
 
 const uint16_t iconToggle[ITEM_TOGGLE_NUM] =
 {
-  ICONCHAR_TOGGLE_OFF,
-  ICONCHAR_TOGGLE_ON
+  CHARICON_TOGGLE_OFF,
+  CHARICON_TOGGLE_ON
 };
 
 // Check time elapsed against the time specified in milliseconds for displaying/updating info on screen
@@ -169,6 +167,41 @@ bool nextScreenUpdate(uint32_t duration)
   }
 }
 
+#ifdef FRIENDLY_Z_OFFSET_LANGUAGE
+  void invertZAxisIcons(MENUITEMS * menuItems)
+  {
+    if (GET_BIT(infoSettings.inverted_axis, Z_AXIS))
+    {
+      menuItems->items[KEY_ICON_0].icon = ICON_Z_INC;
+      menuItems->items[KEY_ICON_0].label.index = LABEL_UP;
+      menuItems->items[KEY_ICON_3].icon = ICON_Z_DEC;
+      menuItems->items[KEY_ICON_3].label.index = LABEL_DOWN;
+    }
+  }
+#endif
+
+void drawBorder(const GUI_RECT *rect, uint16_t color, uint16_t edgeDistance)
+{
+  //uint16_t origColor = GUI_GetColor();
+
+  GUI_SetColor(color);
+  GUI_DrawRect(rect->x0 + edgeDistance, rect->y0 + edgeDistance,
+               rect->x1 - edgeDistance, rect->y1 - edgeDistance);
+
+  //GUI_SetColor(origColor);
+}
+
+void drawBackground(const GUI_RECT *rect, uint16_t bgColor, uint16_t edgeDistance)
+{
+  //uint16_t origBgColor = GUI_GetBkColor();
+
+  GUI_SetBkColor(bgColor);
+  GUI_ClearRect(rect->x0 + edgeDistance, rect->y0 + edgeDistance,
+                rect->x1 - edgeDistance, rect->y1 - edgeDistance);
+
+  //GUI_SetBkColor(origBgColor);
+}
+
 const bool warmupTemperature(uint8_t toolIndex, void (* callback)(void))
 {//TG 8/22/21 entire sub commented out for CNC, since some LABELS were removed from Language.inc for room
 /*
@@ -176,7 +209,7 @@ const bool warmupTemperature(uint8_t toolIndex, void (* callback)(void))
   { // low temperature warning
     char tempMsg[120];
     LABELCHAR(tempStr, LABEL_EXT_TEMPLOW);
-
+    
     sprintf(tempMsg, tempStr, infoSettings.min_ext_temp);
     strcat(tempMsg, "\n");
     sprintf(tempStr, (char *) textSelect(LABEL_HEAT_HOTEND), infoSettings.min_ext_temp);
@@ -184,7 +217,6 @@ const bool warmupTemperature(uint8_t toolIndex, void (* callback)(void))
 
     setDialogText(LABEL_WARNING, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL);
     showDialog(DIALOG_TYPE_ERROR, callback, NULL, NULL);
-
     return false;
   }
 */
@@ -209,139 +241,159 @@ const void cooldownTemperature(void)
 */
 }
 
+void drawStandardValue(const GUI_RECT *rect, VALUE_TYPE valType, const void *val, uint16_t font,
+                       uint16_t color, uint16_t bgColor, uint16_t edgeDistance, bool clearBgColor)
+{
+  uint16_t origColor = GUI_GetColor();
+  uint16_t origBgColor = GUI_GetBkColor();
+
+  if (clearBgColor)
+    drawBackground(rect, bgColor, edgeDistance);
+
+  if (val != NULL)
+  {
+    char tempstr[20] = "\0";
+    const char * buf = tempstr;
+
+    switch (valType)
+    {
+      case VALUE_BYTE:
+        sprintf(tempstr, "%d", *((uint8_t *) val));
+        break;
+
+      case VALUE_INT:
+        sprintf(tempstr, "%d", *((uint16_t *) val));
+        break;
+
+      case VALUE_FLOAT:
+        sprintf(tempstr, "%.3f", *((float *) val));
+        break;
+
+      case VALUE_STRING:
+        buf = val;
+        break;
+
+      default:
+        break;
+    }
+
+    GUI_SetColor(color);
+    GUI_SetBkColor(bgColor);
+
+    setFontSize(font);
+    GUI_DispStringInRect(rect->x0 + edgeDistance, rect->y0 + edgeDistance,
+                         rect->x1 - edgeDistance, rect->y1 - edgeDistance,
+                         (uint8_t *) buf);
+    setFontSize(FONT_SIZE_NORMAL);
+  }
+
+  GUI_SetColor(origColor);
+  GUI_SetBkColor(origBgColor);
+}
+
 // Show/draw a temperature in a standard menu
-const void temperatureReDraw(uint8_t toolIndex, int16_t * temp, bool skipHeader)
+void temperatureReDraw(uint8_t toolIndex, int16_t * temp, bool drawHeader)
 {
   char tempstr[20];
 
-  setLargeFont(true);
-
-  if (!skipHeader)
+  if (drawHeader)
   {
-    sprintf(tempstr, "%-15s", heatDisplayID[toolIndex]);
-    setLargeFont(false);
-    GUI_DispString(exhibitRect.x0, exhibitRect.y0, (uint8_t *) tempstr);
-    setLargeFont(true);
-    GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1) >> 1, exhibitRect.y0, (uint8_t *) "�C");
+    displayExhibitHeader(heatDisplayID[toolIndex], "ºC");
   }
 
   if (temp != NULL)
     sprintf(tempstr, "  %d  ", *temp);
   else
-    sprintf(tempstr, "%4d/%-4d", heatGetCurrentTemp(toolIndex), heatGetTargetTemp(toolIndex));
+    sprintf(tempstr, DUAL_VAL_FORMAT, heatGetCurrentTemp(toolIndex), heatGetTargetTemp(toolIndex));
 
-  GUI_DispStringInPrect(&exhibitRect, (uint8_t *) tempstr);
-  setLargeFont(false);
+  displayExhibitValue(tempstr);
 }
 
 // Show/draw fan in a standard menu
-const void fanReDraw(uint8_t fanIndex, bool skipHeader)
+void fanReDraw(uint8_t fanIndex, bool drawHeader)
 {
   char tempstr[20];
 
-  setLargeFont(true);
-
-  if (!skipHeader)
+  if (drawHeader)
   {
-    sprintf(tempstr, "%-15s", fanID[fanIndex]);
-    setLargeFont(false);
-    GUI_DispString(exhibitRect.x0, exhibitRect.y0, (uint8_t *) tempstr);
-    setLargeFont(true);
-
-    if (infoSettings.fan_percentage == 1)
-    {
-      GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1) >> 1, exhibitRect.y0, (uint8_t *) "%");
-    }
-    else
-    {
-      GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1) >> 1, exhibitRect.y0, (uint8_t *) "PWM");
-    }
+    displayExhibitHeader(fanID[fanIndex], (infoSettings.fan_percentage == 1) ? " % " : "PWM");
   }
 
   if (infoSettings.fan_percentage == 1)
-    sprintf(tempstr, "%4d/%-4d", fanGetCurPercent(fanIndex), fanGetSetPercent(fanIndex));
+    sprintf(tempstr, DUAL_VAL_FORMAT, fanGetCurPercent(fanIndex), fanGetSetPercent(fanIndex));
   else
-    sprintf(tempstr, "%4d/%-4d", fanGetCurSpeed(fanIndex), fanGetSetSpeed(fanIndex));
+    sprintf(tempstr, DUAL_VAL_FORMAT, fanGetCurSpeed(fanIndex), fanGetSetSpeed(fanIndex));
 
-  GUI_DispStringInPrect(&exhibitRect, (uint8_t *) tempstr);
-  setLargeFont(false);
+  displayExhibitValue(tempstr);
 }
 
 // Show/draw extruder in a standard menu
-const void extruderReDraw(uint8_t extruderIndex, float extrusion, bool skipHeader)
-{//TG 8/22/21 entire sub commented out for CNC, since some LABELS were removed from Language.inc for room
-/*
+//TG 8/22/21 comment out for CNC because som LABELS removed from Language.inc for space
+void extruderReDraw(uint8_t extruderIndex, float extrusion, bool drawHeader)
+{/*
   char tempstr[20];
 
-  setLargeFont(true);
-
-  if (!skipHeader)
+  if (drawHeader)
   {
-    sprintf(tempstr, "%-15s", extruderDisplayID[extruderIndex]);
-    setLargeFont(false);
-    GUI_DispString(exhibitRect.x0, exhibitRect.y0, (uint8_t *) tempstr);
-    setLargeFont(true);
-    GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1) >> 1, exhibitRect.y0, (uint8_t *) "mm");
+    displayExhibitHeader(extruderDisplayID[extruderIndex], "mm");
   }
 
   sprintf(tempstr, "  %.2f  ", extrusion);
-  GUI_DispStringInPrect(&exhibitRect, (uint8_t *) tempstr);
-  setLargeFont(false);
-*/
+  displayExhibitValue(tempstr);
+  */
 }
 
 // Show/draw percentage in a standard menu
-const void percentageReDraw(uint8_t itemIndex, bool skipHeader)
+void percentageReDraw(uint8_t itemIndex, bool drawHeader)
 {
   char tempstr[20];
 
-  setLargeFont(true);
-
-  if (!skipHeader)
+  if (drawHeader)
   {
-    setLargeFont(false);
-
-    if (itemIndex == 0)
-      sprintf(tempstr, "%-15s", textSelect(LABEL_PERCENTAGE_SPEED));
-    else
-      sprintf(tempstr, "%-15s", textSelect(LABEL_REMOVED)); //TG 10/12/22 removed LABEL_PERCENTAGE_FLOW
-
-    GUI_DispString(exhibitRect.x0, exhibitRect.y0, (uint8_t *) tempstr);
-    setLargeFont(true);
-    GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1) >> 1, exhibitRect.y0, (uint8_t *) "%");
+    //TG 10/12/22 removed LABEL_PERCENTAGE_FLOW
+    displayExhibitHeader((char *)textSelect((itemIndex == 0) ? LABEL_PERCENTAGE_SPEED : LABEL_REMOVED), "%");
   }
 
-  sprintf(tempstr, "%4d/%-4d", speedGetCurPercent(itemIndex), speedGetSetPercent(itemIndex));
-  GUI_DispStringInPrect(&exhibitRect, (uint8_t *) tempstr);
-  setLargeFont(false);
+  sprintf(tempstr, DUAL_VAL_FORMAT, speedGetCurPercent(itemIndex), speedGetSetPercent(itemIndex));
+  displayExhibitValue(tempstr);
+}
+
+static void redrawMenu(MENU_TYPE menuType)
+{ // used only when exiting from numpad
+  if (menuType == MENU_TYPE_ICON)
+    menuDrawPage(getCurMenuItems());
+  else if (menuType == MENU_TYPE_LISTVIEW)
+    listViewRefreshMenu();
 }
 
 // Edit an integer value in a standard menu
-const int16_t editIntValue(int16_t minValue, int16_t maxValue, int16_t resetValue, int16_t value)
+int32_t editIntValue(int32_t minValue, int32_t maxValue, int32_t resetValue, int32_t value)
 {
-  int16_t val;
+  int32_t val;
   char tempstr[30];
+  MENU_TYPE menuTypeBackup = getMenuType();
 
   sprintf(tempstr, "Min:%i | Max:%i", minValue, maxValue);
-
   val = numPadInt((uint8_t *) tempstr, value, resetValue, false);
-  val = NOBEYOND(minValue, val, maxValue);
 
-  return val;
+  redrawMenu(menuTypeBackup);
+
+  return NOBEYOND(minValue, val, maxValue);
 }
 
 // Edit a float value in a standard menu
-const float editFloatValue(float minValue, float maxValue, float resetValue, float value)
+float editFloatValue(float minValue, float maxValue, float resetValue, float value)
 {
   float val;
   char tempstr[30];
+  MENU_TYPE menuTypeBackup = getMenuType();
 
   sprintf(tempstr, "Min:%.2f | Max:%.2f", minValue, maxValue);
-
   val = numPadFloat((uint8_t *) tempstr, value, resetValue, true);
-  val = NOBEYOND(minValue, val, maxValue);
 
-  return val;
+  redrawMenu(menuTypeBackup);
+
+  return NOBEYOND(minValue, val, maxValue);
 }
 
 //TG 10/4/22 - added new - put this in common.c so it can be used by several menus
@@ -356,3 +408,77 @@ void drawWCSinfo()
   GUI_RestoreColorDefault();
 }
 
+
+// set the hotend to the minimum extrusion temperature if user selected "OK"
+void heatToMinTemp(void)
+{
+  heatSetTargetTemp(heatGetCurrentTool(), infoSettings.min_ext_temp, FROM_GUI);
+}
+
+NOZZLE_STATUS warmupNozzle(void)
+{ /* //TG 2/26/23 removed for CNC
+  uint8_t toolIndex = heatGetCurrentTool();
+
+  if (heatGetTargetTemp(toolIndex) < infoSettings.min_ext_temp)
+  {
+    if (heatGetCurrentTemp(toolIndex) < infoSettings.min_ext_temp)
+    { // low temperature warning
+      char tempMsg[200];
+      char tempStr[100];
+
+      sprintf(tempMsg, (char *)textSelect(LABEL_EXT_TEMPLOW), infoSettings.min_ext_temp);
+      sprintf(tempStr, (char *)textSelect(LABEL_HEAT_HOTEND), infoSettings.min_ext_temp);
+      strcat(tempMsg, "\n");
+      strcat(tempMsg, tempStr);
+      popupDialog(DIALOG_TYPE_ERROR, LABEL_WARNING, (uint8_t *)tempMsg, LABEL_CONFIRM, LABEL_CANCEL, heatToMinTemp, NULL, NULL);
+
+      return COLD;
+    }
+    // temperature falling down to a target lower than the minimal extrusion temperature
+    else
+    { // contiunue with current temp but no lower than the minimum extruder temperature
+      heatSetTargetTemp(toolIndex, MAX(infoSettings.min_ext_temp, heatGetCurrentTemp(toolIndex)), FROM_GUI);
+      return SETTLING;
+    }
+  }
+  else
+  {
+    if (heatGetCurrentTemp(toolIndex) < heatGetTargetTemp(toolIndex) - NOZZLE_TEMP_LAG)
+    { // low temperature warning
+      char tempMsg[200];
+      char tempStr[100];
+
+      sprintf(tempMsg, (char *)textSelect(LABEL_DESIRED_TEMPLOW), heatGetTargetTemp(toolIndex));
+      sprintf(tempStr, (char *)textSelect(LABEL_WAIT_HEAT_UP));
+      strcat(tempMsg, "\n");
+      strcat(tempMsg, tempStr);
+
+      popupReminder(DIALOG_TYPE_ERROR, LABEL_WARNING, (uint8_t *)tempMsg);
+      return COLD;
+    }
+  }
+*/
+  return HEATED;
+  
+}
+
+#ifdef SAFETY_ALERT
+
+// User choice for disabling all heaters/hotends
+//TG 8/22/21 entire sub commented out for CNC, since some LABELS were removed from Language.inc for room
+/*void cooldownTemperature(void)
+{
+  if (!isPrinting())
+  {
+    for (uint8_t i = 0; i < MAX_HEATER_COUNT; i++)
+    {
+      if (heatGetTargetTemp(i) > 0)
+      {
+        popupDialog(DIALOG_TYPE_QUESTION, LABEL_WARNING, LABEL_HEATERS_ON, LABEL_CONFIRM, LABEL_CANCEL, heatCoolDown, NULL, NULL);
+        break;
+      }
+    }
+  }
+}*/
+
+#endif  // SAFETY_ALERT

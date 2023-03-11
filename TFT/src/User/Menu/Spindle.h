@@ -1,6 +1,6 @@
 //TG MODIFIED*****
-#ifndef _TOOL_H_
-#define _TOOL_H_
+#ifndef _SPINDLE_H_
+#define _SPINDLE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,19 +18,20 @@ uint8_t spindleState;
 int16_t actTarget;
 int16_t actCurrent;
 
-char* spindleID[MAX_SPINDLE_COUNT];      
-char* spindleDisplayID[MAX_SPINDLE_COUNT]; 
-char* spindleCmd[MAX_SPINDLE_COUNT]; 
-MENUITEMS spindleItems; 
+extern char* spindleID[MAX_SPINDLE_COUNT];      
+extern char* spindleDisplayID[MAX_SPINDLE_COUNT]; 
+extern char* spindleCmd[MAX_SPINDLE_COUNT]; 
+extern MENUITEMS spindleItems; 
 
 //Icons list for on/off change  //TG 1/16/20 new for spindle  //TODO CHANGE ICONS
-const ITEM itemSpindleONOFF[2];
+extern const ITEM itemSpindleONOFF[2];
 
 void showSpeed(u8 index);
 void menuSpindle(void);        //TG 1/16/20 new replaces menuSpindle
 void toolSetCurrentIndex(uint8_t index);
 void drawSpindleStatusInIcon(void);
 void updateSpeedStatusDisplay(u8 index, bool speed_only);
+void spindleSetCurIndex(int8_t index);   //TG 2/24/23 new added
 #ifdef __cplusplus
 }
 #endif

@@ -4,22 +4,20 @@
    for more up to 0x08007FF0. If more features are added that need settings stored add them to
    readStoredPara() and storePara() below, also adjust PARA_SIZE upwards!
 */
+#include "FlashStore.h"
+#include "HAL_Flash.h"
 #include <string.h>
-#include "flashStore.h"
-#include "STM32_Flash.h"
 
 #define TSC_SIGN  0x20200512  // DO NOT MODIFY
-#define PARA_SIGN 0x20221003  // (YYYYMMDD) If a new setting parameter is added,
+#define PARA_SIGN 0x20230223  // (YYYYMMDD) If a new setting parameter is added,
                               // modify here and initialize the initial value
-                              // in the "infoSettingsReset()" function
+                              // in the "initSettings()" function
 enum
 {
   PARA_TSC_EXIST = (1 << 0),
-  PARA_WAS_RESTORED = (1<< 1),
+  PARA_NOT_STORED = (1 << 1),
 };
 
-extern int32_t TSC_Para[7];
-extern SETTINGS infoSettings;
 
 uint8_t paraStatus = 0;
 
@@ -52,30 +50,36 @@ void readStoredPara(void)
   uint8_t data[PARA_SIZE];
   uint32_t index = 0;
   uint32_t sign = 0;
-  STM32_FlashRead(data, PARA_SIZE);	// read parameters into data[] array
+
+#ifdef I2C_EEPROM  // added I2C_EEPROM suppport for MKS_TFT35_V1_0
+  EEPROM_FlashRead(data, PARA_SIZE);
+#else
+  HAL_FlashRead(data, PARA_SIZE);
+#endif
 
   sign = byteToWord(data + (index += 4), 4);
-  if (sign == TSC_SIGN)	// compare word32 at 0x8004000 to 0x20201205(TSC_SIGN)
+  if (sign == TSC_SIGN)
   {
     paraStatus |= PARA_TSC_EXIST;  // If the touch screen calibration parameter already exists
-    for (int i = 0; i < sizeof(TSC_Para) / sizeof(TSC_Para[0]); i++) // get next 7 dwords of cal data
+    for (int i = 0; i < sizeof(TSC_Para) / sizeof(TSC_Para[0]); i++)
     {
       TSC_Para[i] = byteToWord(data + (index += 4), 4);
     }
   }
 
-  sign = byteToWord(data + (index += 4), 4);   // compare word32 at 0x8004028 to 0x20202712(PARA_SIGN)
+  sign = byteToWord(data + (index += 4), 4);
   if (sign != PARA_SIGN)  // If the settings parameter is illegal, reset settings parameter
   {
-    paraStatus = PARA_WAS_RESTORED;
-    infoSettingsReset();
+    paraStatus |= PARA_NOT_STORED;
+    initSettings();
   }
   else
   {
     memcpy(&infoSettings, data + (index += 4), sizeof(SETTINGS));
-    if ((paraStatus & PARA_TSC_EXIST) == 0) infoSettings.rotate_ui = DISABLED;
+    //if ((paraStatus & PARA_TSC_EXIST) == 0) infoSettings.rotated_ui = DISABLED;  // unecessarily rotates UI to Default?
   }
 }
+
 
 void storePara(void)
 {
@@ -87,10 +91,15 @@ void storePara(void)
   {
     wordToByte(TSC_Para[i], data + (index += 4));
   }
+
   wordToByte(PARA_SIGN, data + (index += 4));
   memcpy(data + (index += 4), &infoSettings, sizeof(SETTINGS));
 
-  STM32_FlashWrite(data, PARA_SIZE);
+#ifdef I2C_EEPROM                      // added I2C_EEPROM suppport for MKS_TFT35_V1_0
+  EEPROM_FlashWrite(data, PARA_SIZE);  // store settings in I2C_EEPROM
+#else
+  HAL_FlashWrite(data, PARA_SIZE);
+#endif
 }
 
 bool readIsTSCExist(void)
@@ -98,7 +107,7 @@ bool readIsTSCExist(void)
   return ((paraStatus & PARA_TSC_EXIST) != 0);
 }
 
-bool readIsRestored(void)
+bool readIsNotStored(void)
 {
-  return ((paraStatus & PARA_WAS_RESTORED) != 0);
+  return ((paraStatus & PARA_NOT_STORED) != 0);
 }

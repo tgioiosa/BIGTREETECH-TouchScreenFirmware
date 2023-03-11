@@ -11,12 +11,15 @@ extern "C" {
 #include "Settings.h"
 
 // should this be 768 as in prior versions?
-#define PARA_SIZE 512  //TG 8/30/21 increased from 256 Max size of settings buffer to read/write
+#define PARA_SIZE (128 * 3)  // Max size of settings buffer to read/write
+
+extern int32_t TSC_Para[7];
+extern SETTINGS infoSettings;
 
 void readStoredPara(void);
 void storePara(void);
 bool readIsTSCExist(void);
-bool readIsRestored(void);
+bool readIsNotStored(void);
 
 #ifdef __cplusplus
 }

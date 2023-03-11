@@ -5,12 +5,12 @@
 extern "C" {
 #endif
 
-#include "stdbool.h"
-#include "sw_spi.h"
+#include <stdint.h>
+#include "variants.h"  // for uint8_t etc...
 
 void XPT2046_Init(void);
 uint8_t XPT2046_Read_Pen(void);
-uint16_t XPT2046_Repeated_Compare_AD(u8 CMD);
+uint16_t XPT2046_Repeated_Compare_AD(uint8_t CMD);
 
 #ifdef __cplusplus
 }

@@ -44,9 +44,9 @@ typedef struct
 }SPINDLE;
 
 
-extern char * spindleID[];
-extern char * spindleDisplayID[];
-extern char * spindleCmd[];
+//extern char * spindleID[];        //TG 2/26/23 redundant
+//extern char * spindleDisplayID[]; //TG 2/26/23 redundant
+//extern char * spindleCmd[];       //TG 2/26/23 redundant
 extern char * spindleWaitCmd[];
 
 

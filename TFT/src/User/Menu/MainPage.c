@@ -2,7 +2,9 @@
 #include "MainPage.h"
 #include "includes.h"
 
-//TG ***** This is OPENING MENU only is Classic Mode is selected in selectMode.c *****
+//====================================================================================
+//TG ***** This is OPENING MENU only if Classic Mode is selected in selectMode.c *****
+//====================================================================================
 void menuMain(void)
 {
   // 1 title, ITEM_PER_PAGE items (icon + label)
@@ -22,7 +24,7 @@ void menuMain(void)
 
   KEY_VALUES key_num = KEY_IDLE;
 
-  if (infoSettings.rrf_macros_enable)
+  if (infoMachineSettings.firmwareType == FW_REPRAPFW)
   {
     mainPageItems.items[5].label.index = LABEL_MACROS;
   }
@@ -35,46 +37,48 @@ void menuMain(void)
 
   menuDrawPage(&mainPageItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuMain)
+  while (MENU_IS(menuMain))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
-      case KEY_ICON_0:  infoMenu.menu[++infoMenu.cur] = menuSpindle;  break;
-      case KEY_ICON_1:  infoMenu.menu[++infoMenu.cur] = menuUnifiedMove;  break;
-      case KEY_ICON_2:  infoMenu.menu[++infoMenu.cur] = menuVacuum;  break;  //TG 2/8/21 removed Extrude module
+      case KEY_ICON_0:  OPEN_MENU(menuSpindle);  break;
+      case KEY_ICON_1:  OPEN_MENU(menuUnifiedMove);  break;
+      case KEY_ICON_2:  OPEN_MENU(menuVacuum);  break;  //TG 2/8/21 removed Extrude module
       case KEY_ICON_3:
         // Emergency Stop : Used for emergency stopping, a reset is required to return to operational mode.
         // it may need to wait for a space to open up in the command queue.
         // Enable EMERGENCY_PARSER in Marlin Firmware for an instantaneous M112 command.
-        Serial_Puts(SERIAL_PORT, "M112\n");
+        sendEmergencyCmd("M112\n");
         break;
 
       case KEY_ICON_4:
-        infoMenu.menu[++infoMenu.cur] = menuTerminal;
+        OPEN_MENU(menuTerminal);
         break;
 
       case KEY_ICON_5:
-        if (infoSettings.rrf_macros_enable)
+        #ifndef NO_RRFSupport   //TG 3/2/23 added
+        if (infoMachineSettings.firmwareType == FW_REPRAPFW)
         {
-          infoFile.title[0] = 0;
-          infoMenu.menu[++infoMenu.cur] = menuCallMacro;
+          strcpy(infoFile.path, "Macros");
+          OPEN_MENU(menuCallMacro);
         }
         else
+        #endif
         {
-          infoMenu.menu[++infoMenu.cur] = menuCustom;
+          OPEN_MENU(menuCustom);
         }
         break;
 
       case KEY_ICON_6:
-        infoMenu.menu[++infoMenu.cur] = menuSettings;
+        OPEN_MENU(menuSettings);
         break;
 
       case KEY_ICON_7:
         if (infoSettings.status_screen != 1)
-          infoMenu.menu[++infoMenu.cur] = menuPrint;
+          OPEN_MENU(menuPrint);
         else
-          infoMenu.cur--;
+          CLOSE_MENU();
         break;
 
       default:
@@ -85,7 +89,10 @@ void menuMain(void)
   }
 }
 
-void cncMenu(void){                               //TG 1/12/20  this entire function cncMenu(void) is new
+//====================================================================================
+//TG ***** This is CNC MENU which replaces menuMain in the CNC customized version ****
+//====================================================================================
+void cncMenu(void){            //TG 1/12/20  this entire function cncMenu(void) is new
   //1 title, ITEM_PER_PAGE items(icon+label)
   MENUITEMS cncPageItems = {
   // title
@@ -113,30 +120,28 @@ void cncMenu(void){                               //TG 1/12/20  this entire func
 
   menuDrawPage(&cncPageItems);
 
-  while(infoMenu.menu[infoMenu.cur] == cncMenu)
+  while(MENU_IS(cncMenu))
   {
     key_num = menuKeyGetValue();
     switch(key_num)
     {
-      case KEY_ICON_0: infoMenu.menu[++infoMenu.cur] = menuHome;       break;
-      case KEY_ICON_1: infoMenu.menu[++infoMenu.cur] = menuMove;       break;
-      case KEY_ICON_2: infoMenu.menu[++infoMenu.cur] = menuTerminal;   break;
+      case KEY_ICON_0: OPEN_MENU(menuHome);       break;
+      case KEY_ICON_1: OPEN_MENU(menuMove);       break;
+      case KEY_ICON_2: OPEN_MENU(menuTerminal);   break;
       case KEY_ICON_3: storeCmd("M112\n"); break;     // Emergency Stop : Used for emergency stopping, a reset is required to return to operational m
                                                       // it may need to wait for a space to open up in the command queue.
                                                       // Enable EMERGENCY_PARSER in Marlin Firmware for an instantaneous M112 command.
-      case KEY_ICON_4: infoMenu.menu[++infoMenu.cur] = menuVacuum;      break;
-      case KEY_ICON_5: infoMenu.menu[++infoMenu.cur] = infoSettings.laser_mode == 1 ? menuLaser : menuSpindle;  break;
-      case KEY_ICON_6: infoMenu.menu[++infoMenu.cur] = menuSettings;    break;
+      case KEY_ICON_4: OPEN_MENU(menuVacuum);      break;
+      case KEY_ICON_5: OPEN_MENU(infoSettings.laser_mode == 1 ? menuLaser : menuSpindle);  break;
+      case KEY_ICON_6: OPEN_MENU(menuSettings);    break;
       case KEY_ICON_7: 
         if (infoSettings.status_screen != 1)
-          infoMenu.menu[++infoMenu.cur] = menuPrint;
+          OPEN_MENU(menuPrint);
         else
-          infoMenu.cur--;
+          CLOSE_MENU();
       
       default:break;
-      // Uh Oh...case KEY_ICON_7: infoMenu.cur--;        break;
-      // This would be nice too...case KEY_ICON_5: infoMenu.menu[++infoMenu.cur] = menuCustom;          break;
     }
     loopProcess();
-    }
+  }
 }

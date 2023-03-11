@@ -22,10 +22,10 @@ static bool ublSlotSaved = false;
     {{ICON_Z_0,                     LABEL_Z_0},
      {ICON_Z_300,                   LABEL_Z_300},
      {ICON_M503,                    LABEL_M503},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
+     {ICON_NULL,              LABEL_NULL},
+     {ICON_NULL,              LABEL_NULL},
+     {ICON_NULL,              LABEL_NULL},
+     {ICON_NULL,              LABEL_NULL},
      {ICON_BACK,                    LABEL_BACK}}
   };
 
@@ -83,7 +83,7 @@ static bool ublSlotSaved = false;
 
         storeCmd("M503\n");
         //gcodeBuf[0] = 0;
-        infoMenu.menu[++infoMenu.cur] = menuTerminal;
+        OPEN_MENU(menuTerminal);
         break;
 
       case KEY_ICON_7:

@@ -14,24 +14,24 @@ MENUITEMS moreItems = {  //TG removed const so this menu can be dynamically chan
 	{ICON_FEATURE_SETTINGS,        LABEL_FEATURE_SETTINGS},
 	{ICON_MACHINE_SETTINGS,        LABEL_MACHINE_SETTINGS},
     #ifdef LOAD_UNLOAD_M701_M702
-      {ICON_LOAD,                 LABEL_LOAD_UNLOAD_SHORT}, //TG 8/21/21 NEED TO CHECK THIS ICON!!
+      {ICON_LOAD,                  LABEL_LOAD_UNLOAD_SHORT}, //TG 8/21/21 NEED TO CHECK THIS ICON!!
     #else
-      {ICON_MORE,                LABEL_MORE},
+      {ICON_MORE,                  LABEL_MORE},
     #endif
     {ICON_BACK,                    LABEL_BACK},
   }
 };
 
-void isPauseExtrude(void)
+void isPauseSpindle(void)               //TG 3/2/23 renamed was isPauseExtrude
 {
-  if(printPause(true,false))                   //TG 8/21/21 fixed for V27, and removed Extrude module
-    infoMenu.menu[infoMenu.cur] = (infoSettings.laser_mode == 1) ? menuLaser : menuSpindle;    //TG 2/8/21 was menuExtrude
+  if (pausePrint(true, PAUSE_NORMAL))   //TG 8/21/21 fixed for V27, and removed Extrude module
+    REPLACE_MENU((infoSettings.laser_mode == 1) ? menuLaser : menuSpindle); //TG 2/8/21 was menuExtrude
 }
-
+ 
 void isPauseLoadUnload(void)
 {
-  if (printPause(true, false))
-    infoMenu.menu[infoMenu.cur] = menuLoadUnload;
+  if (pausePrint(true, PAUSE_NORMAL))
+    REPLACE_MENU(menuLoadUnload);
 }
 
 void menuMore(void)
@@ -43,61 +43,59 @@ void menuMore(void)
 
   menuDrawPage(&moreItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuMore)
+  while (MENU_IS(menuMore))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
-      case KEY_ICON_0:	//TG modified this
-        if (isPrinting() && !isPaused())  // need paused before spindle
+       case KEY_ICON_0:	//TG modified this
+        if (isPrinting() && !isPaused())  // need paused before spindle     case KEY_ICON_0:
         {
-          setDialogText(LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL);
-          showDialog(DIALOG_TYPE_ALERT, isPauseExtrude, NULL, NULL);
+          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, isPauseSpindle, NULL, NULL);
         }
         else
         {
-          infoMenu.menu[++infoMenu.cur] = menuSpindle;
+          OPEN_MENU(menuSpindle);
         }
         break;
-
+        
       case KEY_ICON_1:
-        infoMenu.menu[++infoMenu.cur] = menuVacuum;
+        OPEN_MENU(menuVacuum);
         break;
 
       case KEY_ICON_2:
-		infoMenu.menu[++infoMenu.cur] = menuFan;
+		OPEN_MENU(menuFan);
         break;
 
       case KEY_ICON_3:
-        infoMenu.menu[++infoMenu.cur] = menuSpeed;
+        OPEN_MENU(menuSpeed);
         break;
 
       case KEY_ICON_4:
-        infoMenu.menu[++infoMenu.cur] = menuFeatureSettings;
+        OPEN_MENU(menuFeatureSettings);
         break;
 
       case KEY_ICON_5:
-        infoMenu.menu[++infoMenu.cur] = menuMachineSettings;
+        OPEN_MENU(menuMachineSettings);
         break;
 
       case KEY_ICON_6:
         #ifdef LOAD_UNLOAD_M701_M702
           if (isPrinting() && !isPaused())  // need paused before extrude
           {
-            setDialogText(LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL);
-            showDialog(DIALOG_TYPE_ALERT, isPauseLoadUnload, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, isPauseLoadUnload, NULL, NULL);
           }
           else
           {
-            infoMenu.menu[++infoMenu.cur] = menuLoadUnload;
+            OPEN_MENU(menuLoadUnload);
           }
         #else
-          infoMenu.menu[++infoMenu.cur] = menu2More;  //TG 10/12/22 this was menuTerminal
+          OPEN_MENU(menu2More);
         #endif
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:

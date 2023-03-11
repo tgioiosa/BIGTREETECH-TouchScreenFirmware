@@ -1,7 +1,7 @@
 #include "BedLeveling.h"
 #include "includes.h"
 
-static inline void blUpdateState(MENUITEMS *menu)
+void blUpdateState(MENUITEMS * menu)
 {
   if (getParameter(P_ABL_STATE, 0) == ENABLED)
   {
@@ -13,8 +13,21 @@ static inline void blUpdateState(MENUITEMS *menu)
     menu->items[3].icon = ICON_LEVELING_OFF;
     menu->items[3].label.index = LABEL_BL_DISABLE;
   }
-  menuDrawItem(&menu->items[3], 3);
 }
+
+#if DELTA_PROBE_TYPE == 2  // if Delta printer with removable probe
+  void deltaMeshEditor(void)
+  {
+    OPEN_MENU(menuMeshEditor);
+  }
+
+  void deltaZOffset(void)
+  {
+    storeCmd("M851\n");
+    zOffsetSetMenu(true);  // use Probe Offset menu
+    OPEN_MENU(menuZOffset);
+  }
+#endif
 
 void menuBedLeveling(void)
 {
@@ -25,16 +38,17 @@ void menuBedLeveling(void)
     {
       {ICON_LEVELING,                LABEL_ABL},
       {ICON_MESH_EDITOR,             LABEL_MESH_EDITOR},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_LEVELING_OFF,            LABEL_BL_DISABLE},
-      {ICON_Z_FADE,                  LABEL_ABL_Z},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
+      {ICON_MESH_VALID,              LABEL_MESH_VALID},
+      {ICON_NULL,                    LABEL_NULL},
+      {ICON_NULL,                    LABEL_NULL},
+      {ICON_NULL,                    LABEL_NULL},
       {ICON_HEAT_FAN,                LABEL_UNIFIEDHEAT},
       {ICON_BACK,                    LABEL_BACK},
     }
   };
 
   KEY_VALUES key_num = KEY_IDLE;
+  bool index3And4Support = (infoMachineSettings.firmwareType == FW_MARLIN || infoMachineSettings.firmwareType == FW_REPRAPFW);
   int8_t levelStateOld = -1;
 
   switch (infoMachineSettings.leveling)
@@ -58,10 +72,13 @@ void menuBedLeveling(void)
       break;
   }
 
-  if (getParameter(P_ABL_STATE, 0) == ENABLED)
+  if (index3And4Support)
   {
-    bedLevelingItems.items[3].icon = ICON_LEVELING_ON;
-    bedLevelingItems.items[3].label.index = LABEL_BL_ENABLE;
+    levelStateOld = getParameter(P_ABL_STATE, 0);
+    blUpdateState(&bedLevelingItems);  // update icon & label 3
+
+    bedLevelingItems.items[4].icon = ICON_Z_FADE;
+    bedLevelingItems.items[4].label.index = LABEL_ABL_Z;
   }
 
   if (infoMachineSettings.zProbe == ENABLED)
@@ -72,61 +89,93 @@ void menuBedLeveling(void)
 
   menuDrawPage(&bedLevelingItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuBedLeveling)
+  while (MENU_IS(menuBedLeveling))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
       case KEY_ICON_0:
-        infoMenu.menu[++infoMenu.cur] = menuBedLevelingLayer2;
+        #if DELTA_PROBE_TYPE == 0
+          OPEN_MENU(menuBedLevelingLayer2);
+        #else
+          {
+            #if DELTA_PROBE_TYPE != 2  // if not removable probe
+              ablStart();
+            #else  // if removable probe
+              popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_CONNECT_PROBE, LABEL_CONTINUE, LABEL_CANCEL, ablStart, NULL, NULL);
+            #endif
+          }
+        #endif
         break;
 
       case KEY_ICON_1:
-        infoMenu.menu[++infoMenu.cur] = menuMeshEditor;
+        #if DELTA_PROBE_TYPE != 2
+          OPEN_MENU(menuMeshEditor);
+        #else
+          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_DISCONNECT_PROBE, LABEL_CONTINUE, LABEL_CANCEL, deltaMeshEditor, NULL, NULL);
+        #endif
+        break;
+
+      case KEY_ICON_2:
+        OPEN_MENU(menuMeshValid);
         break;
 
       case KEY_ICON_3:
-        if (getParameter(P_ABL_STATE, 0) == ENABLED)
-          storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 S0\n" : "G29 S2\n");
-        else
-          storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 S1\n" : "G29 S1\n");
+        if (index3And4Support)
+        {
+          if (getParameter(P_ABL_STATE, 0) == ENABLED)
+            storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 S0\n" : "G29 S2\n");
+          else
+            storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 S1\n" : "G29 S1\n");
+        }
         break;
 
       case KEY_ICON_4:
       {
-        float val = editFloatValue(Z_FADE_MIN_VALUE, Z_FADE_MAX_VALUE, 0.0f, getParameter(P_ABL_STATE, 1));
-        storeCmd("M420 Z%.2f\n", val);
+        if (index3And4Support)
+        {
+          float val = editFloatValue(Z_FADE_MIN_VALUE, Z_FADE_MAX_VALUE, 0.0f, getParameter(P_ABL_STATE, 1));
 
-        menuDrawPage(&bedLevelingItems);
+          if (val != getParameter(P_ABL_STATE, 1))
+            storeCmd(infoMachineSettings.firmwareType != FW_REPRAPFW ? "M420 Z%.2f\n" : "M376 H%.2f\n", val);
+
+          menuDrawPage(&bedLevelingItems);
+        }
         break;
       }
 
       case KEY_ICON_5:
         if (infoMachineSettings.zProbe == ENABLED)
         {
-          storeCmd("M851\n");
-          zOffsetSetMenu(true);  // use Probe Offset menu
-          infoMenu.menu[++infoMenu.cur] = menuZOffset;
+          #if DELTA_PROBE_TYPE != 2
+            storeCmd("M851\n");
+            zOffsetSetMenu(true);  // use Probe Offset menu
+            OPEN_MENU(menuZOffset);
+          #else
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_DISCONNECT_PROBE, LABEL_CONTINUE, LABEL_CANCEL, deltaZOffset, NULL, NULL);
+          #endif
         }
         break;
 
       case KEY_ICON_6:
-        infoMenu.menu[++infoMenu.cur] = menuUnifiedHeat;
+        OPEN_MENU(menuUnifiedHeat);
         break;
 
       case KEY_ICON_7:
-        cooldownTemperature();
-        infoMenu.cur--;
+        COOLDOWN_TEMPERATURE();
+        CLOSE_MENU();
         break;
 
       default:
         break;
     }
 
-    if (levelStateOld != getParameter(P_ABL_STATE, 0))
+    if (index3And4Support && levelStateOld != getParameter(P_ABL_STATE, 0))
     {
       levelStateOld = getParameter(P_ABL_STATE, 0);
+
       blUpdateState(&bedLevelingItems);
+      menuDrawItem(&bedLevelingItems.items[3], 3);
     }
 
     loopProcess();

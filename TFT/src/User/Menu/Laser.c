@@ -9,11 +9,11 @@ LABEL_SPINDLE,
 // icon                       label
  {{ICON_EEPROM_SAVE,          LABEL_ON},
   {ICON_STOP,                 LABEL_OFF},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
   {ICON_BACK,                 LABEL_BACK},}
 };
 

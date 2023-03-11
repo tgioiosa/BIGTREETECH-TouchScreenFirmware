@@ -1,6 +1,7 @@
 //TG MODIFIED*****
 #include "UnifiedHeat.h"
 #include "includes.h"
+#ifndef NO_UNIFIED_HEAT_MENU  //TG 3/2/23 added global flag to exclude this code
 
 const MENUITEMS UnifiedHeatItems = {
   // title
@@ -10,10 +11,10 @@ const MENUITEMS UnifiedHeatItems = {
     {ICON_REMOVED,                 LABEL_REMOVED},      //TG 7/17/22 was HEAT-PREHEAT    
     {ICON_REMOVED,                 LABEL_REMOVED},      //TG 7/17/22 was HEAT-HEAT
     {ICON_FAN,                     LABEL_FAN},
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},
+    {ICON_NULL,              LABEL_NULL},
+    {ICON_NULL,              LABEL_NULL},
     {ICON_REMOVED,                 LABEL_REMOVED},       //TG 2/18/21 was COOLDOWN
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},
+    {ICON_NULL,              LABEL_NULL},
     {ICON_BACK,                    LABEL_BACK},
   }
 };
@@ -24,21 +25,21 @@ void menuUnifiedHeat(void)
 
   menuDrawPage(&UnifiedHeatItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuUnifiedHeat)
+  while (MENU_IS(menuUnifiedHeat))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
       case KEY_ICON_0:
-        //infoMenu.menu[++infoMenu.cur] = menuPreheat;  //TG 7/17/22 removed
+        //OPEN_MENU(menuPreheat);  //TG 7/17/22 removed
         break;
 
       case KEY_ICON_1:
-        infoMenu.menu[++infoMenu.cur] = menuSpindle;
+        OPEN_MENU(menuSpindle);
         break;
 
       case KEY_ICON_2:
-        infoMenu.menu[++infoMenu.cur] = menuFan;
+        OPEN_MENU(menuFan);
         break;
 
       case KEY_ICON_5:
@@ -46,7 +47,7 @@ void menuUnifiedHeat(void)
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:
@@ -56,3 +57,5 @@ void menuUnifiedHeat(void)
     loopProcess();
   }
 }
+
+#endif

@@ -13,12 +13,14 @@ const int16_t itemPercentTypeTitle[SPEED_NUM] = {
 };
 
 static uint8_t item_index = 0;
-static uint8_t percentSteps_index = 0;
+static uint8_t percentSteps_index = 1;
 
+#ifdef TFT70_V3_0
 void setSpeedItemIndex(uint8_t index)
 {
   item_index = index;
 }
+#endif
 
 void menuSpeed(void)
 {
@@ -29,8 +31,8 @@ void menuSpeed(void)
     // icon                          label
     {
       {ICON_DEC,                     LABEL_DEC},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
+      {ICON_NULL,                    LABEL_NULL},
+      {ICON_NULL,                    LABEL_NULL},
       {ICON_INC,                     LABEL_INC},
       {ICON_MOVE,                    LABEL_PERCENTAGE_SPEED},
       {ICON_E_5_PERCENT,             LABEL_5_PERCENT},
@@ -42,11 +44,7 @@ void menuSpeed(void)
   KEY_VALUES key_num = KEY_IDLE;
   LASTSPEED lastSpeed;
 
-#if EXTRUDER_NUM > 0    //TG 9/1/22 added this test 
-  storeCmd("M220\nM221\n");
-#else
-  storeCmd("M220\n");
-#endif
+  speedQuery();
 
   speedSetPercent(item_index, speedGetCurPercent(item_index));
   lastSpeed = (LASTSPEED) {speedGetCurPercent(item_index), speedGetSetPercent(item_index)};
@@ -56,23 +54,22 @@ void menuSpeed(void)
   percentageItems.items[KEY_ICON_5] = itemPercent[percentSteps_index];
 
   menuDrawPage(&percentageItems);
-  percentageReDraw(item_index, false);
+  percentageReDraw(item_index, true);
 
-  #if LCD_ENCODER_SUPPORT
-    encoderPosition = 0;
-  #endif
-
-  while (infoMenu.menu[infoMenu.cur] == menuSpeed)
+  while (MENU_IS(menuSpeed))
   {
     key_num = menuKeyGetValue();
+
     switch (key_num)
     {
       case KEY_ICON_0:
+      case KEY_DECREASE:
         if(checkFlowRateAllowed())
         {
           if (speedGetSetPercent(item_index) > SPEED_MIN)
             speedSetPercent(item_index, speedGetSetPercent(item_index) - percentSteps[percentSteps_index]);
         }
+
         break;
 
       case KEY_INFOBOX:
@@ -82,27 +79,31 @@ void menuSpeed(void)
         if (val != speedGetSetPercent(item_index))
           speedSetPercent(item_index, val);
 
-        menuDrawPage(&percentageItems);
-        percentageReDraw(item_index, false);
+        percentageReDraw(item_index, true);
         break;
       }
 
       case KEY_ICON_3:
+      case KEY_INCREASE:
         if(checkFlowRateAllowed())
         {
            if (speedGetSetPercent(item_index) < SPEED_MAX)
-          speedSetPercent(item_index, speedGetSetPercent(item_index) + percentSteps[percentSteps_index]);
+            speedSetPercent(item_index, speedGetSetPercent(item_index) + percentSteps[percentSteps_index]);
         }
         break;
 
       case KEY_ICON_4:
-        item_index = (item_index + 1) % SPEED_NUM;
+        if (infoSettings.ext_count > 0)
+        {
+          item_index = (item_index + 1) % SPEED_NUM;
+        }
+
         percentageItems.title.index = itemPercentTypeTitle[item_index];
         percentageItems.items[key_num] = itemPercentType[item_index];
 
-        menuDrawTitle(textSelect(percentageItems.title.index));
+        menuDrawTitle();
         menuDrawItem(&percentageItems.items[key_num], key_num);
-        percentageReDraw(item_index, false);
+        percentageReDraw(item_index, true);
         break;
 
       case KEY_ICON_5:
@@ -120,20 +121,10 @@ void menuSpeed(void)
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:
-        #if LCD_ENCODER_SUPPORT
-          if (encoderPosition)
-          {
-            if (speedGetSetPercent(item_index) < SPEED_MAX && encoderPosition > 0)
-              speedSetPercent(item_index, speedGetSetPercent(item_index) + percentSteps[percentSteps_index]);
-            else if (speedGetSetPercent(item_index) > SPEED_MIN && encoderPosition < 0)
-              speedSetPercent(item_index, speedGetSetPercent(item_index) - percentSteps[percentSteps_index]);
-            encoderPosition = 0;
-          }
-        #endif
         break;
     }
 
@@ -141,7 +132,7 @@ void menuSpeed(void)
     {
       lastSpeed = (LASTSPEED) {speedGetCurPercent(item_index), speedGetSetPercent(item_index)};
 
-      percentageReDraw(item_index, true);
+      percentageReDraw(item_index, false);
     }
 
     loopProcess();

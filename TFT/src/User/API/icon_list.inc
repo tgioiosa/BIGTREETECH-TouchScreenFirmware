@@ -19,6 +19,7 @@ X_ICON (FAN)
 X_ICON (SETTINGS)
 //X_ICON (LEVELING)           //TG 7/17/22 removed
 //X_ICON (Z_FADE)             //TG 7/17/22 removed
+X_ICON (LEVEL_CORNER)
 X_ICON (INC)
 X_ICON (DEC)
 //X_ICON (NOZZLE)		          //TG 2/18/21 removed
@@ -69,7 +70,6 @@ X_ICON (LANGUAGE)
 X_ICON (TOUCHSCREEN_ADJUST)
 X_ICON (MORE)
 X_ICON (SCREEN_INFO)
-X_ICON (MARLIN_MODE)
 X_ICON (DISCONNECT)
 X_ICON (BAUD_RATE)
 X_ICON (PERCENTAGE)
@@ -77,14 +77,14 @@ X_ICON (BABYSTEP)
 X_ICON (001_MM)
 X_ICON (ONBOARD_SD)
 X_ICON (ONTFT_SD)
-X_ICON (U_DISK)
+X_ICON (USB_DISK)
 //X_ICON (POINT_1)              //TG 7/17/22 removed 
 //X_ICON (POINT_2)              //TG 7/17/22 removed 
 //X_ICON (POINT_3)              //TG 7/17/22 removed 
 //X_ICON (POINT_4)              //TG 7/17/22 removed 
 //X_ICON (POINT_5)              //TG 7/17/22 removed 
-X_ICON (MARLIN)
-X_ICON (BIGTREETECH)
+X_ICON (MARLIN_MODE)
+X_ICON (TOUCH_MODE)
 X_ICON (GCODE)
 //X_ICON (BLTOUCH)              //TG 7/17/22 removed
 //X_ICON (BLTOUCH_DEPLOY)       //TG 7/17/22 removed
@@ -129,6 +129,7 @@ X_ICON (HOME_MOVE)
 //X_ICON (COOLDOWN)             //TG 2/18/21 removed
 //X_ICON (STATUS_NOZZLE)        //TG 1/14/20 replacing with SPINDLE
 //X_ICON (STATUS_BED)           //TG 1/14/20 replacing with VACUUM
+//X_ICON (STATUS_CHAMBER)
 X_ICON (STATUS_FAN)
 X_ICON (STATUS_SPEED)
 X_ICON (STATUS_FLOW)
@@ -138,13 +139,15 @@ X_ICON (NOZZLE_DOWN)
 X_ICON (NOZZLE_UP)
 //X_ICON (LEVEL_EDGE_DISTANCE)  //TG 7/17/22 removed 
 X_ICON (TUNING)
-X_ICON (PID)
-//X_ICON (TUNE_EXTRUDER)        //TG 7/17/22 removed 
+X_ICON (MPC_PID)
+X_ICON (TUNE_EXTRUDER)        //TG 7/17/22 removed, //TG 2/28/23 added back 
 X_ICON (CONNECTION_SETTINGS)
 X_ICON (CASE_LIGHT)
 //X_ICON (Z_ALIGN)              //TG 7/17/22 removed    
 //X_ICON (MESH_EDITOR)          //TG 7/17/22 removed
 X_ICON (BRIGHTNESS)
+X_ICON (MESH_VALID)
+X_ICON (DELTA_CALIBRATE)
 X_ICON (TGMENU)                 //TG 1/12/20 new
 X_ICON (M503)                   //TG 1/12/20 new
 X_ICON (GLOBAL_VACUUM)          //TG 1/12/20 new
@@ -190,4 +193,5 @@ X_ICON (MARLIN_INT)             //TG 7/17/22 new
 X_ICON (PIDRUN_INT)             //TG 7/17/22 new
 X_ICON (CUST_SPEED)             //TG 7/17/22 new
 X_ICON (PROBE_STOCK)            //TG 10/12/22 new
+X_ICON (VFD_CONTROL)            //TG 12/26/22 new
 //after changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

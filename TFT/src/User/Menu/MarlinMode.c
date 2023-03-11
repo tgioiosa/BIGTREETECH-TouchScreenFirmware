@@ -1,14 +1,14 @@
 #include "MarlinMode.h"
+#include "includes.h"
 #include "spi_slave.h"
 #include "HD44780.h"
-#include "includes.h"
 
 #ifdef HAS_EMULATOR
 
-typedef void (*CB_INIT)(CIRCULAR_QUEUE *);
-typedef void (*CB_DEINIT)(void);
-typedef bool (*CB_DATA)(uint8_t *);
-typedef void (*CB_PARSE)(uint8_t);
+typedef void (* CB_INIT)(CIRCULAR_QUEUE *);
+typedef void (* CB_DEINIT)(void);
+typedef bool (* CB_DATA)(uint8_t *);
+typedef void (* CB_PARSE)(uint8_t);
 
 void menuMarlinMode(void)
 {
@@ -17,11 +17,11 @@ void menuMarlinMode(void)
   CB_DATA   marlinGetData = NULL;
   CB_PARSE  marlinParse = NULL;
 
-  GUI_Clear(infoSettings.marlin_mode_bg_color);
-  GUI_SetColor(infoSettings.marlin_mode_font_color);
-  GUI_SetBkColor(infoSettings.marlin_mode_bg_color);
+  GUI_Clear(infoSettings.marlin_bg_color);
+  GUI_SetColor(infoSettings.marlin_font_color);
+  GUI_SetBkColor(infoSettings.marlin_bg_color);
 
-  if (infoSettings.marlin_mode_showtitle == 1)
+  if (infoSettings.marlin_show_title == 1)
   {
     STRINGS_STORE tempST;
     W25Qxx_ReadBuffer((uint8_t *)&tempST, STRINGS_STORE_ADDR, sizeof(STRINGS_STORE));
@@ -29,12 +29,16 @@ void menuMarlinMode(void)
   }
 
   #if defined(ST7920_EMULATOR)
+    ST7920 st7920;
+
     if (infoSettings.marlin_type == LCD12864)
     {
       marlinInit = SPI_Slave;
       marlinDeInit = SPI_SlaveDeInit;
       marlinGetData = SPI_SlaveGetData;
       marlinParse = ST7920_ParseRecv;
+
+      ST7920_Init(&st7920);
     }
   #endif
 
@@ -53,7 +57,7 @@ void menuMarlinMode(void)
 
   marlinInit(&marlinQueue);
 
-  while (infoMenu.menu[infoMenu.cur] == menuMarlinMode)
+  while (MENU_IS(menuMarlinMode))
   {
     while (marlinGetData(&data))
     {
@@ -61,25 +65,27 @@ void menuMarlinMode(void)
     }
 
     #if LCD_ENCODER_SUPPORT
-      sendEncoder(LCD_ReadTouch());
+      if (Touch_Enc_ReadBtn(LCD_ENC_BUTTON_INTERVAL))
+        LCD_Enc_SendPulse(1);
 
-      if (LCD_BtnTouch(LCD_BUTTON_INTERVALS))
-        sendEncoder(1);
+      LCD_Enc_SendPulse(Touch_Enc_ReadPos());
     #endif
 
-    loopCheckMode();
-
-    #if defined(SCREEN_SHOT_TO_SD)
-      loopScreenShot();
-    #endif
-
-    #ifdef LCD_LED_PWM_CHANNEL
-      loopDimTimer();
-    #endif
-
-    if (infoSettings.serial_alwaysOn == ENABLED)
+    if (infoSettings.serial_always_on == ENABLED)
     {
       loopBackEnd();
+    }
+    else  // Mode_CheckSwitching(), loopScreenShot() and LCD_CheckDimming() are invoked by loopBackEnd(),
+    {     // so we guarantee they are invoked only once
+      Mode_CheckSwitching();
+
+      #ifdef SCREEN_SHOT_TO_SD
+        loopScreenShot();
+      #endif
+
+      #ifdef LCD_LED_PWM_CHANNEL
+        LCD_CheckDimming();
+      #endif
     }
   }
 

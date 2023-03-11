@@ -1,16 +1,16 @@
 #include "spi_slave.h"
+#include "variants.h"  // for ST7920_EMULATOR etc...
 #include "spi.h"
 #include "GPIO_Init.h"
-#include "stdlib.h"
-#include "stm32f10x_conf.h"
+#include <stdlib.h>
 
-#if defined(MKS_32_V1_4) || defined (MKS_28_V1_0)
+#if defined(MKS_TFT)
 
 #if defined(ST7920_EMULATOR)
-//TODO:
-//now support SPI3 and PB1 CS only
-//more compatibility changes are needed
-//Config for SPI Channel
+// TODO:
+// now support SPI3 and PB1 CS only
+// more compatibility changes are needed
+// Config for SPI Channel
 #if ST7920_SPI == _SPI1
   #define ST7920_SPI_NUM          SPI1
 #elif ST7920_SPI == _SPI2
@@ -23,7 +23,7 @@ CIRCULAR_QUEUE *spi_queue = NULL;
 
 void SPI_Slave_CS_Config(void);        // forward declaration
 
-void SPI_ReEnable(u8 mode)
+void SPI_ReEnable(uint8_t mode)
 {
   ST7920_SPI_NUM->CR1 = (0<<15)        // 0:2-line 1: 1-line
                       | (0<<14)        // in bidirectional mode 0:read only 1: read/write
@@ -54,10 +54,10 @@ void SPI_Slave(CIRCULAR_QUEUE *queue)
 
   NVIC_InitTypeDef NVIC_InitStructure;
 
-#ifndef SPI3_PIN_SMART_USAGE                                         // if enabled, it avoids any SPI3 CS pin usage and free the MISO (PB4 pin) for encoder pins
-  SPI_GPIO_Init(ST7920_SPI);
-  GPIO_InitSet(SPI3_CS_PIN, MGPIO_MODE_IPU, 0);                      // CS
-#endif
+  #ifndef SPI3_PIN_SMART_USAGE                                       // if enabled, it avoids any SPI3 CS pin usage and free the MISO (PB4 pin) for encoder pins
+    SPI_GPIO_Init(ST7920_SPI);
+    GPIO_InitSet(SPI3_CS_PIN, MGPIO_MODE_IPN, 0);                    // MKS TFTs already have an external pull-up resistor on PB0 and PB1 pins
+  #endif
 
   NVIC_InitStructure.NVIC_IRQChannel = SPI3_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
@@ -67,9 +67,9 @@ void SPI_Slave(CIRCULAR_QUEUE *queue)
 
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 
-#ifndef SPI3_PIN_SMART_USAGE                                         // if enabled, it avoids any SPI3 CS pin usage and free the MISO (PB4 pin) for encoder pins
-  SPI_Slave_CS_Config();                                             // not needed, you can also comment out this line!
-#endif
+  #ifndef SPI3_PIN_SMART_USAGE                                       // if enabled, it avoids any SPI3 CS pin usage and free the MISO (PB4 pin) for encoder pins
+    SPI_Slave_CS_Config();                                           // not needed, you can also comment out this line!
+  #endif
 
   SPI_ReEnable(0);  // spi mode0
 
@@ -159,4 +159,4 @@ void EXTI1_IRQHandler(void)
 }
 #endif             // endif for #if defined(ST7920_EMULATOR)
 
-#endif             // endif for #if defined(MKS_32_V1_4) || defined (MKS_28_V1_0)
+#endif             // endif for #if defined(MKS_TFT)

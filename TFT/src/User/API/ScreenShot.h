@@ -5,11 +5,13 @@
 extern "C" {
 #endif
 
-#include "variants.h"
-#include "stdbool.h"
+#include <stdbool.h>
+#include "variants.h"  // for SCREEN_SHOT_TO_SD
 
-bool screenShotBMP(char *bmp);
-void loopScreenShot(void);
+#ifdef SCREEN_SHOT_TO_SD
+  bool screenShotBMP(char *bmp);
+  void loopScreenShot(void);
+#endif
 
 #ifdef __cplusplus
 }

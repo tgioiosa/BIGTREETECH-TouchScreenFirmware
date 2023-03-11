@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 void menuMore(void);
-void isPauseExtrude(void);
+void isPauseSpindle(void);    //TG 3/2/23 renamed was isPauseExtrude
 void isPauseLoadUnload(void);
 
-void menu2More(void);   //TG 10/12/22 added extra menu after menuMore
+void menu2More(void);         //TG 10/12/22 added extra menu after menuMore
 
 #ifdef __cplusplus
 }

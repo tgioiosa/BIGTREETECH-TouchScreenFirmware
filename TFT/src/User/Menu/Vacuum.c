@@ -14,11 +14,11 @@ LABEL_VACUUM,
 // icon                       label
  {{ICON_APPLY,                LABEL_ON},
   {ICON_STOP,                 LABEL_OFF},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
+  {ICON_NULL,           LABEL_NULL},
   {ICON_AUTO_MODE,            LABEL_AUTO_MODE},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
-  {ICON_BACKGROUND,           LABEL_BACKGROUND},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
+  {ICON_NULL,           LABEL_NULL},
   {ICON_BACK,                 LABEL_BACK},}
 };
 

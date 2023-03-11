@@ -1,10 +1,17 @@
 #ifndef _MYGCODEFS_H_
 #define _MYGCODEFS_H_
 
-#include "stdbool.h"
-#include "gcode.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdbool.h>
 
 bool mountGcodeSDCard(void);
 bool scanPrintFilesGcodeFs(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,16 +1,14 @@
 #include "spi_slave.h"
+#include "includes.h"  // for infoSettings, ST7920_EMULATOR etc...
 #include "spi.h"
 #include "GPIO_Init.h"
-#include "stdlib.h"
-#include "variants.h"
-#include "Settings.h"
 #include "HD44780.h"
 
 #if defined(ST7920_EMULATOR)
-//TODO:
-//now support SPI2 and PB12 CS only
-//more compatibility changes are needed
-//Config for SPI Channel
+// TODO:
+// now support SPI2 and PB12 CS only
+// more compatibility changes are needed
+// Config for SPI Channel
 #if ST7920_SPI == _SPI1
   #define ST7920_SPI_NUM          SPI1
 #elif ST7920_SPI == _SPI2
@@ -23,7 +21,7 @@ CIRCULAR_QUEUE *spi_queue = NULL;
 
 void SPI_Slave_CS_Config(void);        // forward declaration
 
-void SPI_ReEnable(u8 mode)
+void SPI_ReEnable(uint8_t mode)
 {
   ST7920_SPI_NUM->CR1 = (0<<15)        // 0:2-line 1: 1-line
                       | (0<<14)        // in bidirectional mode 0:read only 1: read/write
@@ -148,7 +146,7 @@ void EXTI15_10_IRQHandler(void)
 
     #ifdef ST7920_EMULATOR
     case LCD12864:
-      if((GPIOB->IDR & (1<<12)) != 0)
+      if ((GPIOB->IDR & (1<<12)) != 0)
       {
         SPI_ReEnable(!!(GPIOB->IDR & (1<<13)));                      // Adaptive spi mode0 / mode3
         ST7920_SPI_NUM->CR1 |= (1<<6);

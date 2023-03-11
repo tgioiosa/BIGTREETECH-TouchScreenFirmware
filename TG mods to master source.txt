@@ -33,8 +33,8 @@ C:\Users\tony\Documents\3D Printers\Marlin Firmware\BIGTREETECH-TouchScreenFirmw
   472,51:     case KEY_ICON_7:                              //TG back arrow, load prev infoMenu
 
 C:\Users\tony\Documents\3D Printers\Marlin Firmware\BIGTREETECH-TouchScreenFirmware-master\TFT\src\User\Menu\SettingsMenu.c
-  120,59:      {ICON_BACKGROUND,              LABEL_BACKGROUND},    //TG available button?
-  121,59:      {ICON_BACKGROUND,              LABEL_BACKGROUND},    //TG available button?
+  120,59:      {ICON_NULL,              LABEL_NULL},    //TG available button?
+  121,59:      {ICON_NULL,              LABEL_NULL},    //TG available button?
 
 
 To create a new icon for a button to be used in menus, first choose a name for the
@@ -53,7 +53,7 @@ modify the const MENUITEMS array for that parent menu. For example, we'll use th
 menu for our new button because it has some empty positions in it (each menu page can have 7 buttons max).
 So open the code file for the Settings Menu (TFT\src\User\Menu\SettingsMenu.c in this case).
 We see there is a const MENUITEMS array named settingsItems and we also see this array has two unused
-entries at indexes 5 and 6 (they're set to ICON_BACKGROUND,LABEL_BACKGROUND which means empty).
+entries at indexes 5 and 6 (they're set to ICON_NULL,LABEL_NULL which means empty).
 So we can add our new button in like so, replacing with our new values:
 
 const MENUITEMS settingsItems = {
@@ -65,8 +65,8 @@ const MENUITEMS settingsItems = {
      {ICON_FEATURE_SETTINGS,        LABEL_FEATURE_SETTINGS},
      {ICON_SCREEN_INFO,             LABEL_SCREEN_INFO},
      {ICON_CONNECTION_SETTINGS,     LABEL_CONNECTION_SETTINGS},
-     {ICON_CUSTOM_1,                LABEL_CUSTOM_1},              <-- we overwrite the previous ICON_BACKGROUND, LABEL_BACKGROUND
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},		      with the name and text label of our custom icon
+     {ICON_CUSTOM_1,                LABEL_CUSTOM_1},              <-- we overwrite the previous ICON_NULL, LABEL_NULL
+     {ICON_NULL,              LABEL_NULL},		      with the name and text label of our custom icon
      {ICON_BACK,                    LABEL_BACK},}
   };
 

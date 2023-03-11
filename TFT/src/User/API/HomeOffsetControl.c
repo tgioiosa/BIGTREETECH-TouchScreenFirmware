@@ -4,15 +4,24 @@
 static float z_offset_value = HOME_Z_OFFSET_DEFAULT_VALUE;
 static bool home_offset_enabled = false;
 
+/* //TG 2/28/23 - Home Offset
+  Use M206 to apply a persistent offset to the native home position and coordinate space. 
+  This effectively shifts the coordinate space in the negative direction. See examples below.
+  The current position is adjusted to align to the new home offset values.
+  The home offset is persistent — added to the current position until changed.
+  Some uses include fine adjustment of Z position (without moving endstops) and shifting the
+  coordinate space to print on a different part of the bed.
+*/
+
 // Enable home offset
-void homeOffsetEnable(bool skipZOffset, float shim)
+void homeOffsetEnable(float shim)
 {
   home_offset_enabled = true;
 
-  probeHeightEnable();  // temporary disable software endstops
+  probeHeightEnable();  // temporary disable software endstops and save ABL state
 
   // Z offset gcode sequence start
-  mustStoreCmd("G28\n");          // home printer
+  probeHeightHomeAndNoABL();      // home and disable ABL
   probeHeightStart(shim, false);  // lower nozzle to absolute Z0 point + shim
   probeHeightRelative();          // set relative position mode
 }
@@ -23,10 +32,10 @@ void homeOffsetDisable(void)
   home_offset_enabled = false;
 
   // Z offset gcode sequence stop
-  mustStoreCmd("G28\n");  // home printer
-  probeHeightAbsolute();  // set absolute position mode
+  probeHeightHomeAndNoABL();  // home and disable ABL
+  probeHeightAbsolute();      // set absolute position mode
 
-  probeHeightDisable();  // restore original software endstops state
+  probeHeightDisable();  // restore original software endstops state and ABL state
 }
 
 // Get home offset status
@@ -38,7 +47,7 @@ bool homeOffsetGetStatus(void)
 // Set Z offset value
 float homeOffsetSetValue(float value)
 {
-  mustStoreCmd("M206 Z%.2f\n", value);
+  sendParameterCmd(P_HOME_OFFSET, AXIS_INDEX_Z, value);
   mustStoreCmd("M206\n");  // needed by homeOffsetResetValue() to retrieve the new value
   z_offset_value = value;
 
@@ -48,7 +57,7 @@ float homeOffsetSetValue(float value)
 // Get current Z offset value
 float homeOffsetGetValue(void)
 {
-  z_offset_value = getParameter(P_HOME_OFFSET, Z_STEPPER);
+  z_offset_value = getParameter(P_HOME_OFFSET, AXIS_INDEX_Z);
 
   return z_offset_value;
 }
@@ -62,53 +71,36 @@ float homeOffsetResetValue(void)
   float unit = z_offset_value - HOME_Z_OFFSET_DEFAULT_VALUE;
 
   z_offset_value = HOME_Z_OFFSET_DEFAULT_VALUE;
-  mustStoreCmd("M206 Z%.2f\n", z_offset_value);  // set Z offset value
-  mustStoreCmd("G1 Z%.2f\n", unit);              // move nozzle
+  sendParameterCmd(P_HOME_OFFSET, AXIS_INDEX_Z, z_offset_value);  // set Z offset value
+  mustStoreCmd("G1 Z%.2f\n", unit);                               // move nozzle
 
   return z_offset_value;
 }
 
-// Decrease Z offset value
-float homeOffsetDecreaseValue(float unit)
+// Update Z offset value
+float homeOffsetUpdateValue(float unit, int8_t direction)
 {
-  if (z_offset_value > HOME_Z_OFFSET_MIN_VALUE)
+  float diff;
+
+  if (direction < 0)
   {
-    float diff = z_offset_value - HOME_Z_OFFSET_MIN_VALUE;
+    if (z_offset_value <= HOME_Z_OFFSET_MIN_VALUE)
+      return z_offset_value;
 
-    unit = (diff > unit) ? unit : diff;
-    z_offset_value += unit;
-    mustStoreCmd("M206 Z%.2f\n", z_offset_value);  // set Z offset value
-    mustStoreCmd("G1 Z%.2f\n", -unit);             // move nozzle
+    diff = z_offset_value - HOME_Z_OFFSET_MIN_VALUE;
   }
-
-  return z_offset_value;
-}
-
-// Increase Z offset value
-float homeOffsetIncreaseValue(float unit)
-{
-  if (z_offset_value < HOME_Z_OFFSET_MAX_VALUE)
-  {
-    float diff = HOME_Z_OFFSET_MAX_VALUE - z_offset_value;
-
-    unit = (diff > unit) ? unit : diff;
-    z_offset_value -= unit;
-    mustStoreCmd("M206 Z%.2f\n", z_offset_value);  // set Z offset value
-    mustStoreCmd("G1 Z%.2f\n", unit);              // move nozzle
-  }
-
-  return z_offset_value;
-}
-
-// Update Z offset value by encoder
-float homeOffsetUpdateValueByEncoder(float unit, int8_t direction)
-{
-  float overall_unit = (direction > 0) ? (direction * unit) : (-direction * unit);  // always positive unit
-
-  if (direction < 0)  // if negative encoder value, decrease the value. Otherwise increase the value
-    homeOffsetDecreaseValue(overall_unit);
   else
-    homeOffsetIncreaseValue(overall_unit);
+  {
+    if (z_offset_value >= HOME_Z_OFFSET_MAX_VALUE)
+      return z_offset_value;
+
+    diff = HOME_Z_OFFSET_MAX_VALUE - z_offset_value;
+  }
+
+  unit = ((diff > unit) ? unit : diff) * direction;
+  z_offset_value -= unit;
+  sendParameterCmd(P_HOME_OFFSET, AXIS_INDEX_Z, z_offset_value);  // set Z offset value
+  mustStoreCmd("G1 Z%.2f\n", unit);                               // move nozzle
 
   return z_offset_value;
 }

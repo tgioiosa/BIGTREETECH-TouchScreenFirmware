@@ -6,14 +6,14 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <stdbool.h>
-#include "Configuration.h"
-#include "Settings.h"
-#include "menu.h"
-#include "Temperature.h"
 
+/**
+ * index >= 0 to set the specific index
+ * index == -1 to set the last used hotend index
+ * index == -2 to set the last used bed index
+ */
+void heatSetCurrentIndex(int8_t index);
 void menuHeat(void);
-void heatSetCurrentIndex(uint8_t index);
 
 #ifdef __cplusplus
 }

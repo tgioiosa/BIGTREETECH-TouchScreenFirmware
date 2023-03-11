@@ -14,14 +14,14 @@ extern "C" {
 #define SPINDLE_TYPE_CTRL_I   2  // Controller FAN on Idle            (Check - Marlin M710)
 #define SPINDLE_TYPE_UNKNOWN  8  // Unknown / Not defined!
 
-extern char* spindleID[MAX_SPINDLE_COUNT];
-extern char* spindleDisplayID[MAX_SPINDLE_COUNT];
-extern char* spindleCmd[MAX_SPINDLE_COUNT];
+//extern char* spindleID[MAX_SPINDLE_COUNT];        //TG 2/26/23 redundant
+//extern char* spindleDisplayID[MAX_SPINDLE_COUNT]; //TG 2/26/23 redundant
+//extern char* spindleCmd[MAX_SPINDLE_COUNT];       //TG 2/26/23 redundant
 
 extern uint8_t spindleType[MAX_SPINDLE_COUNT];
-uint16_t lastSetSpindleSpeed[MAX_SPINDLE_COUNT];
+extern uint16_t lastSetSpindleSpeed[MAX_SPINDLE_COUNT];
 extern float stockTopZaxis;
-extern uint8_t maxNativeMachineZ;
+extern float Marlin_ZMAX_POS;
 
 typedef enum  {
   MRPM = 0,

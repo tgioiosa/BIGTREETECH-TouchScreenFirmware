@@ -1,11 +1,12 @@
-#ifndef _STATUSSCREEN_H_
-#define _STATUSSCREEN_H_
+#ifndef _STATUS_SCREEN_H_
+#define _STATUS_SCREEN_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "includes.h"
+#include <stdint.h>
+#include "GUI.h"
 
 //Colors for drawing the icons
 #define GANTRYLBL_BKCOLOR   MAT_DARKSLATE
@@ -21,11 +22,13 @@ extern "C" {
 extern const GUI_POINT ss_title_point;
 extern const GUI_POINT ss_val_point;
 extern const GUI_POINT ss_val2_point;
+
 extern const GUI_RECT msgRect;
 
 void menuStatus(void);
+void drawTemperature(void);
 void drawAllLiveIconData(void);
-void drawSingleLiveIconLine(uint8_t currentSpeedID);
+void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID);
 
 //void storegantry(int n, float val);       //TG 1/12/20 seems to not be used in this version
 void statusScreen_setMsg(const uint8_t *title,const uint8_t *msg);

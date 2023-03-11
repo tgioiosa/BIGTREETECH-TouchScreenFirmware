@@ -6,7 +6,7 @@
 #define POPUP_MAX_CHAR (X_MAX_CHAR * MAX_MSG_LINES)
 
 static BUTTON bottomSingleBtn = {
-  //button location                       color before pressed   color after pressed
+  // button location                      color before pressed   color after pressed
   POPUP_RECT_SINGLE_CONFIRM, NULL, 5, 1,  DARKGREEN, DARKGREEN,  MAT_LOWWHITE, DARKGREEN, WHITE, DARKGREEN
 };
 
@@ -19,15 +19,15 @@ const GUI_RECT doubleBtnRect[] = {POPUP_RECT_DOUBLE_CONFIRM, POPUP_RECT_DOUBLE_C
 static const GUI_RECT singleBtnRect = POPUP_RECT_SINGLE_CONFIRM;
 
 static WINDOW window = {
-  DIALOG_TYPE_INFO,             //default window type
-  POPUP_RECT_WINDOW,            //rectangle position and size of popup window
-  POPUP_TITLE_HEIGHT,           //height of title bar
-  POPUP_BOTTOM_HEIGHT,          //height of action bar
-  2,                            //window border width
-  GRAY,                         //window border color
-  {DARKGRAY, MAT_LOWWHITE},     //Title bar font color / background color
-  {DARKGRAY, MAT_LOWWHITE},     //Message area font color / background color
-  {DARKGRAY, MAT_LOWWHITE},     //actionbar font color / background color
+  DIALOG_TYPE_INFO,                                  // default window type
+  POPUP_RECT_WINDOW,                                 // rectangle position and size of popup window
+  POPUP_TITLE_HEIGHT,                                // height of title bar
+  POPUP_BOTTOM_HEIGHT,                               // height of action bar
+  2,                                                 // window border width
+  POPUP_BORDER_COLOR,                                // window border color
+  {POPUP_TITLE_FONT_COLOR, POPUP_TITLE_BG_COLOR},    // Title bar font color / background color
+  {POPUP_MSG_FONT_COLOR, POPUP_MSG_BG_COLOR},        // Message area font color / background color
+  {POPUP_ACTION_FONT_COLOR, POPUP_ACTION_BG_COLOR},  // action bar font color / background color
 };
 
 static BUTTON *windowButton =  NULL;
@@ -62,10 +62,8 @@ void windowReDrawButton(uint8_t position, uint8_t pressed)
 void popupDrawPage(DIALOG_TYPE type, BUTTON * btn, const uint8_t * title, const uint8_t * context, const uint8_t * yes,
                    const uint8_t * no)
 {
-  setMenuType(MENU_TYPE_DIALOG);
-
-  if (btn != NULL)  // set the following global variables only if buttons must be provided.
-  {                 // Otherwise, leave these variables unchanged so current values are maintained
+  if (btn != NULL)
+  {
     buttonNum = 0;
     windowButton = btn;
 
@@ -77,37 +75,40 @@ void popupDrawPage(DIALOG_TYPE type, BUTTON * btn, const uint8_t * title, const 
     {
       windowButton[buttonNum++].context = no;
     }
+
+    // draw a window with buttons bar
+    GUI_DrawWindow(&window, title, context, true);
+    for (uint8_t i = 0; i < buttonNum; i++) GUI_DrawButton(&windowButton[i], 0);
+
+    setMenuType(MENU_TYPE_DIALOG);
+  }
+  else
+  { // draw a window with no buttons bar
+    GUI_DrawWindow(&window, title, context, false);
+
+    setMenuType(MENU_TYPE_SPLASH);
   }
 
   TSC_ReDrawIcon = windowReDrawButton;
   window.type = type;
-
-  if (btn != NULL)  // draw a window with buttons bar
-  {
-    GUI_DrawWindow(&window, title, context, true);
-    for (uint8_t i = 0; i < buttonNum; i++) GUI_DrawButton(&windowButton[i], 0);
-  }
-  else  // draw a window with no buttons bar
-  {
-    GUI_DrawWindow(&window, title, context, false);
-  }
 }
 
 void menuDialog(void)
 {
-  while (infoMenu.menu[infoMenu.cur] == menuDialog)
+  menuSetTitle(NULL);
+  while (MENU_IS(menuDialog))
   {
     uint16_t key_num = KEY_GetValue(buttonNum, cur_btn_rect);
     switch (key_num)
     {
       case KEY_POPUP_CONFIRM:
-        infoMenu.cur--;           //TG this sets back to previous menu before popup, basically clearing the popup
+        CLOSE_MENU();
         if (action_ok != NULL)
           action_ok();
         break;
 
       case KEY_POPUP_CANCEL:
-        infoMenu.cur--;           //TG this sets back to previous menu before popup, basically clearing the popup
+        CLOSE_MENU();
         if (action_cancel != NULL)
           action_cancel();
         break;
@@ -189,13 +190,17 @@ void _setDialogCancelTextLabel(int16_t index)
   popup_strcpy(popup_cancel, tempstr, sizeof(popup_cancel));
 }
 
-/** Show dialog. Set dialog text before calling showDialog, if actions are NULL button press just clears the dialog box.
- * @param ok_action - pointer to a function to perform if ok is pressed. (pass NULL if no action need to be performed)
- * @param cancel_action - pointer to a function to perform if Cancel is pressed.(pass NULL if no action need to be performed)
+/**
+ * @brief Show a popup with a message. Set dialog text before calling showDialog
+ *
+ * @param type the type of the dialog (alert, question, error, etc)
+ * @param ok_action pointer to a function to perform if ok is pressed. (pass NULL if no action need to be performed)
+ * @param cancel_action pointer to a function to perform if Cancel is pressed.(pass NULL if no action need to be performed)
+ * @param loop_action pointer to a function to perform whilst the dialog is active (visible/not answered)
 */
 void showDialog(DIALOG_TYPE type, void (*ok_action)(), void (*cancel_action)(), void (*loop_action)())
 {
-  if (infoSettings.mode == MODE_MARLIN)
+  if ((infoSettings.mode == MODE_MARLIN) || (infoSettings.mode == MODE_BLOCKED_MARLIN))  // if standard/blocked Marlin mode, then exit
     return;
 
   popup_redraw = true;
@@ -206,29 +211,37 @@ void showDialog(DIALOG_TYPE type, void (*ok_action)(), void (*cancel_action)(), 
   action_loop = loop_action;
 }
 
-void loopPopup(void)
+void loopPopup(void)    // called by loopFrontEnd()/loopProcess(), sets up dialog box and switches menu to menuDialog
 {
+  // display the last received popup message, overriding previous popup messages, if any
   if (popup_redraw == false)
     return;
 
   popup_redraw = false;
 
-  wakeLCD();
+  LCD_WAKE();
 
-  //display the last received popup message, overriding previous popup messages, if any
   if (popup_cancel[0])
   {
     popupDrawPage(popup_type, bottomDoubleBtn, popup_title, popup_msg, popup_ok, popup_cancel);
     cur_btn_rect = doubleBtnRect;
   }
-  else
+  else if (popup_ok[0])  // show only ok button
   {
     popupDrawPage(popup_type, &bottomSingleBtn, popup_title, popup_msg, popup_ok, NULL);
     cur_btn_rect = &singleBtnRect;
   }
-  //avoid to nest menuDialog popup type (while a menuNotification popup type can be overridden)
-  if (infoMenu.menu[infoMenu.cur] != menuDialog)
-  { //handle the user interaction, then reload the previous menu
-    infoMenu.menu[++infoMenu.cur] = menuDialog;
+  else  // if no button is requested
+  {
+    // display only a splash screen, avoiding to register the menuDialog handler
+    // (the handler needs at least one button to allow to close the dialog box)
+    popupDrawPage(popup_type, NULL, popup_title, popup_msg, NULL, NULL);
+    return;
+  }
+
+  // avoid to nest menuDialog popup type (while a menuNotification popup type can be overridden)
+  if (MENU_IS_NOT(menuDialog))
+  { // handle the user interaction, then reload the previous menu
+    OPEN_MENU(menuDialog);
   }
 }

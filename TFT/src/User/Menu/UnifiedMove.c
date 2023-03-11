@@ -2,6 +2,14 @@
 #include "UnifiedMove.h"
 #include "includes.h"
 
+#if DELTA_PROBE_TYPE != 0  // if Delta printer
+  void deltaCalibration(void)
+  {
+    mustStoreCmd("G33\n");
+  }
+#endif
+//TG - this only gets called from menuMain, which would only be active in 
+//Classic Mode(see selectMode.c)  THIS WILL NEVER BE USED IN CNC VERSION!
 void menuUnifiedMove(void)
 {
   MENUITEMS UnifiedMoveItems = {
@@ -15,7 +23,7 @@ void menuUnifiedMove(void)
 	    {ICON_DISABLE_STEPPERS,        LABEL_DISABLE_STEPPERS},
       {ICON_BABYSTEP,                LABEL_BABYSTEP},
       {ICON_REMOVED,				         LABEL_REMOVED},           //TG 7/17/22 removed, was MANUAL_LEVEL-LEVELING
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
+      {ICON_NULL,                    LABEL_NULL},
       {ICON_BACK,                    LABEL_BACK},
     }
   };
@@ -30,21 +38,21 @@ void menuUnifiedMove(void)
 
   menuDrawPage(&UnifiedMoveItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuUnifiedMove)
+  while (MENU_IS(menuUnifiedMove))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
       case KEY_ICON_0:
-        infoMenu.menu[++infoMenu.cur] = menuHome;
+        OPEN_MENU(menuHome);
         break;
 
       case KEY_ICON_1:
-        infoMenu.menu[++infoMenu.cur] = menuMove;
+        OPEN_MENU(menuMove);
         break;
 
       case KEY_ICON_2:
-        //infoMenu.menu[++infoMenu.cur] = menuExtrude; //TG removed for CNC
+        //OPEN_MENU(menuExtrude); //TG removed for CNC
         break;
 
       case KEY_ICON_3:
@@ -52,20 +60,20 @@ void menuUnifiedMove(void)
         break;
 
       case KEY_ICON_4:
-        infoMenu.menu[++infoMenu.cur] = menuBabystep;
+        OPEN_MENU(menuBabystep);
         break;
 
       case KEY_ICON_5:
-      //  infoMenu.menu[++infoMenu.cur] = menuManualLeveling;     //TG 7/17/22 menuManualLeveling.c was removed
+      //  OPEN_MENU(menuManualLeveling);     //TG 7/17/22 menuManualLeveling.c was removed
         break;
 
       case KEY_ICON_6:
       //  if (infoMachineSettings.leveling != BL_DISABLED)        //TG 7/17/22 menuBedLeveling.c was removed
-      //    infoMenu.menu[++infoMenu.cur] = menuBedLeveling;
+      //    OPEN_MENU(menuBedLeveling);
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:

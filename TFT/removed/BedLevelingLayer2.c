@@ -9,12 +9,12 @@ void menuBedLevelingLayer2(void)
     // icon                          label
     {
       {ICON_LEVELING,                LABEL_START},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
       {ICON_BACK,                    LABEL_BACK},
     }
   };
@@ -73,7 +73,7 @@ void menuBedLevelingLayer2(void)
         if (infoMachineSettings.leveling < BL_MBL)  // if ABL
           ablStart();
         else                                        // if MBL
-          infoMenu.menu[++infoMenu.cur] = menuMBL;
+          OPEN_MENU(menuMBL);
         break;
 
       case KEY_ICON_1:
@@ -90,9 +90,9 @@ void menuBedLevelingLayer2(void)
         if (infoMachineSettings.zProbe == ENABLED)
         {
           if (infoSettings.touchmi_sensor != 0)
-            infoMenu.menu[++infoMenu.cur] = menuTouchMi;
+            OPEN_MENU(menuTouchMi);
           else
-            infoMenu.menu[++infoMenu.cur] = menuBLTouch;
+            OPEN_MENU(menuBLTouch);
         }
         break;
 

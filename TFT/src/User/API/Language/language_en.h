@@ -1,47 +1,53 @@
 #ifndef _LANGUAGE_EN_H_
 #define _LANGUAGE_EN_H_
 
-    // config.ini Parameter Settings / Feature Settings
-    #define STRING_STATUS_SCREEN          "Enable Status Screen"
-    #define STRING_BAUDRATE               "BaudRate"
+    // config.ini Parameter Settings - Screen Settings and Feature Settings
     #define STRING_LANGUAGE               "English"
-    #define STRING_ROTATE_UI              "Rotate UI"
-    #define STRING_TERMINAL_ACK           "Show ACK in Terminal"
-    #define STRING_PERSISTENT_INFO        "Persistent Status Info"
-    #define STRING_FILE_LIST_MODE         "Files viewer List Mode"
+    #define STRING_EMULATED_M600          "Emulated M600"
+    #define STRING_EMULATED_M109_M190     "Emulated M109 / M190"
+    #define STRING_EVENT_LED              "Event LED"
+    #define STRING_FILE_COMMENT_PARSING   "File comment parsing"
+    #define STRING_ROTATED_UI             "Rotate UI"
     #define STRING_ACK_NOTIFICATION       "ACK notification style"
-    #define STRING_EMULATE_M600           "Emulate M600"
+    #define STRING_FILES_SORT_BY          "Sort files by"
+    #define STRING_FILES_LIST_MODE        "Files viewer List Mode"
+    #define STRING_FILENAME_EXTENSION     "Show filename extension"
+    #define STRING_FAN_SPEED_PERCENTAGE   "Fan Speed in Percentage"
+    #define STRING_PERSISTENT_INFO        "Persistent Status Info"
+    #define STRING_TERMINAL_ACK           "Show ACK in Terminal"
     #define STRING_SERIAL_ALWAYS_ON       "Serial Always ON"
     #define STRING_MARLIN_FULLSCREEN      "Fullscreen Mode"
     #define STRING_MARLIN_SHOW_TITLE      "Show Title"
     #define STRING_MARLIN_TYPE            "Marlin Mode Type"
     #define STRING_MOVE_SPEED             "Move speed(X Y Z)"
-    #define STRING_AUTO_LOAD_LEVELING     "Auto Save Load Leveling"
-    #define STRING_FAN_SPEED_PERCENT      "Fan Speed in Percent"
-    #define STRING_XY_OFFSET_PROBING      "XY Offset Probing Support"
+    #define STRING_AUTO_LOAD_LEVELING     "Auto Load Leveling"
+    #define STRING_PROBING_Z_OFFSET       "Z offset"                        //TG 2/28/23 removed "Probing for"
     #define STRING_Z_STEPPERS_ALIGNMENT   "Z Steppers Auto-Alignment"
-    #define STRING_PS_ON                  "Auto Power"
+    #define STRING_PS_AUTO_SHUTDOWN       "Auto shutdown"
     #define STRING_FIL_RUNOUT             "Filament sensor"
-    #define STRING_PL_RECOVERY_EN         "Power loss recovery"
+    #define STRING_PL_RECOVERY            "Power loss recovery"
     #define STRING_PL_RECOVERY_HOME       "Home after power loss"
     #define STRING_BTT_MINI_UPS           "BTT UPS Support"
     #define STRING_TOUCH_SOUND            "Touch sounds"
     #define STRING_TOAST_SOUND            "Toast Notifications"
     #define STRING_ALERT_SOUND            "Popups and Alerts"
     #define STRING_HEATER_SOUND           "Heater notification"
-    #define STRING_KNOB_LED_COLOR         "Rotary Knob LED"       //TG removed 8/22/21
-    #define STRING_KNOB_LED_IDLE          "Rotary Knob LED idle"  //TG removed 8/22/21
     #define STRING_LCD_BRIGHTNESS         "Brightness"
     #define STRING_LCD_IDLE_BRIGHTNESS    "Idle brightness"
-    #define STRING_LCD_IDLE_DELAY         "Idle timeout"
+    #define STRING_LCD_IDLE_TIME          "Idle timeout"
+    #define STRING_LCD_LOCK_ON_IDLE       "LCD lock on idle"
+    #define STRING_LED_ALWAYS_ON          "LED always ON"
+    #define STRING_KNOB_LED_COLOR         "Rotary Knob LED"
+    #define STRING_KNOB_LED_IDLE          "Rotary Knob LED idle"
     #define STRING_START_GCODE_ENABLED    "Start Gcode before print"
     #define STRING_END_GCODE_ENABLED      "End Gcode after print"
     #define STRING_CANCEL_GCODE_ENABLED   "Cancel Gcode"
 
-    // Machine Parameter Settings
+    // Machine Parameter Settings - Param Title (ordered by gcode)
     #define STRING_STEPS_SETTING          "Steps per mm"
-    #define STRING_MAXFEEDRATE            "Max Feed Rate"
+    #define STRING_FILAMENT_SETTING       "Filament Diameter"
     #define STRING_MAXACCELERATION        "Max Acceleration"
+    #define STRING_MAXFEEDRATE            "Max Feed Rate"
     #define STRING_ACCELERATION           "Acceleration"
     #define STRING_JERK                   "Jerk"
     #define STRING_JUNCTION_DEVIATION     "Junction Deviation"
@@ -50,13 +56,22 @@
     #define STRING_FWRECOVER              "FW Retraction Recover"
     #define STRING_RETRACT_AUTO           "Auto Firmware Retract"
     #define STRING_HOTEND_OFFSET          "Offset 2nd Nozzle"
+    #define STRING_HOTEND_PID             "Hotend PID"
+    #define STRING_BED_PID                "Bed PID"
+    #define STRING_STEALTH_CHOP           "TMC StealthChop"
+    #define STRING_INPUT_SHAPING          "Input Shaping"
+    #define STRING_DELTA_CONFIGURATION    "Delta Configuration"
+    #define STRING_DELTA_TOWER_ANGLE      "Tower Angle Trim"
+    #define STRING_DELTA_DIAGONAL_ROD     "Diagonal Rod Trim"
+    #define STRING_DELTA_ENDSTOP          "Endstop Adjustments"
     #define STRING_PROBE_OFFSET           "Probe Offset"
     #define STRING_LIN_ADVANCE            "Linear Advance"
-    #define STRING_FILAMENT_SETTING       "Filament Diameter"
     #define STRING_CURRENT_SETTING        "Driver Current (mA)"
-    #define STRING_BUMP_SENSITIVITY       "TMC bump sensitivity"
     #define STRING_HYBRID_THRESHOLD       "TMC HybridThreshold"
-    #define STRING_STEALTH_CHOP           "TMC StealthChop"
+    #define STRING_BUMP_SENSITIVITY       "TMC bump sensitivity"
+    #define STRING_MBL_OFFSET             "MBL Offset"
+
+    // Machine Parameter Settings - Param Attributes (ordered by gcode)
     #define STRING_PRINT_ACCELERATION     "Print Acceleration"
     #define STRING_RETRACT_ACCELERATION   "Retract Acceleration"
     #define STRING_TRAVEL_ACCELERATION    "Travel Acceleration"
@@ -68,20 +83,19 @@
     #define STRING_SWAP_RECOVER_LENGTH    "Extra recover swap length"
     #define STRING_RECOVER_FEEDRATE       "Recover feedrate"
     #define STRING_SWAP_RECOVER_FEEDRATE  "Swap recover feedrate"
-    #define STRING_MBL_OFFSET             "MBL Offset"
 
     // Save / Load
     #define STRING_SAVE                   "Save"
     #define STRING_RESTORE                "Restore"
     #define STRING_RESET                  "Reset"
-    #define STRING_EEPROM_SAVE_INFO       "Save printer settings\nto EEPROM?"
-    #define STRING_EEPROM_RESTORE_INFO    "Reload settings from\nEEPROM?"
+    #define STRING_EEPROM_SAVE_INFO       "Save printer settings to EEPROM?"
+    #define STRING_EEPROM_RESTORE_INFO    "Reload settings from EEPROM?"
     #define STRING_EEPROM_RESET_INFO      "Reset EEPROM to stock printer settings?"
     #define STRING_SETTINGS_SAVE          "Save settings"
     #define STRING_SETTINGS_RESTORE       "Restore settings"
     #define STRING_SETTINGS_RESET         "Reset default settings"
-    #define STRING_SETTINGS_RESET_INFO    "Reset all settings to\ndefault values?"
-    #define STRING_SETTINGS_RESET_DONE    "Reset all settings\nsuccessful.\nplease restart the device."
+    #define STRING_SETTINGS_RESET_INFO    "Reset all settings to default values?"
+    #define STRING_SETTINGS_RESET_DONE    "Reset all settings successful.\nPlease restart the device."
 
     // Navigation Buttons
     #define STRING_PAGE_UP                "Page up"
@@ -125,9 +139,9 @@
     #define STRING_COOLDOWN               "Cool down"
 
     // Dialog Buttons
-    #define STRING_CONFIRM                "\u088E OK" //Confirm Sign
-    #define STRING_CANCEL                 "\u088F Cancel" //Cancel Sign
-    #define STRING_WARNING                "Warning" //Exclamation Sign
+    #define STRING_CONFIRM                "\u088E OK"  // Confirm Sign
+    #define STRING_CANCEL                 "\u088F Cancel"  // Cancel Sign
+    #define STRING_WARNING                "Warning"  // Exclamation Sign
     #define STRING_CONTINUE               "Continue"
     #define STRING_CONFIRMATION           "Are you sure?"
 
@@ -136,46 +150,52 @@
     #define STRING_READY                  "Ready"
     #define STRING_BUSY                   "Busy processing, please wait..."
     #define STRING_LOADING                "Loading..."
-    #define STRING_UNCONNECTED            " Waiting for CNC Controller!"
-
+    #define STRING_UNCONNECTED            " Waiting for Controller!"
+    #define STRING_LISTENING              "TFT in Listening Mode!"
+             
     // Process Info
-    #define STRING_INFO                   "Info" //Info Sign
+    #define STRING_INFO                   "Info"  // Info Sign
     #define STRING_INVALID_VALUE          "Invalid value(s)"
     #define STRING_TIMEOUT_REACHED        "Timeout reached!"
     #define STRING_DISCONNECT_INFO        "Now you can control the printer by your computer!"
     #define STRING_SHUTTING_DOWN          "Shutting down..."
-    #define STRING_WAIT_TEMP_SHUT_DOWN    "Wait for the hotend\ntemperature to be\nlower than %d ℃"
-    #define STRING_POWER_FAILED           "Continue printing?" //Question Sign
+    #define STRING_WAIT_TEMP_SHUT_DOWN    "Wait for the hotend temperature to be lower than %d℃"
+    #define STRING_POWER_FAILED           "Continue printing?"  // Question Sign
     #define STRING_PROCESS_RUNNING        "Process already running!"
     #define STRING_PROCESS_COMPLETED      "Process completed!"
     #define STRING_PROCESS_ABORTED        "Process aborted!"
 
-    // TFT SD, U_DISK, Onboard SD, Filament Runout Process Commands / Status / Info
-    #define STRING_TFTSD                  "TFT SD"
-    #define STRING_READ_TFTSD_ERROR       "Read TFT SD card error!"
-    #define STRING_TFTSD_INSERTED         "Card inserted!"
-    #define STRING_TFTSD_REMOVED          "Card removed!"
-    #define STRING_U_DISK                 "U Disk"
-    #define STRING_READ_U_DISK_ERROR      "Read U Disk error!"
-    #define STRING_U_DISK_INSERTED        "U Disk inserted!"
-    #define STRING_U_DISK_REMOVED         "U Disk removed!"
-    #define STRING_ONBOARDSD              "OnboardSD"
-    #define STRING_READ_ONBOARDSD_ERROR   "Read Onboard SD card error!"
+    // TFT Media, Onboard Media, Filament Runout Process Commands / Status / Info
+    #define STRING_TFT_SD                 "TFT SD"
+    #define STRING_TFT_SD_INSERTED        "SD card inserted"
+    #define STRING_TFT_SD_REMOVED         "SD card removed"
+    #define STRING_TFT_SD_NOT_DETECTED    "No SD card detected!"
+    #define STRING_TFT_SD_READ_ERROR      "SD card reading error!"
+    #define STRING_TFT_USB                "TFT USB"
+    #define STRING_TFT_USB_INSERTED       "USB disk inserted"
+    #define STRING_TFT_USB_REMOVED        "USB disk removed"
+    #define STRING_TFT_USB_NOT_DETECTED   "No USB disk detected!"
+    #define STRING_TFT_USB_READ_ERROR     "USB disk reading error!"
+    #define STRING_ONBOARD_SD             "Onboard SD"
+    #define STRING_ONBOARD_USB            "OnboardUSB"
+    #define STRING_ONBOARD_SD_READ_ERROR  "Onboard media reading error!"
     #define STRING_FILAMENT_RUNOUT        "Filament runout!"
 
     // Steppers, Print, Probe Process Commands / Status / Info
     #define STRING_DISABLE_STEPPERS       "Disarm All"
     #define STRING_XY_UNLOCK              "Disarm XY"
 
-    #define STRING_START_PRINT            "Start Printing:\n %s?"
+    #define STRING_START_PRINT            "Start printing:\n%s?"
     #define STRING_STOP_PRINT             "Stop printing?"
-    #define STRING_IS_PAUSE               "Action not allowed while printing.\n \nPause printing?"
+    #define STRING_IS_PAUSE               "Action not allowed while printing.\n\nPause printing?"
     #define STRING_M0_PAUSE               "Paused by M0 command"
 
     #define STRING_TEST                   "Test"
     #define STRING_DEPLOY                 "Deploy"
     #define STRING_STOW                   "Stow"
     #define STRING_REPEAT                 "Repeat"
+    #define STRING_HS_ON                  "HS: On"
+    #define STRING_HS_OFF                 "HS: Off"
 
     // Printer Tools
     #define STRING_NOZZLE                 "Nozzle"
@@ -240,10 +260,16 @@
 
     #define STRING_SETTINGS               "Settings"
     #define STRING_SCREEN_SETTINGS        "Screen"
-    #define STRING_MACHINE_SETTINGS       "Machine"
-    #define STRING_MARLIN_MODE_SETTINGS   "MarlinMode"
-    #define STRING_FEATURE_SETTINGS       "Feature"
+    #define STRING_UI_SETTINGS            "UI"
     #define STRING_SOUND                  "Sound"
+    #define STRING_MARLIN_MODE_SETTINGS   "MarlinMode"
+    #define STRING_MACHINE_SETTINGS       "Machine"
+    #define STRING_PARAMETER_SETTINGS     "Settings"
+    #define STRING_FEATURE_SETTINGS       "Feature"
+    #define STRING_CONNECTION_SETTINGS    "Connection"
+    #define STRING_SERIAL_PORTS           "S. Ports"
+    #define STRING_BAUDRATE               "BaudRate"
+    #define STRING_EEPROM_SETTINGS        "EEPROM"
     #define STRING_RGB_SETTINGS           "LED Color"
     #define STRING_RGB_OFF                "LED Off"
     #define STRING_TERMINAL               "Terminal"
@@ -272,11 +298,14 @@
     #define STRING_ABL_SLOT1              "Slot 1"
     #define STRING_ABL_SLOT2              "Slot 2"
     #define STRING_ABL_SLOT3              "Slot 3"
-    #define STRING_ABL_SLOT_EEPROM        "Remember slot for next\nreboot? (Save EEPROM)"
+    #define STRING_ABL_SLOT_EEPROM        "Save the mesh to EEPROM to load after reboot?"
     #define STRING_ABL_Z                  "Z Fade"
+    #define STRING_LEVEL_CORNER           "L corner"
+    #define STRING_LEVEL_CORNER_INFO      "Edge distance is below probe offset X/Y and some target points could be not reachable.\nDo you want to use a safe edge distance?"
     #define STRING_P_OFFSET               "P Offset"
     #define STRING_H_OFFSET               "H Offset"
     #define STRING_DISTANCE               "Distance"
+    #define STRING_SHIM                   "Shim"
     #define STRING_LOAD_UNLOAD            "Load/Unload"
     #define STRING_LOAD_UNLOAD_SHORT      "(Un)Load"
     #define STRING_TOUCHSCREEN_ADJUST     "TSC Adjust"
@@ -301,21 +330,18 @@
     #define STRING_ADJUST_TITLE           "Touch Screen Calibration"
     #define STRING_ADJUST_INFO            "Please click on the red dot"
     #define STRING_ADJUST_OK              "Adjustment success"
-    #define STRING_ADJUST_FAILED          "Adjustment failed, please try again"
+    #define STRING_ADJUST_FAILED          "Adjustment failed, please try again."
     #define STRING_UNIFIEDMOVE            "Movement"
     #define STRING_UNIFIEDHEAT            "Heat/Fan"
     #define STRING_TOUCH_TO_EXIT          "Touch anywhere to exit"
     #define STRING_MAINMENU               "Menu"
-    #define STRING_PARAMETER_SETTING      "Parameter Settings"
-    #define STRING_EEPROM_SETTINGS        "EEPROM"
-    #define STRING_LEVELING_EDGE_DISTANCE "Bed edge distance"
     #define STRING_TUNING                 "Tuning"
-    //#define STRING_PID                    "PID"                       //TG 7/17/21 removed for CNC
+    #define STRING_PID                    "PID"                       //TG 7/17/21 removed for CNC, //TG 2/28/23 added back
     //#define STRING_PID_TITLE              "PID autotune"              //TG 7/17/21 removed for CNC
     //#define STRING_PID_START_INFO         "PID autotune may take\nsome time to complete.\nContinue?"  //TG 7/17/21 removed for CNC
     //#define STRING_PID_START_INFO_2       "PID autotune in progress!" //TG 7/17/21 removed for CNC
     //#define STRING_PID_START_INFO_3       "Do not touch the screen until completed (green LED ON)!"   //TG 7/17/21 removed for CNC
-    //#define STRING_TUNE_EXTRUDER          "Tune steps"                //TG 2/10/21 removed for CNC
+    #define STRING_TUNE_EXTRUDER          "Tune steps"                //TG 2/10/21 removed for CNC, //TG 2/28/23 added back
     //#define STRING_TUNE_EXT_EXTRUDE_100   "Ext. 100mm"                //TG 2/10/21 removed for CNC
     //#define STRING_TUNE_EXT_TEMP          "Extruder tuning | Heat"    //TG 2/10/21 removed for CNC
     //#define STRING_TUNE_EXT_TEMPLOW       "Desired temperature too low!\nMinimum temperature: %d℃"    //TG 2/18/21 removed
@@ -327,7 +353,9 @@
     //#define STRING_TUNE_EXT_MEASURED      "Length remaining:"
     //#define STRING_TUNE_EXT_OLD_ESTEP     "Old e-steps: %0.2f"
     //#define STRING_TUNE_EXT_NEW_ESTEP     "New e-steps: %0.2f"
-    #define STRING_CONNECTION_SETTINGS    "Connection"
+    #define STRING_MPC                    "MPC"
+    #define STRING_MPC_TITLE              "MPC autotune"
+    #define STRING_TUNE_START_INFO        "Autotune may take some time to complete.\nContinue?"
     #define STRING_NOTIFICATIONS          "Notifications"
     //#define STRING_MESH_EDITOR            "Mesh edit"               //TG 7/17/21 removed for CNC
     //#define STRING_MESH_TUNER             "Mesh tuner"              //TG 7/17/21 removed for CNC
@@ -347,8 +375,14 @@
     #define STRING_CLICK_FOR_MORE         "Click for more."
     //#define STRING_EXT_TEMPLOW            "Hotend temperature is below\nminimum temperature (%d℃)."  //TG 2/18/21 removed
     #define STRING_HEAT_HOTEND            "Heat hotend to %d℃?"
+    #define STRING_DESIRED_TEMPLOW        "Hotend temperature is below desired temperature (%d℃)."
+    #define STRING_WAIT_HEAT_UP           "Wait for it to heat up."
     #define STRING_Z_ALIGN                "Z Align"
     #define STRING_MACROS                 "Macros"
+    #define STRING_MESH_VALID             "Mesh Validation"
+    #define STRING_CONNECT_PROBE          "Connect probe before starting the process. Make sure to disconnect it afterwards."
+    #define STRING_DISCONNECT_PROBE       "Make sure you have disconnected probe before using this feature."
+    #define STRING_CALIBRATION            "Calibrate"
     #define STRING_TGMENU                 "TG Menu"
     #define STRING_M503                   "Read EEPROM"
     #define STRING_VACUUM                 "Vacuum"                  //TG 1/12/20 new
@@ -403,4 +437,7 @@
     #define STRING_CUST_SPEED             "Custom"                  //TG 7/17/22 new
     #define STRING_SHOULD_M0_PAUSE        "Should M0 Pause"         //TG 7/17/22 new
     #define STRING_PROBE_STOCK            "Probe Stk"               //TG 10/12/22 new
+    #define STRING_VFD_CONTROL            "VFD Control"             //TG 12/26/22 new
+    #define STRING_DISABLED_FOR_CNC       " disabled for CNC!"      //TG  2/28/23 new
+
 #endif

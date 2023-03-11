@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-#include "variants.h"
+#include <stdint.h>
+#include "variants.h"  // for uint8_t etc...
 
 typedef enum
 {
@@ -25,7 +26,7 @@ typedef struct
   uint8_t   dataSize;
 } _SW_SPI;
 
-void SW_SPI_Config(_SW_SPI *sw_spi, _SPI_MODE mode, u8 dataSize,
+void SW_SPI_Config(_SW_SPI *sw_spi, _SPI_MODE mode, uint8_t dataSize,
   uint16_t cs,
   uint16_t sck,
   uint16_t miso,

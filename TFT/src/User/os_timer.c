@@ -1,11 +1,20 @@
 #include "os_timer.h"
 #include "includes.h"
 
-volatile uint32_t os_counter=0;
+volatile uint32_t os_counter = 0;
 
-//
 void OS_TimerInitMs(void)
 {
+#ifdef GD32F2XX
+  nvic_irq_enable(TIMER6_IRQn, 2U, 0U);
+
+  rcu_periph_clock_enable(RCU_TIMER6);
+  TIMER_CAR(TIMER6) = 1000 - 1;
+  TIMER_PSC(TIMER6) = mcuClocks.PCLK1_Timer_Frequency / 1000000 - 1;
+  TIMER_INTF(TIMER6) = (uint16_t)~(1<<0);
+  TIMER_DMAINTEN(TIMER6) |= 1<<0;
+  TIMER_CTL0(TIMER6) |= 0x01;
+#else
   NVIC_InitTypeDef NVIC_InitStructure;
 
   NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
@@ -20,26 +29,50 @@ void OS_TimerInitMs(void)
   TIM7->SR = (uint16_t)~(1<<0);
   TIM7->DIER |= 1<<0;
   TIM7->CR1 |= 0x01;
+#endif
 }
 
-void TIM7_IRQHandler(void)
+#ifdef GD32F2XX
+void TIMER6_IRQHandler(void)
 {
-  if ((TIM7->SR & 0x01) != 0) {   // update interrupt flag
-    TIM7->SR &= (uint16_t)~(1<<0); // clear interrupt flag
+  if ((TIMER_INTF(TIMER6) & 0x01) != 0)
+  { // update interrupt flag
+    TIMER_INTF(TIMER6) &= (uint16_t)~(1<<0);  // clear interrupt flag
 
     os_counter++;
 
-    setPrintTime(os_counter);
+    updatePrintTime(os_counter);
 
-    loopTouchScreen();    // check if lcd screen was pressed, update touchScreenIsPress
+    loopTouchScreen();
 
-    if(os_counter == (uint32_t)(~0)) {
+    if (os_counter == (uint32_t)(~0))
+    {
       os_counter = 0;
     }
   }
 }
+#else
+void TIM7_IRQHandler(void)
+{
+  if ((TIM7->SR & 0x01) != 0)
+  { // update interrupt flag
+    TIM7->SR &= (uint16_t)~(1<<0);  // clear interrupt flag
 
-/* 1ms */
+    os_counter++;
+
+    updatePrintTime(os_counter);
+
+    loopTouchScreen();    // check if lcd screen was pressed, update touchScreenIsPress
+
+    if (os_counter == (uint32_t)(~0))
+    {
+      os_counter = 0;
+    }
+  }
+}
+#endif
+
+// 1ms
 uint32_t OS_GetTimeMs(void)
 {
   return os_counter;
@@ -55,13 +88,16 @@ void OS_TaskInit(OS_TASK *task, uint32_t time_ms, FP_TASK function, void *para)
   task->task = function;
   task->para = para;
 }
-/*
-*/
+
 void OS_TaskLoop(OS_TASK *task_t)
 {
-  if(task_t->is_exist == 0)   return;
-  if(OS_GetTimeMs() < task_t->next_time)  return;
-  if(task_t->is_repeat == 0)
+  if (task_t->is_exist == 0)
+    return;
+
+  if (OS_GetTimeMs() < task_t->next_time)
+    return;
+
+  if (task_t->is_repeat == 0)
   {
     task_t->is_exist = 0;
   }
@@ -69,22 +105,20 @@ void OS_TaskLoop(OS_TASK *task_t)
   {
     task_t->next_time = OS_GetTimeMs() + task_t->time_ms;
   }
+
   (*task_t->task)(task_t->para);
 }
 
-/*
-*/
-void OS_TaskEnable(OS_TASK *task_t, uint8_t is_exec,uint8_t is_repeat)
+void OS_TaskEnable(OS_TASK *task_t, uint8_t is_exec, uint8_t is_repeat)
 {
   task_t->is_exist =1;
   task_t->is_repeat = is_repeat;
   task_t->next_time = OS_GetTimeMs() + task_t->time_ms;
-  if(is_exec)
+
+  if (is_exec)
     (*task_t->task)(task_t->para);
 }
 
-/*
-*/
 void OS_TaskDisable(OS_TASK *task_t)
 {
   task_t->is_exist = 0;

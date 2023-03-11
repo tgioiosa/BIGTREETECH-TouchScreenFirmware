@@ -20,8 +20,8 @@ void menuHeat(void)
     // icon                          label
     {
       {ICON_DEC,                     LABEL_DEC},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
-      {ICON_BACKGROUND,              LABEL_BACKGROUND},
+      {ICON_NULL,              LABEL_NULL},
+      {ICON_NULL,              LABEL_NULL},
       {ICON_INC,                     LABEL_INC},
       {ICON_SPINDLE,                 LABEL_SPINDLE},   //TG changed for CNC
       {ICON_500_RPM,                 LABEL_500_RPM},  //TG changed for CNC

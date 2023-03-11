@@ -1,4 +1,4 @@
-Import("env")
+Import("env","projenv")
 print("RUNNING EXTRA SCRIPT")
 #print(env.Dump())
 build_flags = env.ParseFlags(env['BUILD_FLAGS'])

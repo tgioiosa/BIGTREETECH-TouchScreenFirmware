@@ -8,47 +8,53 @@ extern "C" {
 #include <stdbool.h>
 #include "variants.h"
 
-// config.ini Parameter Settings / Feature Settings
-#define LANG_KEY_STATUS_SCREEN                "label_status_screen:"
-#define LANG_KEY_BAUDRATE                     "label_baudrate:"
+// config.ini Parameter Settings - Screen Settings and Feature Settings
 #define LANG_KEY_LANGUAGE                     "label_language:"
-#define LANG_KEY_ROTATE_UI                    "label_rotate_ui:"
-#define LANG_KEY_TERMINAL_ACK                 "label_terminal_ack:"
-#define LANG_KEY_PERSISTENT_INFO              "label_persistent_info:"
-#define LANG_KEY_FILE_LIST_MODE               "label_file_list_mode:"
+#define LANG_KEY_EMULATED_M600                "label_emulated_m600:"
+#define LANG_KEY_EMULATED_M109_M190           "label_emulated_m109_m190:"
+#define LANG_KEY_EVENT_LED                    "label_event_led:"
+#define LANG_KEY_FILE_COMMENT_PARSING         "label_file_comment_parsing:"
+#define LANG_KEY_ROTATED_UI                   "label_rotated_ui:"
 #define LANG_KEY_ACK_NOTIFICATION             "label_ack_notification:"
-#define LANG_KEY_EMULATE_M600                 "label_emulate_m600:"
+#define LANG_KEY_FILES_SORT_BY                "label_files_sort_by:"
+#define LANG_KEY_FILES_LIST_MODE              "label_files_list_mode:"
+#define LANG_KEY_FILENAME_EXTENSION           "label_filename_extension:"
+#define LANG_KEY_FAN_SPEED_PERCENTAGE         "label_fan_speed_percentage:"
+#define LANG_KEY_PERSISTENT_INFO              "label_persistent_info:"
+#define LANG_KEY_TERMINAL_ACK                 "label_terminal_ack:"
 #define LANG_KEY_SERIAL_ALWAYS_ON             "label_serial_always_on:"
 #define LANG_KEY_MARLIN_FULLSCREEN            "label_marlin_fullscreen:"
 #define LANG_KEY_MARLIN_SHOW_TITLE            "label_marlin_show_title:"
 #define LANG_KEY_MARLIN_TYPE                  "label_marlin_type:"
 #define LANG_KEY_MOVE_SPEED                   "label_move_speed:"
 #define LANG_KEY_AUTO_LOAD_LEVELING           "label_auto_load_leveling:"
-#define LANG_KEY_FAN_SPEED_PERCENT            "label_fan_speed_percent:"
-#define LANG_KEY_XY_OFFSET_PROBING            "label_xy_offset_probing:"
+#define LANG_KEY_PROBING_Z_OFFSET             "label_probing_z_offset:"
 #define LANG_KEY_Z_STEPPERS_ALIGNMENT         "label_z_steppers_alignment:"
-#define LANG_KEY_PS_ON                        "label_ps_on:"
+#define LANG_KEY_PS_AUTO_SHUTDOWN             "label_ps_auto_shutdown:"
 #define LANG_KEY_FIL_RUNOUT                   "label_fil_runout:"
-#define LANG_KEY_PL_RECOVERY_EN               "label_pl_recovery_en:"
+#define LANG_KEY_PL_RECOVERY                  "label_pl_recovery:"
 #define LANG_KEY_PL_RECOVERY_HOME             "label_pl_recovery_home:"
 #define LANG_KEY_BTT_MINI_UPS                 "label_btt_mini_ups:"
 #define LANG_KEY_TOUCH_SOUND                  "label_touch_sound:"
 #define LANG_KEY_TOAST_SOUND                  "label_toast_sound:"
 #define LANG_KEY_ALERT_SOUND                  "label_alert_sound:"
 #define LANG_KEY_HEATER_SOUND                 "label_heater_sound:"
-#define LANG_KEY_KNOB_LED_COLOR               "label_knob_led_color:"     //TG removed 8/22/21
-#define LANG_KEY_KNOB_LED_IDLE                "label_knob_led_idle:"      //TG removed 8/22/21
 #define LANG_KEY_LCD_BRIGHTNESS               "label_lcd_brightness:"
 #define LANG_KEY_LCD_IDLE_BRIGHTNESS          "label_lcd_idle_brightness:"
-#define LANG_KEY_LCD_IDLE_DELAY               "label_lcd_idle_delay:"
+#define LANG_KEY_LCD_IDLE_TIME                "label_lcd_idle_time:"
+#define LANG_KEY_LCD_LOCK_ON_IDLE             "label_lcd_lock_on_idle:"
+#define LANG_KEY_LED_ALWAYS_ON                "label_led_always_on:"
+#define LANG_KEY_KNOB_LED_COLOR               "label_knob_led_color:"
+#define LANG_KEY_KNOB_LED_IDLE                "label_knob_led_idle:"
 #define LANG_KEY_START_GCODE_ENABLED          "label_start_gcode_enabled:"
 #define LANG_KEY_END_GCODE_ENABLED            "label_end_gcode_enabled:"
 #define LANG_KEY_CANCEL_GCODE_ENABLED         "label_cancel_gcode_enabled:"
 
-// Machine Parameter Settings
+// Machine Parameter Settings - Param Title (ordered by gcode)
 #define LANG_KEY_STEPS_SETTING                "label_steps_setting:"
-#define LANG_KEY_MAXFEEDRATE                  "label_maxfeedrate:"
+#define LANG_KEY_FILAMENT_SETTING             "label_filament_setting:"
 #define LANG_KEY_MAXACCELERATION              "label_maxacceleration:"
+#define LANG_KEY_MAXFEEDRATE                  "label_maxfeedrate:"
 #define LANG_KEY_ACCELERATION                 "label_acceleration:"
 #define LANG_KEY_JERK                         "label_jerk:"
 #define LANG_KEY_JUNCTION_DEVIATION           "label_junction_deviation:"
@@ -57,13 +63,22 @@ extern "C" {
 #define LANG_KEY_FWRECOVER                    "label_fwrecover:"
 #define LANG_KEY_RETRACT_AUTO                 "label_retract_auto:"
 #define LANG_KEY_HOTEND_OFFSET                "label_hotend_offset:"
+#define LANG_KEY_HOTEND_PID                   "label_hotend_pid:"
+#define LANG_KEY_BED_PID                      "label_bed_pid:"
+#define LANG_KEY_STEALTH_CHOP                 "label_stealth_chop:"
+#define LANG_KEY_INPUT_SHAPING                "label_input_shaping:"
+#define LANG_KEY_DELTA_CONFIGURATION          "label_delta_configuration:"
+#define LANG_KEY_DELTA_TOWER_ANGLE            "label_delta_tower_angle:"
+#define LANG_KEY_DELTA_DIAGONAL_ROD           "label_delta_diagonal_rod:"
+#define LANG_KEY_DELTA_ENDSTOP                "label_delta_endstop:"
 #define LANG_KEY_PROBE_OFFSET                 "label_probe_offset:"
 #define LANG_KEY_LIN_ADVANCE                  "label_lin_advance:"
-#define LANG_KEY_FILAMENT_SETTING             "label_filament_setting:"
 #define LANG_KEY_CURRENT_SETTING              "label_current_setting:"
-#define LANG_KEY_BUMP_SENSITIVITY             "label_bump_sensitivity:"
 #define LANG_KEY_HYBRID_THRESHOLD             "label_hybrid_threshold:"
-#define LANG_KEY_STEALTH_CHOP                 "label_stealth_chop:"
+#define LANG_KEY_BUMP_SENSITIVITY             "label_bump_sensitivity:"
+#define LANG_KEY_MBL_OFFSET                   "label_mbl_offset:"
+
+// Machine Parameter Settings - Param Attributes (ordered by gcode)
 #define LANG_KEY_PRINT_ACCELERATION           "label_print_acceleration:"
 #define LANG_KEY_RETRACT_ACCELERATION         "label_retract_acceleration:"
 #define LANG_KEY_TRAVEL_ACCELERATION          "label_travel_acceleration:"
@@ -75,7 +90,6 @@ extern "C" {
 #define LANG_KEY_SWAP_RECOVER_LENGTH          "label_swap_recover_length:"
 #define LANG_KEY_RECOVER_FEEDRATE             "label_recover_feedrate:"
 #define LANG_KEY_SWAP_RECOVER_FEEDRATE        "label_swap_recover_feedrate:"
-#define LANG_KEY_MBL_OFFSET                   "label_mbl_offset:"
 
 // Save / Load
 #define LANG_KEY_SAVE                         "label_save:"
@@ -144,6 +158,7 @@ extern "C" {
 #define LANG_KEY_BUSY                         "label_busy:"
 #define LANG_KEY_LOADING                      "label_loading:"
 #define LANG_KEY_UNCONNECTED                  "label_unconnected:"
+#define LANG_KEY_LISTENING                    "label_listening:"
 
 // Process Info
 #define LANG_KEY_INFO                         "label_info:" //Info Sign
@@ -157,17 +172,20 @@ extern "C" {
 #define LANG_KEY_PROCESS_COMPLETED            "label_process_completed:"
 #define LANG_KEY_PROCESS_ABORTED              "label_process_aborted:"
 
-// TFT SD, U_DISK, Onboard SD, Filament Runout Process Commands / Status / Info
-#define LANG_KEY_TFTSD                        "label_tftsd:"
-#define LANG_KEY_READ_TFTSD_ERROR             "label_read_tftsd_error:"
-#define LANG_KEY_TFTSD_INSERTED               "label_tftsd_inserted:"
-#define LANG_KEY_TFTSD_REMOVED                "label_tftsd_removed:"
-#define LANG_KEY_U_DISK                       "label_u_disk:"
-#define LANG_KEY_READ_U_DISK_ERROR            "label_read_u_disk_error:"
-#define LANG_KEY_U_DISK_INSERTED              "label_u_disk_inserted:"
-#define LANG_KEY_U_DISK_REMOVED               "label_u_disk_removed:"
-#define LANG_KEY_ONBOARDSD                    "label_onboardsd:"
-#define LANG_KEY_READ_ONBOARDSD_ERROR         "label_read_onboardsd_error:"
+// TFT Media, Onboard Media, Filament Runout Process Commands / Status / Info
+#define LANG_KEY_TFT_SD                       "label_tft_sd:"
+#define LANG_KEY_TFT_SD_INSERTED              "label_tft_sd_inserted:"
+#define LANG_KEY_TFT_SD_REMOVED               "label_tft_sd_removed:"
+#define LANG_KEY_TFT_SD_NOT_DETECTED          "label_tft_sd_not_detected:"
+#define LANG_KEY_TFT_SD_READ_ERROR            "label_tft_sd_read_error:"
+#define LANG_KEY_TFT_USB                      "label_tft_usb:"
+#define LANG_KEY_TFT_USB_INSERTED             "label_tft_usb_inserted:"
+#define LANG_KEY_TFT_USB_REMOVED              "label_tft_usb_removed:"
+#define LANG_KEY_TFT_USB_NOT_DETECTED         "label_tft_usb_not_detected:"
+#define LANG_KEY_TFT_USB_READ_ERROR           "label_tft_usb_read_error:"
+#define LANG_KEY_ONBOARD_SD                   "label_onboard_sd:"
+#define LANG_KEY_ONBOARD_USB                  "label_onboard_usb:"
+#define LANG_KEY_ONBOARD_SD_READ_ERROR        "label_onboard_sd_read_error:"
 #define LANG_KEY_FILAMENT_RUNOUT              "label_filament_runout:"
 
 // Steppers, Print, Probe Process Commands / Status / Info
@@ -183,6 +201,8 @@ extern "C" {
 #define LANG_KEY_DEPLOY                       "label_deploy:"
 #define LANG_KEY_STOW                         "label_stow:"
 #define LANG_KEY_REPEAT                       "label_repeat:"
+#define LANG_KEY_HS_ON                        "label_hs_on:"
+#define LANG_KEY_HS_OFF                       "label_hs_off:"
 
 // Printer Tools
 //#define LANG_KEY_NOZZLE                       "label_nozzle:"     //TG 1/14/20 removed for adding Spindle
@@ -247,10 +267,16 @@ extern "C" {
 
 #define LANG_KEY_SETTINGS                     "label_settings:"
 #define LANG_KEY_SCREEN_SETTINGS              "label_screen_settings:"
-#define LANG_KEY_MACHINE_SETTINGS             "label_machine_settings:"
-#define LANG_KEY_MARLIN_MODE_SETTINGS         "label_marlin_mode_settings:"
-#define LANG_KEY_FEATURE_SETTINGS             "label_feature_settings:"
+#define LANG_KEY_UI_SETTINGS                  "label_ui_settings:"
 #define LANG_KEY_SOUND                        "label_sound:"
+#define LANG_KEY_MARLIN_MODE_SETTINGS         "label_marlin_mode_settings:"
+#define LANG_KEY_MACHINE_SETTINGS             "label_machine_settings:"
+#define LANG_KEY_PARAMETER_SETTINGS           "label_parameter_settings:"
+#define LANG_KEY_FEATURE_SETTINGS             "label_feature_settings:"
+#define LANG_KEY_CONNECTION_SETTINGS          "label_connection_settings:"
+#define LANG_KEY_SERIAL_PORTS                 "label_serial_ports:"
+#define LANG_KEY_BAUDRATE                     "label_baudrate:"
+#define LANG_KEY_EEPROM_SETTINGS              "label_eeprom_settings:"
 #define LANG_KEY_RGB_SETTINGS                 "label_rgb_settings:"
 #define LANG_KEY_RGB_OFF                      "label_rgb_off:"
 #define LANG_KEY_TERMINAL                     "label_terminal:"
@@ -281,9 +307,12 @@ extern "C" {
 #define LANG_KEY_ABL_SLOT3                    "label_abl_slot3:"
 #define LANG_KEY_ABL_SLOT_EEPROM              "label_abl_slot_eeprom:"
 #define LANG_KEY_ABL_Z                        "label_abl_z:"
+#define LANG_KEY_LEVEL_CORNER                 "label_level_corner:"
+#define LANG_KEY_LEVEL_CORNER_INFO            "label_level_corner_info:"
 #define LANG_KEY_P_OFFSET                     "label_p_offset:"
 #define LANG_KEY_H_OFFSET                     "label_h_offset:"
 #define LANG_KEY_DISTANCE                     "label_distance:"
+#define LANG_KEY_SHIM                         "label_shim:"
 #define LANG_KEY_LOAD_UNLOAD                  "label_load_unload:"
 #define LANG_KEY_LOAD_UNLOAD_SHORT            "label_load_unload_short:"
 #define LANG_KEY_TOUCHSCREEN_ADJUST           "label_touchscreen_adjust:"
@@ -313,16 +342,15 @@ extern "C" {
 #define LANG_KEY_UNIFIEDHEAT                  "label_unifiedheat:"
 #define LANG_KEY_TOUCH_TO_EXIT                "label_touch_to_exit:"
 #define LANG_KEY_MAINMENU                     "label_mainmenu:"
-#define LANG_KEY_PARAMETER_SETTING            "label_parameter_setting:"
-#define LANG_KEY_EEPROM_SETTINGS              "label_eeprom_settings:"
-#define LANG_KEY_LEVELING_EDGE_DISTANCE       "label_leveling_edge_distance:"
 #define LANG_KEY_TUNING                       "label_tuning:"
+#define LANG_KEY_MPC                          "label_mpc:"
+#define LANG_KEY_MPC_TITLE                    "label_mpc_title:"
 #define LANG_KEY_PID                          "label_pid:"
 #define LANG_KEY_PID_TITLE                    "label_pid_title:"
 #define LANG_KEY_PID_START_INFO               "label_pid_start_info:"
 #define LANG_KEY_PID_START_INFO_2             "label_pid_start_info_2:"
 #define LANG_KEY_PID_START_INFO_3             "label_pid_start_info_3:"
-//#define LANG_KEY_TUNE_EXTRUDER                "label_tune_extruder:"              //TG 2/10/21 removed for CNC
+#define LANG_KEY_TUNE_EXTRUDER                "label_tune_extruder:"                //TG 2/10/21 removed for CNC, //TG 2/28/23 added back
 //#define LANG_KEY_TUNE_EXT_EXTRUDE_100         "label_tune_ext_extrude_100:"       //TG 2/10/21 removed for CNC
 //#define LANG_KEY_TUNE_EXT_TEMP                "label_tune_ext_temp:"              //TG 2/10/21 removed for CNC
 //#define LANG_KEY_TUNE_EXT_TEMPLOW             "label_tune_ext_templow:"           //TG 2/18/21 removed for CNC           
@@ -334,7 +362,6 @@ extern "C" {
 //#define LANG_KEY_TUNE_EXT_MEASURED            "label_tune_ext_measured:"          //TG 2/18/21 removed for CNC
 //#define LANG_KEY_TUNE_EXT_OLD_ESTEP           "label_tune_ext_old_estep:"         //TG 2/18/21 removed for CNC
 //#define LANG_KEY_TUNE_EXT_NEW_ESTEP           "label_tune_ext_new_estep:"         //TG 2/18/21 removed for CNC
-#define LANG_KEY_CONNECTION_SETTINGS          "label_connection_settings:"
 #define LANG_KEY_NOTIFICATIONS                "label_notifications:"
 //#define LANG_KEY_MESH_EDITOR                  "label_mesh_editor:"                //TG 7/17/22 removed for CNC
 //#define LANG_KEY_MESH_TUNER                   "label_mesh_tuner:"                 //TG 7/17/22 removed for CNC
@@ -353,8 +380,14 @@ extern "C" {
 #define LANG_KEY_CLICK_FOR_MORE               "label_click_for_more:"
 //#define LANG_KEY_EXT_TEMPLOW                  "label_ext_templow:"        //TG 2/18/21 removed
 #define LANG_KEY_HEAT_HOTEND                  "label_heat_hotend:"
+#define LANG_KEY_DESIRED_TEMPLOW              "label_desired_templow:"
+#define LANG_KEY_WAIT_HEAT_UP                 "label_wait_heat_up:"
 #define LANG_KEY_Z_ALIGN                      "label_z_align:"
 #define LANG_KEY_MACROS                       "label_macros:"
+#define LANG_KEY_MESH_VALID                   "label_mesh_valid:"
+#define LANG_KEY_CONNECT_PROBE                "label_connect_probe:"
+#define LANG_KEY_DISCONNECT_PROBE             "label_disconnect_probe:"
+#define LANG_KEY_CALIBRATION                  "label_calibration:"
 
 #define LANG_KEY_TGMENU                       "label_TG Menu:"
 #define LANG_KEY_M503                         "label_Read EEPROM:"
@@ -406,10 +439,12 @@ extern "C" {
 #define LANG_KEY_MARLIN_INT                   "label_Marlin_Int:"           //TG 7/17/22 new
 #define LANG_KEY_PIDRUN_INT                   "label_PIDRUN_Int:"           //TG 7/17/22 new
 #define LANG_KEY_CUST_SPEED                   "label_Custom:"               //TG 7/17/22 new
-#define LANG_KEY_SHOULD_M0_PAUSE              "label_should M0 pause:"     //TG 10/3/22 new
-#define LANG_KEY_PROBE_STOCK                  "label_probe_stock    :"     //TG 10/12/22 new
+#define LANG_KEY_SHOULD_M0_PAUSE              "label_should M0 pause:"      //TG 10/3/22 new
+#define LANG_KEY_PROBE_STOCK                  "label_probe_stock    :"      //TG 10/12/22 new
+#define LANG_KEY_VFD_CONTROL                  "label_vfd_control    :"      //TG 12/26/22 new
 //#define LANG_KEY_Z_0                          "label_Z to 0mm:"
 //#define LANG_KEY_Z_300                        "label_Z to 300mm:"
+#define LANG_KEY_DISABLED_FOR_CNC             "label_disabled_for_cnc:"     //TG 3/2/23 added
 
 #ifdef __cplusplus
 }

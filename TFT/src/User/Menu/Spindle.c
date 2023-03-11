@@ -14,6 +14,8 @@
 
 uint8_t speed_mismatch;
 static uint8_t spIndex = 0;          // should always be zero
+static uint8_t last_spindle_index = TOOL0;
+static uint8_t last_bed_index = BED;
 static uint8_t stepsIndex = 0;       //TG 1/16/20 new where the list starts as default 1=CW
 //uint8_t spindleState=0;              // spindle off = 0       
 
@@ -32,8 +34,8 @@ MENUITEMS spindleItems = {
   LABEL_SPINDLE ,
   // icon                         label
   {{ICON_DEC,                     LABEL_DEC},
-   {ICON_BACKGROUND,              LABEL_BACKGROUND},
-   {ICON_BACKGROUND,              LABEL_BACKGROUND},
+   {ICON_NULL,              LABEL_NULL},
+   {ICON_NULL,              LABEL_NULL},
    {ICON_INC,                     LABEL_INC},
    {ICON_SPINDLE,                 LABEL_SPINDLE},     
    {ICON_500_RPM,                 LABEL_500_RPM},   //TODO change icon
@@ -61,20 +63,20 @@ void updateSpeedStatusDisplay(u8 index, bool speed_only)
   if(speed_only == false) {
     sprintf(tempstr, "%-15s", spindleDisplayID[index]);                               // display the tool id
     GUI_DispString(exhibitRect.x0, exhibitRect.y0, (u8 *)tempstr);                    // above the speeds
-    setLargeFont(true);
+    setFontSize(FONT_SIZE_LARGE);
     symPtr = (infoSettings.cutter_disp_unit == MPWM) ? (uint8_t *)"PWM" 
              : (infoSettings.cutter_disp_unit == MPCT) ? (uint8_t *)"%" 
              : (uint8_t *)"RPM";
     GUI_DispStringCenter((exhibitRect.x0 + exhibitRect.x1)>>1, exhibitRect.y0, symPtr);
   }
   
-  setLargeFont(true);
+  setFontSize(FONT_SIZE_LARGE);
   GUI_SetColor(speed_mismatch==1 ? RED : infoSettings.font_color);  //TG 8/31/21 if speed mismatch, highlight target/actual in RED
   sprintf(tempstr, "%5d/%-5d", convertSpeed_Marlin_2_LCD(index,spindleGetCurSpeed(index)), 
           convertSpeed_Marlin_2_LCD(index, spindleGetSetSpeed(index))); // show temp target/actual in large font
   GUI_DispStringInPrect(&exhibitRect, (u8 *)tempstr);
   GUI_SetColor(infoSettings.font_color);  //TG 8/31/21 restore normal font color for code that follows                                       
-  setLargeFont(false);
+  setFontSize(FONT_SIZE_NORMAL);
 
   if(speed_only == false) {
     drawSpindleStatusInIcon();    // show CW, CCW, or nothing in spindle icon
@@ -99,6 +101,15 @@ uint8_t toPercent (uint8_t speed){
   return (speed * 100.0f) / infoSettings.spindle_pwm_max[spIndex] + 0.5f;
 }
 
+void spindleSetCurIndex(int8_t index)   //TG 2/24/23 new added
+{
+  if (index >= 0)  // set specific tool
+    spIndex = (uint8_t)(index);
+  else if (index == -1)  // set last used hotend index
+    spIndex= last_spindle_index;
+  else  // set last used bed index
+    spIndex = last_bed_index;
+}
 
 void menuSpindle(void)   //TODO should rename this and this file from tool to spindle
 {
@@ -207,6 +218,7 @@ void menuSpindle(void)   //TODO should rename this and this file from tool to sp
         }
 
       case KEY_ICON_4:    //TODO  MIGHT NEED TO WORK ON THIS -  all references need to change to laser
+        infoHost.rx_ok[0] = true; //TG TEST TEST TEST
         if ((infoSettings.spindle_count + infoSettings.spindle_ctrl_count) > 1)
           spIndex = (spIndex + 1) % (infoSettings.spindle_count + infoSettings.spindle_ctrl_count);
 
@@ -266,28 +278,35 @@ void menuSpindle(void)   //TODO should rename this and this file from tool to sp
     loopProcess();
   }
 
+  if (spIndex < BED)
+    last_spindle_index = spIndex;  // save last used hotend index
+  else
+    last_bed_index = spIndex;  // save last used bed index
+
+
 }
 
 void drawSpindleStatusInIcon(void)    //TG new adds text to an icon at ss_spin_point
 {
   //icons and their values are updated one by one to reduce flicker/clipping
   //char tempstr[45];
-  GUI_POINT ss_spin_point = {SSICON_WIDTH - 3*BYTE_WIDTH-BYTE_WIDTH/4, SSICON_NAME_Y0};
+  GUI_POINT ss_spin_point = {SS_ICON_WIDTH - 3*BYTE_WIDTH-BYTE_WIDTH/4, SS_ICON_NAME_Y0};
   LIVE_INFO lvIcon;
   lvIcon.enabled[0] = true;
   lvIcon.lines[0].h_align = LEFT;
   lvIcon.lines[0].v_align = TOP;
-  lvIcon.lines[0].fn_color = SSICON_NAME_COLOR;
+  lvIcon.lines[0].fn_color = SS_NAME_COLOR;
   lvIcon.lines[0].text_mode = GUI_TEXTMODE_TRANS;
   lvIcon.lines[0].pos = ss_spin_point;
-  lvIcon.lines[0].large_font = NAME_LARGE_FONT;
+  lvIcon.lines[0].font = FONT_SIZE_NORMAL;
   lvIcon.enabled[1] = false;
   lvIcon.enabled[2] = false;
+  lvIcon.iconIndex = spindleItems.items[4].icon; //TG only needed if you set redraw=true on showLiveInfo()
               
   //TOOL / EXT
   lvIcon.lines[0].text = (uint8_t *)(infoSettings.spin_dir==0 ? "CCW" : " CW");
   if(spindleState==0) {lvIcon.lines[0].text = (uint8_t *)"OFF";}
-  showLiveInfo(4, &lvIcon, &spindleItems.items[4]);
+  showLiveInfo(4, &lvIcon, true);
  
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRYLBL_COLOR);
