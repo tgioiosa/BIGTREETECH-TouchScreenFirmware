@@ -107,7 +107,7 @@ void menuInfo(void)
   char buf[128];
 
   const char *const msrcfile = (char *const)Marlin_folder_name;  //TG 2/12/23 added to display Marlin source folder name
-  const char *const srcfile = SRC_FILE_NAME;  //TG 2/12/23 added to display source folder name
+  const char *const srcfile = SRC_NAME_SHORT;  //TG 3/12/23 added to display source folder name
   const char *const hardware = HARDWARE_MANUFACTURER HARDWARE_VERSION;
 
   GUI_Clear(infoSettings.bg_color);
