@@ -13,7 +13,7 @@ uint8_t currentFan = 0;             //TG for multiple fan indices
 uint8_t currentSpeedFlowID = 0;     //TG renamed for speed or flow, 2 indices
 uint8_t currentSpindleSpeedID = 0;  //TG 2/24/21 new for CNC will always be just the one tool
 uint8_t currentBCIndex = 0;
-static uint32_t lastTime = 0;
+
 bool nextWCSupdate = false;         //TG 10/4/22 - added flag, it gets set whenever parseAck.c gets a workspace change msg from Marlin
 
 //Icons list for tool change  //TG 1/16/20 changed to just 4 tools //TODO can be removed after removing PreHeat.c, Pid.c, Heat.c
@@ -151,10 +151,12 @@ const uint16_t iconToggle[ITEM_TOGGLE_NUM] =
   CHARICON_TOGGLE_ON
 };
 
+
 // Check time elapsed against the time specified in milliseconds for displaying/updating info on screen
-// Use this for timed screen updates in menu loops only
+// Use this for timed screen updates in menu loops only (one instance, don't use twice in same menu loop)
 bool nextScreenUpdate(uint32_t duration)
 {
+  static uint32_t lastTime = 0;
   uint32_t curTime = OS_GetTimeMs();
   if (curTime > (lastTime + duration))
   {
@@ -165,6 +167,27 @@ bool nextScreenUpdate(uint32_t duration)
   {
     return false;
   }
+}
+//TG 3/19/23 added -  Use this for a second elapsed time function in menu loops, this code
+//can be synchronized if you call it with reset=true before using it for elapsed time count 
+bool nextTimeOccurs(uint32_t duration, bool reset){
+static uint32_t lastTime;
+uint32_t curTime = OS_GetTimeMs();
+if (reset == true)                    // just re-synchronize the starting time to now 
+{
+  lastTime = curTime;
+  return false;
+}
+
+if (curTime > (lastTime + duration))
+{
+  lastTime = curTime;
+  return true;
+}
+else
+{
+  return false;
+}
 }
 
 #ifdef FRIENDLY_Z_OFFSET_LANGUAGE

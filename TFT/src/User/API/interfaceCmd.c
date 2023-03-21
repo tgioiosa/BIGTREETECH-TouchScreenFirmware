@@ -710,8 +710,9 @@ void sendQueueCmd(void)
             // pause if printing from TFT media and purge M0/M1 command
             if (infoFile.source < FS_ONBOARD_MEDIA)
             {
-              sendCmd(true, avoid_terminal);
-              pausePrint(true, PAUSE_M0);
+              sendCmd(true, avoid_terminal);      //TG **changed true to false, when true the M0 was never forwarded to Marlin before purging it              
+              if (infoSettings.should_M0_pause)   //TG 3/15/23 added this switch, without it the pause Dialog is always shown on/after M0/M1 action
+                pausePrint(true, PAUSE_M0);       //TG display pause popup Dialog, pause print, and flip pause btn to resume btn
               return;
             }
           }
@@ -1105,6 +1106,8 @@ void sendQueueCmd(void)
             stripChecksum(rawMsg);
             msgText = stripHead(rawMsg);
 
+            //TG 3/19/23 added checks to ignore M117 messages in parseAck.c when printing from TFT
+            //because they will be displayed here as they come in from the SD or USB source of the TFT
             statusScreen_setMsg((uint8_t *)"M117", (uint8_t *)msgText);
 
             if (MENU_IS_NOT(menuStatus))

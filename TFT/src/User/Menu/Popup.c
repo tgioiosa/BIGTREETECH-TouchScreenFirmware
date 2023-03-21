@@ -66,6 +66,7 @@ void popupDrawPage(DIALOG_TYPE type, BUTTON * btn, const uint8_t * title, const 
   {
     buttonNum = 0;
     windowButton = btn;
+    window.type = type; //TG 3/15/23 moved up here, was at bottom of function
 
     if (yes && yes[0])
     {

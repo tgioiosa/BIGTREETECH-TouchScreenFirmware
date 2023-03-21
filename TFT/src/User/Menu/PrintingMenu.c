@@ -56,12 +56,14 @@ enum
   LIVE_INFO_BOTTOM_ROW = (1 << 2),
 };
 
-const uint8_t printingIcon[] = {ICON_PRINTING_SPINDLE, ICON_PRINTING_VACUUM,    ICON_PRINTING_FAN,
-                                ICON_PRINTING_TIMER,  ICON_PRINTING_ZLAYER, ICON_PRINTING_SPEED};
+const uint8_t printingIcon[] = {ICON_PRINTING_SPINDLE, ICON_PRINTING_VACUUM, ICON_PRINTING_FAN,
+                                ICON_PRINTING_TIMER, ICON_PRINTING_ZLAYER, ICON_PRINTING_SPEED};
 
-const uint8_t printingIcon2nd[] = {ICON_PRINTING_SPEED, ICON_PRINTING_FLOW};
+const uint8_t printingIcon2nd[] = {ICON_PRINTING_SPEED, ICON_PRINTING_FLOW};    //TG 3/19/23 not using flow for CNC
+const uint8_t printingIcon1st[] = {ICON_PRINTING_SPINDLE, ICON_PRINTING_LASER}; //TG 3/19/23 for Spindle/Laser
 
-const char * const speedId[2] = {"Speed", "Flow "};
+
+const char * const speedId[2] = {"Speed", "Flow "}; //TG 3/19/23 not using flow for CNC
 
 #define TOGGLE_TIME     2000     // 1 seconds is 1000
 #define LAYER_DRAW_TIME 500   // 1 seconds is 1000
@@ -82,21 +84,15 @@ enum
   PRINT_BOTTOM_ROW = (1 << 2),
 };
 
-enum
+enum  //TG defines layout of the printing_icons (small) at upper half of screen
 {
-  ICON_POS_EXT = 0,
-  ICON_POS_BED,
+  ICON_POS_SPDL = 0,
+  ICON_POS_VAC,
   ICON_POS_FAN,
   ICON_POS_TIM,
   ICON_POS_Z,
   ICON_POS_SPD,
 };
-#define SPDL_ICON_POS 0   //TG defines layout of the printing_icons (small) at upper half of screen
-#define VAC_ICON_POS  1
-#define FAN_ICON_POS  2
-#define TIM_ICON_POS  3
-#define Z_ICON_POS    4
-#define SPD_ICON_POS  5
 
 const ITEM itemIsPause[2] = {                   //TG changes the icon from pause to resume
   // icon                        label
@@ -148,7 +144,7 @@ static void setLayerNumberTxt(char * layer_number_txt)
   }
 }
 
-// initialize printing info before opening Printing menu
+// initialize printing info before opening Printing menu (was menuBeforePrinting())
 static void initMenuPrinting(void)
 {
   getPrintTitle(title, MAX_TITLE_LEN);  // get print title according to print originator (remote or local to TFT)
@@ -211,6 +207,7 @@ void startPrinting(void)
   OPEN_MENU(menuPrinting);
 }
 
+//TG 3/19/23 Universal reDraw for any of the 6 printing icons and their Live Data
 static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
 {
   LIVE_INFO lvIcon;
@@ -219,33 +216,36 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
   char tempstrBottom[14];
 
   lvIcon.enabled[2] = false;
-
-  if (icon_pos == ICON_POS_BED && currentBCIndex != 0)  // Bed & Chamber
-    lvIcon.iconIndex = printingIcon2nd[0];
-  else if (icon_pos == ICON_POS_SPD && currentSpeedFlowID != 0)  // Speed & Flow
+ 
+  //TG 3/19/23 alternate icons on some positions if needed
+  if (icon_pos == ICON_POS_SPDL && infoSettings.laser_mode != 0)  //TG 3/19/23 Spindle & Laser
+    lvIcon.iconIndex = printingIcon1st[1];
+  else if (icon_pos == ICON_POS_SPD && currentSpeedFlowID != 0)   // Speed & Flow
     lvIcon.iconIndex = printingIcon2nd[1];
   else
     lvIcon.iconIndex = printingIcon[icon_pos];
 
+  //TG ================================== TOP text row on icon (offset x=52, y=1)
   if (draw_type & LIVE_INFO_TOP_ROW)
   {
-    lvIcon.enabled[0] = true;
+    lvIcon.enabled[0] = true;                                     //TG enable the live icon
     lvIcon.lines[0].h_align = LEFT;
     lvIcon.lines[0].v_align = TOP;
     lvIcon.lines[0].pos = (GUI_POINT){.x = PS_ICON_TITLE_X, .y = PS_ICON_TITLE_Y};
     lvIcon.lines[0].font = FONT_SIZE_NORMAL;
     lvIcon.lines[0].fn_color = infoSettings.font_color;
     lvIcon.lines[0].text_mode = GUI_TEXTMODE_TRANS;
-    lvIcon.lines[0].text = (uint8_t *)tempstrTop;
+    lvIcon.lines[0].text = (uint8_t *)tempstrTop;                 //TG initialize pointer to text
 
     switch (icon_pos)
     {
-      case ICON_POS_EXT:
-        lvIcon.lines[0].text = (uint8_t *)heatDisplayID[currentTool];
+      case ICON_POS_SPDL:
+        //TG 3/19/23 show label at top - formatted text uses sprintf to tempstrTop (same as lvIcon.lines[n].text)
+        sprintf(tempstrTop, "%s %s ", heatShortID[currentTool],  currentSpindleSpeedID ? (u8*)"Act" : (u8*)"Set");
         break;
 
-      case ICON_POS_BED:
-        lvIcon.lines[0].text = (uint8_t *)heatDisplayID[BED + currentBCIndex];
+      case ICON_POS_VAC:
+        lvIcon.lines[0].text = (uint8_t *)vacuumDisplayID[0];   //TG 3/19/23 simple text direct to lvIcon.lines[0].text
         break;
 
       case ICON_POS_FAN:
@@ -281,6 +281,7 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
     lvIcon.enabled[0] = false;
   }
 
+  //TG ================================== BOTTOM text row on icon (offset varies)
   if (draw_type & LIVE_INFO_BOTTOM_ROW)
   {
     lvIcon.enabled[1] = true;
@@ -296,12 +297,19 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
 
     switch (icon_pos)
     {
-      case ICON_POS_EXT:
-        sprintf(tempstrBottom, "%3d/%-3d", heatGetCurrentTemp(currentTool), heatGetTargetTemp(currentTool));
+      case ICON_POS_SPDL:
+        //TG 3/19/23 show Set or Actual speed on bottom line of icon 
+        sprintf(tempstrBottom, " %d", currentSpindleSpeedID ? convertSpeed_Marlin_2_LCD(currentTool,spindleGetCurSpeed(currentTool)) : 
+                 convertSpeed_Marlin_2_LCD(currentTool,spindleGetSetSpeed(currentTool)));
+        //TG since this info toggles, the value should be cleared each toggle cause prev chars will stay on LCD
+        lvIcon.lines[1].text = (uint8_t *)"      "; //TG clear any old value first in case it
+        showLiveInfo(0, &lvIcon, false);            //had more digits (they stay behind on LCD)      
+        lvIcon.lines[1].text = (uint8_t *)tempstrBottom;
         break;
 
-      case ICON_POS_BED:
-        sprintf(tempstrBottom, "%3d/%-3d", heatGetCurrentTemp(BED + currentBCIndex), heatGetTargetTemp(BED + currentBCIndex));
+      case ICON_POS_VAC:
+        sprintf(tempstrBottom, "%s %s", (vacuumState & 2) == 2 ? (char*)"Auto" : (char*)"", (vacuumState & 1) == 1 ? (char*)"On" : (char*)"Off");
+        //sprintf(tempstrBottom, "%3d/%-3d", heatGetCurrentTemp(BED + currentBCIndex), heatGetTargetTemp(BED + currentBCIndex));
         break;
 
       case ICON_POS_FAN:
@@ -347,22 +355,21 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
 static inline void toggleInfo(void)
 {
   if (nextScreenUpdate(TOGGLE_TIME))
-  {
-    if (infoSettings.hotend_count > 1)
-    {
-      currentTool = (currentTool + 1) % infoSettings.hotend_count;
-      reDrawPrintingValue(ICON_POS_EXT, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
-    }
-
-    if (infoSettings.chamber_en == 1)
-    {
-      TOGGLE_BIT(currentBCIndex, 0);
-      reDrawPrintingValue(ICON_POS_BED, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
-    }
-    else
-    {
-      reDrawPrintingValue(ICON_POS_BED, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
-    }
+  { //TG commented out not needed since there is only one spindle for CNC
+    //currentSpeedID = (currentSpeedID + 1) % 2;  //TG 2/24/21 don't toggle plot speed / flow, flow is not used for CNC
+    currentSpindleSpeedID = (currentSpindleSpeedID + 1) % 2;  // toggle between spindle Actual and spindle Set speeds
+    reDrawPrintingValue(ICON_POS_SPDL, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
+  
+    //TG commented out not needed since there is only one vaccum for CNC 
+    //if (infoSettings.chamber_en == 1)
+    //{
+    //  TOGGLE_BIT(currentBCIndex, 0);
+    //  reDrawPrintingValue(ICON_POS_VAC, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
+    //}
+    //else
+    //{
+    //  reDrawPrintingValue(ICON_POS_VAC, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
+    //}
 
     if ((infoSettings.fan_count + infoSettings.ctrl_fan_en) > 1)
     {
@@ -374,7 +381,7 @@ static inline void toggleInfo(void)
       reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
     }
 
-    TOGGLE_BIT(currentSpeedFlowID, 0);
+    //TOGGLE_BIT(currentSpeedFlowID, 0);  //TG 2/24/21 don't toggle plot speed / flow, flow is not used for CNC
     reDrawPrintingValue(ICON_POS_SPD, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
 
     speedQuery();
@@ -503,6 +510,11 @@ void printSummaryPopup(void)
 
 void menuPrinting(void)
 {
+
+
+
+
+
   MENUITEMS printingItems = {
     // title
     LABEL_NULL,
@@ -519,25 +531,33 @@ void menuPrinting(void)
     }
   };
 
-  uint8_t nowFan[MAX_FAN_COUNT] = {0};
-  uint8_t oldProgress = 0;
-  uint16_t curspeed[2] = {0};
+  //TG 3/19/23 so we can track when speed changes happen and display them quickly
+  uint16_t lastCurrent = spindleGetCurSpeed(currentTool);
+  uint16_t lastTarget = spindleGetSetSpeed(currentTool);
+
+  uint8_t nowFan[MAX_FAN_COUNT] = {0};    //so state of fan can be checked for change
+  uint8_t nowVac = 0;                     //TG 3/19/23 so state of vacuum can be checked for change
+  uint8_t oldProgress = 0;                //TG 8/21/21 added to fix V27
+  uint16_t curspeed[2] = {0};             //so state of Print Speed can be checked for change
   uint32_t time = 0;
-  HEATER nowHeat;
+ //HEATER    nowHeat;                     //TG 2/23/21 take out for CNC
   float curLayerHeight = 0;
   float usedLayerHeight = 0;
   float prevLayerHeight = 0;
   uint16_t curLayerNumber = 0;
   uint16_t prevLayerNumber = 0;
   bool layerDrawEnabled = false;
-  bool lastPause = isPaused();
-  bool lastPrinting = isPrinting();
+  bool lastPause = isPaused();            //TG returns 1=paused, 0=not-paused
+  bool lastPrinting = isPrinting();       //TG returns 1=printing, 0=idle  
 
-  memset(&nowHeat, 0, sizeof(HEATER));
+  //memset(&nowHeat, 0, sizeof(HEATER));  //TG 2/23/21 take out for CNC
 
-  if (lastPrinting == true)
-  {
+  if (lastPrinting == true)               //TG if we are now printing
+  { //TG sets icon to PAUSE (if not paused) or RESUME (if paused) based on lastPause flag
     printingItems.items[KEY_ICON_4] = itemIsPause[lastPause];
+    //TG 3/19/23 if KEY_ICON_4 = Resume, re-sync the resume beep timer to count from the instant the button changed
+    if (lastPause == 1) nextTimeOccurs(5000UL, true);   
+    //TG below line displays STL preview if it exists, otherwise BABYSTEP icon
     printingItems.items[KEY_ICON_5].icon = (infoFile.source < FS_ONBOARD_MEDIA && isPrintModelIcon()) ? ICON_PREVIEW : ICON_BABYSTEP;
   }
   else  // returned to this menu after print was done or aborted
@@ -550,11 +570,11 @@ void menuPrinting(void)
 
   printingItems.title.address = title;
 
-  menuDrawPage(&printingItems);
-  drawLiveInfo();
+  menuDrawPage(&printingItems); //TG draw the basic page layout (4 blank top icons in this case)
+  drawLiveInfo();               //TG calls reDrawPrintingValue() to draw all the printing icons (6 top icons)
 
   #ifndef PORTRAIT_MODE
-    if (lastPrinting == false)
+    if (lastPrinting == false)        //TG if printing has just finished?
       drawPrintInfo();
   #endif
 
@@ -562,28 +582,30 @@ void menuPrinting(void)
   {
     //Scroll_DispString(&titleScroll, LEFT);  // scroll display file name will take too many CPU cycles
 
-    // check nozzle temp change
-    if (nowHeat.T[currentTool].current != heatGetCurrentTemp(currentTool) ||
-        nowHeat.T[currentTool].target != heatGetTargetTemp(currentTool))
+    //check spindle speeds change  //TG 2/23/21 since reValueSpindle gets called in toggle() function, 
+    //this isn't absolutely necessay, but it does allow quicker than 2 sec display of speed changes from toggle()
+    if(spindleGetCurSpeed(currentTool) != lastCurrent || spindleGetSetSpeed(currentTool) != lastTarget)
     {
-      nowHeat.T[currentTool].current = heatGetCurrentTemp(currentTool);
-      nowHeat.T[currentTool].target = heatGetTargetTemp(currentTool);
-      reDrawPrintingValue(ICON_POS_EXT, LIVE_INFO_BOTTOM_ROW);
+      lastCurrent = spindleGetCurSpeed(currentTool);
+      lastTarget = spindleGetSetSpeed(currentTool);
+      RAPID_SERIAL_LOOP();  //perform backend printing loop before drawing to avoid printer idling
+      reDrawPrintingValue(ICON_POS_SPDL, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons) 
     }
 
-    // check bed temp change
-    if (nowHeat.T[BED].current != heatGetCurrentTemp(BED) || nowHeat.T[BED].target != heatGetTargetTemp(BED))
+    //check Vacuum change  //TG 2/23/21
+    if(nowVac != vacuumState)
     {
-      nowHeat.T[BED].current = heatGetCurrentTemp(BED);
-      nowHeat.T[BED].target = heatGetTargetTemp(BED);
-      reDrawPrintingValue(ICON_POS_BED, LIVE_INFO_BOTTOM_ROW);
+      nowVac = vacuumState;   //TG 9/25/22 - added this, was incorrectly missing
+      RAPID_SERIAL_LOOP();   //perform backend printing loop before drawing to avoid printer idling
+      reDrawPrintingValue(ICON_POS_VAC, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
     }
 
-    // check fan speed change
+    //check Fan speed change  //TG 2/23/21 is fan needed?  //TG CAN WE REMOVE FAN AND MAKE THIS MOTOR POWER?
     if (nowFan[currentFan] != fanGetCurSpeed(currentFan))
     {
       nowFan[currentFan] = fanGetCurSpeed(currentFan);
-      reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_BOTTOM_ROW);
+      RAPID_SERIAL_LOOP();  // perform backend printing loop before drawing to avoid printer idling
+      reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
     }
 
     // check print time change
@@ -592,9 +614,9 @@ void menuPrinting(void)
       time = getPrintTime();
 
       if (progDisplayType == ELAPSED_REMAINING)
-        reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
+        reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
       else
-        reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_BOTTOM_ROW);
+        reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
     }
 
     // check print progress percentage change
@@ -617,6 +639,8 @@ void menuPrinting(void)
         if (layerDrawEnabled == true)
         {
           usedLayerHeight = curLayerHeight;
+          RAPID_SERIAL_LOOP();  // perform backend printing loop before drawing to avoid printer idling
+           // draw single printing icon of (6 top icons)
           reDrawPrintingValue(ICON_POS_Z, (layerDisplayType == SHOW_LAYER_BOTH) ? LIVE_INFO_TOP_ROW : LIVE_INFO_BOTTOM_ROW);
         }
 
@@ -634,7 +658,8 @@ void menuPrinting(void)
       if (curLayerNumber != prevLayerNumber)
       {
         prevLayerNumber = curLayerNumber;
-        reDrawPrintingValue(ICON_POS_Z, LIVE_INFO_BOTTOM_ROW);
+        RAPID_SERIAL_LOOP();  // perform backend printing loop before drawing to avoid printer idling
+        reDrawPrintingValue(ICON_POS_Z, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
       }
     }
 
@@ -642,15 +667,22 @@ void menuPrinting(void)
     if (curspeed[currentSpeedFlowID] != speedGetCurPercent(currentSpeedFlowID))
     {
       curspeed[currentSpeedFlowID] = speedGetCurPercent(currentSpeedFlowID);
-      reDrawPrintingValue(ICON_POS_SPD, LIVE_INFO_BOTTOM_ROW);
+      RAPID_SERIAL_LOOP();  // perform backend printing loop before drawing to avoid printer idling
+      reDrawPrintingValue(ICON_POS_SPD, LIVE_INFO_BOTTOM_ROW); // draw single printing icon of (6 top icons)
     }
 
-    // check if print is paused
+    // check if print was paused and now is un-paused(resumed) then change display back to "pause" for icon 4
     if (lastPause != isPaused())
     {
       lastPause = isPaused();
       printingItems.items[KEY_ICON_4] = itemIsPause[lastPause];
-      menuDrawItem(&printingItems.items[KEY_ICON_4], KEY_ICON_4);
+      menuDrawItem(&printingItems.items[KEY_ICON_4], KEY_ICON_4); // draw single menu key icon
+    }
+    else
+    { //TG 3/19/23 added - Alert every 5 seconds to remind that the "Resume" key is waiting to be pressed
+      //but only get here after pause state changed, to start beeping 5 seconds after change
+      if (lastPause == true)
+        if (nextTimeOccurs(5000UL, false)) BUZZER_PLAY(SOUND_RESUME);
     }
 
     // check if print just started or just finished
@@ -664,6 +696,13 @@ void menuPrinting(void)
       #endif
 
       return;  // it will restart this interface if directly return this function without modify the value of infoMenu
+    }
+
+    if(nextWCSupdate)         //TG 3/19/23 added
+    {
+      drawWCSinfo();          //TG put workspace info in Upper Right title area
+      nextWCSupdate = false;
+      RAPID_PRINTING_COMM()   // perform backend printing loop between drawing icons to avoid printer idling
     }
 
     toggleInfo();
@@ -713,7 +752,7 @@ void menuPrinting(void)
       case PS_KEY_6:
         if (lastPrinting == true)  // if printing
         { // Pause button
-          if (getHostDialog())
+          if (getHostDialog())  //TG if set disable Resume/Pause button in the Printing menu
             addToast(DIALOG_TYPE_ERROR, (char *)textSelect(LABEL_BUSY));
           else if (getPrintRunout())
             addToast(DIALOG_TYPE_ERROR, (char *)textSelect(LABEL_FILAMENT_RUNOUT));
@@ -750,7 +789,20 @@ void menuPrinting(void)
         break;
 
       case PS_KEY_INFOBOX:
-        printSummaryPopup();
+        //TG 10/2/22 - modified this to allow getting to AVRTriac or VFD menu during printing
+        // or to printInfoPopup after printing
+        if (lastPrinting == true)
+        {  
+          #ifdef USING_AVR_TRIAC_CONTROLLER
+            infoMenu.mVFDoMenu.cur] = menuTriac;
+          #elif defined USING_VFD_CONTROLLER
+            infoMenu.menu[++infoMenu.cur] = menuVFD;
+          #endif
+        }
+        else
+        {
+          printSummaryPopup();
+        }
         break;
 
       default:

@@ -369,6 +369,8 @@ void menuPrint(void)
       {ICON_NULL,                    LABEL_NULL},
       {ICON_NULL,                    LABEL_NULL},
       {ICON_SCREEN_INFO,             LABEL_PREVIOUS_PRINT_DATA},
+      //TG 3/19/23 - can use key5 to cycle through different sounds to audition
+      //{ICON_SOUND,                    LABEL_NULL},
       {ICON_NULL,                    LABEL_NULL},
       {ICON_NULL,                    LABEL_NULL},
       {ICON_BACK,                    LABEL_BACK},
@@ -455,6 +457,14 @@ void menuPrint(void)
         if (infoPrintSummary.name[0] != '\0')
           printSummaryPopup();
         break;
+
+      //TG 3/19/23 - can use key5 to cycle through different sounds to audition
+      //case KEY_ICON_5:
+      //{  uint8_t sound = 0;
+      //   BUZZER_PLAY((SOUND)sound);
+      //   if(sound++>sizeof(SOUND)) sound=0;
+      //}
+      //  break;
 
       case KEY_ICON_7:
         CLOSE_MENU();

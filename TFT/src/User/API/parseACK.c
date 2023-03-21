@@ -297,11 +297,12 @@ void hostActionCommands(void)
 
       if (!ack_continue_seen("Ready."))  // avoid to display unneeded/frequent useless notifications (e.g. "My printer Ready.")
       {
-        if (MENU_IS_NOT(menuStatus))  // don't show it when in menuStatus
-          addToast(DIALOG_TYPE_INFO, ack_cache + index);
-
-        if (infoSettings.notification_m117 == ENABLED)
-          addNotification(DIALOG_TYPE_INFO, (char *)magic_echo, (char *)ack_cache + index, false);
+        //TG 3/19/23 added condition of NOT printing from TFT since TFT already printing adds M117 messages
+        if (MENU_IS_NOT(menuStatus) && !isPrintingFromTFT())    // don't show it when in menuStatus
+          addToast(DIALOG_TYPE_INFO, ack_cache + index);        // in top of screen, times out after X sec        
+        //TG 3/19/23 added condition of NOT printing from TFT since TFT already printing adds M117 messages
+        if ((infoSettings.notification_m117 == ENABLED) && !isPrintingFromTFT())
+          addNotification(DIALOG_TYPE_INFO, (char *)magic_echo, (char *)ack_cache + index, false); // in status area only
       }
     }
   }
@@ -342,7 +343,8 @@ void hostActionCommands(void)
     strcpy(hostAction.prompt_begin, ack_cache + ack_index);
     hostAction.button = 0;
     hostAction.prompt_show = true;
-
+    //uint16_t index = ack_index;                     //TG 3/17/23 save the current index for further usage
+    
     if (ack_continue_seen("Nozzle Parked"))
     {
       setPrintPause(HOST_STATUS_PAUSING, PAUSE_EXTERNAL);
@@ -364,24 +366,26 @@ void hostActionCommands(void)
   {
     strcpy(hostAction.prompt_button[hostAction.button++], ack_cache + ack_index);
   }
-  //TG was else if
+  //TG 3/19/23 was else if
   if (ack_seen(":prompt_show") && hostAction.prompt_show)
   {
     BUZZER_PLAY(SOUND_NOTIFY);
 
     switch (hostAction.button)
     {
-      case 0:
+      case 0: //single-button message alert dialog, doesn't send a host response to Marlin
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Message", (uint8_t *)hostAction.prompt_begin,
                     LABEL_CONFIRM, LABEL_NULL, setRunoutAlarmFalse, NULL, NULL);
         break;
 
-      case 1:
+      case 1: //one-button dialog
+        //TG the (btn0)-ok_action breakAndContinue() when button pressed is what tells Marlin to end waiting for user (sends M108) 
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Action command", (uint8_t *)hostAction.prompt_begin,
                     (uint8_t *)hostAction.prompt_button[0], LABEL_NULL, breakAndContinue, NULL, NULL);
         break;
 
-      case 2:
+      case 2: //two-button dialog
+      //TG (btn0)-ok_action resumeAndPurge() sends "M876 S0\n", btn(1)-cancel_action resumeAndContinue() sends "M876 S1\n" to Marlin
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Action command", (uint8_t *)hostAction.prompt_begin,
                     (uint8_t *)hostAction.prompt_button[0], (uint8_t *)hostAction.prompt_button[1], resumeAndPurge, resumeAndContinue, NULL);
         break;

@@ -54,6 +54,7 @@ void setRunoutAlarmTrue(void);
 void setRunoutAlarmFalse(void);
 bool getRunoutAlarm(void);
 
+void M0_breakAndContinue(void);            //TG 3/16/23 added to support host action for M0 from Marlin
 void breakAndContinue(void);
 void resumeAndPurge(void);
 void resumeAndContinue(void);
@@ -125,7 +126,6 @@ bool startPrint(void);                                // it also sends start gco
 void endPrint(void);                                  // it also sends end gcode
 void abortPrint(void);                                // it also sends cancel gcode
 bool pausePrint(bool isPause, PAUSE_TYPE pauseType);
-
 bool isPrinting(void);                // return "true" in case a print is ongoing
 bool isPaused(void);                  // return "true" in case a print is paused
 bool isAborted(void);                 // return "true" in case a print is aborted/canceled

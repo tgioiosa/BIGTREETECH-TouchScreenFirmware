@@ -73,7 +73,9 @@ extern const LABEL itemToggle[ITEM_TOGGLE_NUM];
 extern const uint16_t iconToggle[ITEM_TOGGLE_NUM];
 
 // Check if next screen update is due
-bool nextScreenUpdate(uint32_t duration);
+bool nextScreenUpdate(uint32_t duration); //TG can only use once in a menu
+bool nextTimeOccurs(uint32_t duration, bool reset);   //TG 3/19/23 added a secondary elapsed time check
+                                                      //in case 2 need to be used in the same menu
 
 extern const bool warmupTemperature(uint8_t toolIndex, void (* callback)(void));
 

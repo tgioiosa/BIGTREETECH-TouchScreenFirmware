@@ -1131,8 +1131,8 @@
  *   Value range: [min: 3, max: 75 characters]
  */
 #define START_GCODE  "G28\n"  // home XYZ (MPCNC Home Z is always up to ZMAX)
-#define END_GCODE    "G28 XY R20\nG90\nG1 E-4\nG92 E0\nM107\n"
-#define CANCEL_GCODE "G28 XY R20\nM107\n"  // Home XY and raise Z 20mm
+#define END_GCODE    "G0 X500 Y500 F4000\n" // move to rear RH corner
+#define CANCEL_GCODE "G28 XY R20\nM107\n"   // Home XY and raise Z 20mm
 
 //====================================================================================================
 //============================ Settings Configurable At Compile Time Only ============================

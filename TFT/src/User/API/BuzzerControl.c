@@ -134,6 +134,17 @@ void Buzzer_play(SOUND sound)
       }
       break;
 
+    case SOUND_RESUME:  //TG 3/19/23 added new sound for Resume reminder
+     if (GET_BIT(infoSettings.sounds, SOUND_TYPE_HEATER))
+     {
+       Buzzer_TurnOn(B_BASE, 50);
+       Buzzer_TurnOn(SILENCE, 50);
+       Buzzer_TurnOn(G_BASE, 50);
+       Buzzer_TurnOn(SILENCE, 50);
+       Buzzer_TurnOn(B_BASE, 50);
+     }
+     break;
+
     case SOUND_KEYPRESS:
     default:
       if (GET_BIT(infoSettings.sounds, SOUND_TYPE_TOUCH))

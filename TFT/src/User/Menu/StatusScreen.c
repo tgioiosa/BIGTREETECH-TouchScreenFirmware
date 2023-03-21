@@ -86,8 +86,8 @@ const GUI_POINT ss_val2_point = {SS_ICON_WIDTH - 3*BYTE_WIDTH-BYTE_WIDTH/4, SS_I
 #endif
 
 //TG code to update a single lvIcon text line on an icon. Up to three lines can be drawn on any icon, indexes 0,1,2
-void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID) {
   //icons and their values are updated one by one to reduce flicker/clipping
+void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID) {
   if(infoMenu.menu[infoMenu.cur] != menuStatus)
     return;
   
@@ -111,9 +111,10 @@ void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID) {
     lvIcon.lines[2].pos = ss_val2_point;
     lvIcon.lines[2].large_font = VAL2_LARGE_FONT;  
   #endif
+  
   #ifdef TFT70_V3_0
     char tempstr2[45];
-    TOOL / EXT
+    //TOOL / EXT
     lvIcon.lines[0].text = (u8 *)heatDisplayID[currentTool];
     sprintf(tempstr, "%d℃", heatGetCurrentTemp(currentTool));
     sprintf(tempstr2, "%d℃", heatGetTargetTemp(currentTool));
@@ -128,7 +129,7 @@ void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID) {
     lvIcon.lines[2].text = (u8 *)tempstr2;
     showLiveInfo(1, &lvIcon, &StatusItems.items[1]);
     lvIcon.enabled[2] = false;
-  #else
+#else   
     //TOOL / SPINDLE    //TG 2/17/21 updated for spindle, was for EXT, now alternates between Set/Cur speed every UPDATE_TOOL_TIME
     lvIcon.iconIndex = icon;
     lvIcon.lines[0].text = (u8 *)spindleDisplayID[currentTool];
@@ -139,15 +140,16 @@ void drawSingleLiveIconLine(uint8_t icon, uint8_t currentToggleID) {
     lvIcon.lines[1].text = (u8 *)tempstr;
     // icon index(0-7), address of live icon data, address of current icon image, live icon line(0-2)
     showSingleLiveIconLine(0, &lvIcon, &StatusItems.items[0],1);
- #endif
+  #endif
 }
 
-
+//TG 3/19/23 This is the main draw routine to put up all the printing icons (6) and their LiveData
 void drawStatus(void)   //TG was drawAllLiveIconData() in prior versions
 {
   // icons and their values are updated one by one to reduce flicker/clipping
-  char tempstr[45];
+  char tempstr[45];     //TG used for storing lvIcon text strings
 
+  #pragma region ======= lvIcon structures (3) initial settings =======
   LIVE_INFO lvIcon;
   lvIcon.enabled[0] = true;                         // 1st item   (S0, V0, F0, Sp. white text in upper right corner of icon)
   lvIcon.lines[0].h_align = RIGHT;                  // right-justified
@@ -165,66 +167,70 @@ void drawStatus(void)   //TG was drawAllLiveIconData() in prior versions
   lvIcon.lines[1].fn_color = SS_VAL_COLOR;          // black
   lvIcon.lines[1].text_mode = GUI_TEXTMODE_TRANS;   // transparent, no background
 
-  lvIcon.lines[2].h_align = LEFT;                   //TG 2/22/21 for white "Set/Act" text on spindle speed
+                                                    //TG 2/22/21 added
+  lvIcon.lines[2].h_align = LEFT;                   // 3rd item "Set/Act" white text above speed (middle right side of icon)
   lvIcon.lines[2].v_align = TOP;                    // top aligned
   lvIcon.lines[2].fn_color = SS_NAME_COLOR;         // white
   lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;   // transparent, no background
   lvIcon.lines[2].pos = ss_val2_point;              // text location
   lvIcon.lines[2].font = SS_ICON_VAL_FONT_SIZE;     // Normal font size     
+#pragma endregion
 
   #ifndef TFT70_V3_0
     lvIcon.enabled[2] = false;
   #else
-    lvIcon.enabled[2] = true;
-    lvIcon.lines[2].h_align = CENTER;
-    lvIcon.lines[2].v_align = CENTER;
-    lvIcon.lines[2].pos = ss_val_point_2;
-    lvIcon.lines[2].font = SS_ICON_VAL_FONT_SIZE_2;
-    lvIcon.lines[2].fn_color = SS_VAL_COLOR_2;
-    lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;  // default value
+  lvIcon.enabled[2] = true;
+  lvIcon.lines[2].h_align = CENTER;
+  lvIcon.lines[2].v_align = CENTER;
+  lvIcon.lines[2].pos = ss_val_point_2;
+  lvIcon.lines[2].font = SS_ICON_VAL_FONT_SIZE_2;
+  lvIcon.lines[2].fn_color = SS_VAL_COLOR_2;
+  lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;  // default value
   #endif
 
   #ifdef TFT70_V3_0
-    char tempstr2[45];
-
-    // TOOL / EXT
-    lvIcon.iconIndex = ICON_STATUS_NOZZLE;
-    lvIcon.lines[0].text = (uint8_t *)heatShortID[currentTool];
-    sprintf(tempstr, "%3d℃", heatGetCurrentTemp(currentTool));
-    sprintf(tempstr2, "%3d℃", heatGetTargetTemp(currentTool));
-    lvIcon.lines[1].text = (uint8_t *)tempstr;
-    lvIcon.lines[2].text = (uint8_t *)tempstr2;
-    showLiveInfo(0, &lvIcon, false);
-
-    // BED / CHAMBER
-    lvIcon.iconIndex = bedIcons[currentBCIndex];
-    lvIcon.lines[0].text = (uint8_t *)heatShortID[BED + currentBCIndex];
-    sprintf(tempstr, "%3d℃", heatGetCurrentTemp(BED + currentBCIndex));
-    sprintf(tempstr2, "%3d℃", heatGetTargetTemp(BED + currentBCIndex));
-    lvIcon.lines[1].text = (uint8_t *)tempstr;
-    lvIcon.lines[2].text = (uint8_t *)tempstr2;
-    showLiveInfo(1, &lvIcon, infoSettings.chamber_en == 1);
-
-    lvIcon.enabled[2] = false;
-  #else
-    //TOOL / SPINDLE    //TG 2/17/21 updated for spindle, was for EXT
-    //the speed line[1] is also shown every 1000ms from Marlin RPM gate interval which calls drawSingleLiveIconLine()
-    //the order of showing Set/Act is reversed with ref to currentSpeedFlowID so that Speed/Flow icon will display actual
-    //spindle Act rotation speed while the spindle icon is showing Set spindle speed.            
+  char tempstr2[45];
+  // TOOL / EXT
+  lvIcon.iconIndex = ICON_STATUS_NOZZLE;
+  lvIcon.lines[0].text = (uint8_t *)heatShortID[currentTool];
+  sprintf(tempstr, "%3d℃", heatGetCurrentTemp(currentTool));
+  sprintf(tempstr2, "%3d℃", heatGetTargetTemp(currentTool));
+  lvIcon.lines[1].text = (uint8_t *)tempstr;
+  lvIcon.lines[2].text = (uint8_t *)tempstr2;
+  showLiveInfo(0, &lvIcon, false);
+  // BED / CHAMBER
+  lvIcon.iconIndex = bedIcons[currentBCIndex];
+  lvIcon.lines[0].text = (uint8_t *)heatShortID[BED + currentBCIndex];
+  sprintf(tempstr, "%3d℃", heatGetCurrentTemp(BED + currentBCIndex));
+  sprintf(tempstr2, "%3d℃", heatGetTargetTemp(BED + currentBCIndex));
+  lvIcon.lines[1].text = (uint8_t *)tempstr;
+  lvIcon.lines[2].text = (uint8_t *)tempstr2;
+  showLiveInfo(1, &lvIcon, infoSettings.chamber_en == 1);
+  lvIcon.enabled[2] = false;
+ #else
+    //================= TOOL / SPINDLE ====================   
+  //TG 2/17/21 updated for spindle, was for EXT
+  //the speed line[1] is also shown every 1000ms from Marlin RPM gate interval which calls drawSingleLiveIconLine()
+  //the order of showing Set/Act is reversed with ref to currentSpeedFlowID so that Speed/Flow icon will display actual
+  //spindle Act rotation speed while the spindle icon is showing Set spindle speed.            
     lvIcon.iconIndex = ICON_STATUS_SPINDLE;
     lvIcon.lines[0].text = (u8 *)spindleDisplayID[currentTool];
-    //sprintf(tempstr, "%3d/%-3d", heatGetCurrentTemp(currentTool), heatGetTargetTemp(currentTool));
     sprintf(tempstr, infoSettings.cutter_disp_unit == MPCT ? "%d%%" : "%d", currentSpindleSpeedID ? 
             convertSpeed_Marlin_2_LCD(currentTool,spindleGetSetSpeed(currentTool)) : 
             convertSpeed_Marlin_2_LCD(currentTool,spindleGetCurSpeed(currentTool)) 
            );
-    lvIcon.lines[1].text = (uint8_t *)tempstr;
-    lvIcon.lines[2].text = currentSpindleSpeedID ? (u8*)"Set" : (u8*)"Act";
-    lvIcon.enabled[2] = true;         // only show line[2] for spindle/laser icon (0)
-    showLiveInfo(0, &lvIcon, false);  // the icon info is now in the lvIcon.iconIndex
-    lvIcon.enabled[2] = false;        // turn off for other icons
+    //TG since this info toggles, the value should be cleared each toggle cause prev chars will stay on LCD
+    lvIcon.lines[1].text = (uint8_t *)"      "; //TG clear any old value first in case it
+    showLiveInfo(0, &lvIcon, false);            //had more digits (they stay behind on LCD)
 
-    // BED
+    lvIcon.lines[1].text = (uint8_t *)tempstr;  //TG now load new value
+    lvIcon.lines[2].text = currentSpindleSpeedID ? (u8*)"Set" : (u8*)"Act";
+    lvIcon.enabled[2] = true;                   // only show line[2] for spindle/laser icon (0)
+    showLiveInfo(0, &lvIcon, false);            // the icon info is now in the lvIcon.iconIndex
+    lvIcon.enabled[2] = false;                  // turn off for other icons
+
+    //============ VACUUM ================================
+    //TG 2/17/21 updated for spindle, was for BED
     lvIcon.iconIndex = ICON_STATUS_VACUUM;
     lvIcon.lines[0].text = (u8 *)vacuumDisplayID[0];
     sprintf(tempstr, "%s %s", (vacuumState & 2) == 2 ? (char*)"Auto" : (char*)"", (vacuumState & 1) == 1 ? (char*)"On" : (char*)"Off");
@@ -232,34 +238,35 @@ void drawStatus(void)   //TG was drawAllLiveIconData() in prior versions
     showLiveInfo(1, &lvIcon, false);
   #endif
 
-  // FAN
-  lvIcon.iconIndex = ICON_STATUS_FAN;
-  lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
-  if (infoSettings.fan_percentage == 1)
-    sprintf(tempstr, "%3d%%", fanGetCurPercent(currentFan));
-  else
-    sprintf(tempstr, "%3d", fanGetCurSpeed(currentFan));
+    //============ FAN ===================================
+    lvIcon.iconIndex = ICON_STATUS_FAN;
+    lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
+    if (infoSettings.fan_percentage == 1)
+      sprintf(tempstr, "%3d%%", fanGetCurPercent(currentFan));
+    else
+      sprintf(tempstr, "%3d", fanGetCurSpeed(currentFan));
 
-  lvIcon.lines[1].text = (uint8_t *)tempstr;
-  showLiveInfo(2, &lvIcon, false);
+    lvIcon.lines[1].text = (uint8_t *)tempstr;
+    showLiveInfo(2, &lvIcon, false);
 
   #ifdef TFT70_V3_0
-    // SPEED
-    lvIcon.iconIndex = ICON_STATUS_SPEED;
-    lvIcon.lines[0].text = (uint8_t *)speedID[0];
-    sprintf(tempstr, "%3d%%", speedGetCurPercent(0));
-    lvIcon.lines[1].text = (uint8_t *)tempstr;
-    showLiveInfo(3, &lvIcon, false);
-
-    // FLOW
-    lvIcon.iconIndex = ICON_STATUS_FLOW;
-    lvIcon.lines[0].text = (uint8_t *)speedID[1];
-    sprintf(tempstr, "%3d%%", speedGetCurPercent(1));
-    lvIcon.lines[1].text = (uint8_t *)tempstr;
-    showLiveInfo(4, &lvIcon, false);
+  // SPEED
+  lvIcon.iconIndex = ICON_STATUS_SPEED;
+  lvIcon.lines[0].text = (uint8_t *)speedID[0];
+  sprintf(tempstr, "%3d%%", speedGetCurPercent(0));
+  lvIcon.lines[1].text = (uint8_t *)tempstr;
+  showLiveInfo(3, &lvIcon, false);
+  // FLOW
+  lvIcon.iconIndex = ICON_STATUS_FLOW;
+  lvIcon.lines[0].text = (uint8_t *)speedID[1];
+  sprintf(tempstr, "%3d%%", speedGetCurPercent(1));
+  lvIcon.lines[1].text = (uint8_t *)tempstr;
+  showLiveInfo(4, &lvIcon, false);
   #else
-    //SPEED / flow  //TG 2/24/21 (flow no longer applies for CNC, so we put spindle speed/laser power in it's place)
-    //TG TODO need to update this for Laser Power
+
+    //============ SPEED / FLOW ===========================  
+  //TG 2/24/21 (flow no longer applies for CNC, so we put spindle speed/laser power in it's place)
+  //TG TODO need to update this for Laser Power
     lvIcon.iconIndex = speedIcons[currentSpeedFlowID];  //TG set this because redraw=true below
     lvIcon.lines[0].text = (uint8_t *)speedID[currentSpeedFlowID];
     if(currentSpeedFlowID == 0) 
@@ -267,33 +274,33 @@ void drawStatus(void)   //TG was drawAllLiveIconData() in prior versions
       sprintf(tempstr, "%d%%", speedGetCurPercent(currentSpeedFlowID));  
     }
     //TG 2/24/21 don't alternate plot/spindle speed by keeping currentSpeedFlowID=0 in toggleTool(), makes
-    //the display confusing, so for CNC version we always get here with currentSpeedFlowID == 0
+  //the display confusing, so for CNC version we always get here with currentSpeedFlowID == 0
     else
     { // show spindle speed
       sprintf(tempstr, infoSettings.cutter_disp_unit == MPCT ? "%d%%" : "%d", 
               convertSpeed_Marlin_2_LCD(currentTool,spindleGetCurSpeed(currentTool))
              );  
     }
-
     lvIcon.lines[1].text = (uint8_t *)tempstr;
     showLiveInfo(3, &lvIcon, true); // map onto ICON_STATUS_SPEED
   #endif
 
-  // Gantry X,Y,Z position above status area
+  //========= Gantry X,Y,Z position above status area =======
   sprintf(tempstr, XYZ_STATUS, coordinateGetAxisActual(X_AXIS), coordinateGetAxisActual(Y_AXIS), coordinateGetAxisActual(Z_AXIS));
   #ifdef PORTRAIT_MODE
-    int paddingWidth = ((recGantry.x1 - recGantry.x0) - (strlen(tempstr) * BYTE_WIDTH)) / 2;
-
-    GUI_SetColor(GANTRY_XYZ_BG_COLOR);
-    GUI_FillRect(recGantry.x0, recGantry.y0, recGantry.x0 + paddingWidth, recGantry.y1);  // left padding
-    GUI_FillRect(recGantry.x1 - paddingWidth, recGantry.y0, recGantry.x1, recGantry.y1);  // right padding
+  int paddingWidth = ((recGantry.x1 - recGantry.x0) - (strlen(tempstr) * BYTE_WIDTH)) / 2;
+  GUI_SetColor(GANTRY_XYZ_BG_COLOR);
+  GUI_FillRect(recGantry.x0, recGantry.y0, recGantry.x0 + paddingWidth, recGantry.y1);  // left padding
+  GUI_FillRect(recGantry.x1 - paddingWidth, recGantry.y0, recGantry.x1, recGantry.y1);  // right padding
   #endif
+
   GUI_SetTextMode(GUI_TEXTMODE_NORMAL);
   GUI_SetColor(GANTRY_XYZ_FONT_COLOR);
   GUI_SetBkColor(GANTRY_XYZ_BG_COLOR);
   GUI_DispStringInPrect(&recGantry, (uint8_t *)tempstr);
   GUI_RestoreColorDefault();
-}
+
+} //drawStatus
 
 void statusScreen_setMsg(const uint8_t *title, const uint8_t *msg)
 {
@@ -353,7 +360,6 @@ static inline void scrollMsg(void)
 }
 
 
-
 static inline void toggleTool(void)
 {
   if (nextScreenUpdate(UPDATE_TOOL_TIME))
@@ -374,15 +380,17 @@ static inline void toggleTool(void)
         currentFan = (currentFan + 1) % MAX_FAN_COUNT;
       } while (!fanIsValid(currentFan));
     }
-    //TOGGLE_BIT(currentSpeedFlowID, 0);  //TG 2/24/21 don't toggle plot speed / spindle speed(old flow)
+
+    //TG 2/24/21 don't toggle plot speed / spindle speed(old flow)
+    //TOGGLE_BIT(currentSpeedFlowID, 0);  
     TOGGLE_BIT(currentSpindleSpeedID,0);  //TG toggle spindle icon data
 
-    drawStatus();
+    drawStatus();       // draws icons, gantry position, and fills in liveIcon data
 
     // gcode queries must be call after drawStatus
     coordinateQuery(MS_TO_SEC(UPDATE_TOOL_TIME));
-    speedQuery();         // send an M220 speed query
-    ctrlFanQuery();      // send an M710 fan speed query
+    speedQuery();       // send an M220 speed query
+    ctrlFanQuery();     // send an M710 fan speed query
   }
 }
 
@@ -479,12 +487,12 @@ void menuStatus(void)
     if(lastCurrent != spindleGetCurSpeed(currentTool) || lastTarget != spindleGetSetSpeed(currentTool))
     {     
       lastCurrent = 0;
-      drawSingleLiveIconLine(ICON_STATUS_SPINDLE, currentSpindleSpeedID);
-      lastCurrent = spindleGetCurSpeed(currentTool);
+      drawSingleLiveIconLine(ICON_STATUS_SPINDLE, currentSpindleSpeedID);  //TG do this on immediate speed changes instead
+      lastCurrent = spindleGetCurSpeed(currentTool);                       //of waiting to update with drawStatus()
       lastTarget = spindleGetSetSpeed(currentTool);
     }
 
-    toggleTool();
+    toggleTool();   // this does updates with drawStatus() but only when time (every 2 sec)
     loopProcess();
   }
 

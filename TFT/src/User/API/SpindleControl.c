@@ -299,14 +299,13 @@ void disableSpindleandVacuum()
 {
   //spindleSetSpeed(0, 0);
   //spindleSetCurSpeed(0,0);
-  //spindleState = 0;
-  //vacuumState = 0;
-  //vacuum_set(0);
+  spindleState = 0;
+  vacuumState = 0;
+  vacuum_set(0);
   uint8_t clearanceHeight = (stockTopZaxis + 30) < Marlin_ZMAX_POS ? stockTopZaxis + 30 : Marlin_ZMAX_POS;
   mustStoreCmd("%s\n", "G53");                      // reset to native workspace 
   mustStoreCmd("%s%d\n", "G1 Z", clearanceHeight);  // move Z up 30mm if possible, Marlin_ZMAX_POS max
   mustStoreCmd("%s\n", "M05");                      // force stop spindle
-  mustStoreCmd("%s\n", "G0 X500 Y500 F3000");       // move to back corner
   mustStoreCmd("%s\n", "M42 I1 M1 P122 S0");        // force stop vacuum
   //loopProcess(); 
 }

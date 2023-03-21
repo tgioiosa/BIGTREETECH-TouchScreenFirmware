@@ -1,6 +1,8 @@
 #include "Printing.h"
 #include "includes.h"
+#include "ctype.h"
 
+extern char* cmd_ptr;         //TG 3/19/23 added to support m0/m1 logic in pausePrint()
 typedef struct
 {
   FIL        file;
@@ -31,6 +33,13 @@ static float lastEPos = 0;                 // used only to update stats in infoP
 #define NEXT_PRINT_STATE 10000UL  // in msec, this is rate at which TFT print state is sent to Marlin
 static uint32_t nextPrintStateTime = 0;   //TG 2/15/23 added
 
+//TG 3/17/23 added to support handling of M0/M1 host action messages from Marlin
+void M0_breakAndContinue(void)             
+{ 
+  setPrintResume(HOST_STATUS_RESUMING);   // un-pause the TFT printing state that was set
+  breakAndContinue();                     // issue M108 to un-pause Marlin 
+}
+
 void setExtrusionDuringPause(bool extruded)
 {
   extrusionDuringPause = extruded;
@@ -60,19 +69,19 @@ void clearQueueAndRunoutAlarm(void)
 void breakAndContinue(void)
 {
   clearQueueAndRunoutAlarm();
-  sendEmergencyCmd("M108\n");   // M108 stops Marlin waiting for heaters in M109, M190, M303
+  sendEmergencyCmd("M108\n");   // M108 stops Marlin waiting for heaters in M109, M190, M303 or waiting for user(dialog box)
 }
 
 void resumeAndPurge(void)
 {
   clearQueueAndRunoutAlarm();
-  sendEmergencyCmd("M876 S0\n");
+  sendEmergencyCmd("M876 S0\n");  //TG tells Marlin to handle prompt response with response = 0 (used if host_prompt_reason is PROMPT_FILAMENT_RUNOUT)
 }
 
 void resumeAndContinue(void)
 {
   clearQueueAndRunoutAlarm();
-  sendEmergencyCmd("M876 S1\n");
+  sendEmergencyCmd("M876 S1\n");  //TG tells Marlin to handle prompt response with response = 1 (used if host_prompt_reason is PROMPT_FILAMENT_RUNOUT)
 }
 
 void setPrintExpectedTime(uint32_t expectedTime)
@@ -442,7 +451,7 @@ bool startPrint(void)
 
         if (powerFailedCreate(infoFile.path))    // if PLR feature is enabled, open a new PLR file
         {
-          printRestore = true;
+          printRestore = false;   //TG 3/15/23 changed from true - was it wrong?
           powerFailedlSeek(&infoPrinting.file);  // seek on PLR file
         }
       }
@@ -519,6 +528,9 @@ void endPrint(void)
 
   BUZZER_PLAY(SOUND_SUCCESS);
   completePrint();
+
+  //TG 3/19/23 added this
+  statusScreen_setMsg((uint8_t *)"Message", (uint8_t *)"Printing completed!");
 
   if (infoSettings.auto_shutdown)  // auto shutdown after print
     shutdownStart();
@@ -603,8 +615,16 @@ void abortPrint(void)
   if (GET_BIT(infoSettings.send_gcodes, SEND_GCODES_CANCEL_PRINT))
     sendPrintCodes(2);
 
-   loopDetected = false;  // finally, remove lock and exit
+  //TG 3/19/23 added this
+  statusScreen_setMsg((uint8_t *)"Message", (uint8_t *)"Printing aborted...");
+  
+  loopDetected = false;  // finally, remove lock and exit
 }
+
+
+
+
+
 
 bool pausePrint(bool isPause, PAUSE_TYPE pauseType)
 {
@@ -613,7 +633,7 @@ bool pausePrint(bool isPause, PAUSE_TYPE pauseType)
   static bool loopDetected = false;
 
   if (loopDetected) return false;
-  if (!infoPrinting.printing) return false;
+  if (!infoPrinting.printing) return false;   //TG is this true only for printing from TFT SD?
   if (infoPrinting.paused == isPause) return false;
 
   loopDetected = true;
@@ -633,7 +653,25 @@ bool pausePrint(bool isPause, PAUSE_TYPE pauseType)
       {
         if (pauseType == PAUSE_M0)
         {
-          popupReminder(DIALOG_TYPE_ALERT, LABEL_PAUSE, LABEL_PAUSE);
+          //TG this is a way that the TFT could add the M0 text to pause messages that it puts up in
+          //   place of sending the M0/M1 on to Marlin. Note this only happens when the M0/M1 is read
+          //   from the TFT's SD card during a print. Marlin will still get M0/M1 from remote hosts
+          //   and display those as //action: messages (handled in parseAck.c for the TFT to display).
+          static char M0_Title[]="M0 Pause\0";        // default title string
+          static char M0_Message[120];                // up to 4 lines of msg text (30 chars/line)
+          
+          if (*cmd_ptr == 'M')                        // check for M0 or M1 at start of cmd_ptr
+          {
+            M0_Title[0]=*cmd_ptr++;                   // copy the M to title
+            if (*cmd_ptr == '0' || *cmd_ptr == '1')
+              M0_Title[1]=*cmd_ptr++;                 // copy the 0 or 1 to title
+          }
+
+          while (isspace(*cmd_ptr)) cmd_ptr++;        // strip leading spaces on remaining cmd_ptr text
+          strcpy(M0_Message, cmd_ptr);                // copy text after "M0/M1" up to '\0' terminator
+           
+          popupReminder(DIALOG_TYPE_ALERT, (uint8_t *)M0_Title, (uint8_t *)M0_Message);
+          //popupReminder(DIALOG_TYPE_ALERT, LABEL_PAUSE, LABEL_PAUSE);
         }
         else if (pauseType == PAUSE_NORMAL)  // send command only for pause originated from TFT
         {

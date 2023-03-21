@@ -937,7 +937,7 @@ void menuDrawPage(const MENUITEMS *menuItems)
     else
       curRect = rect_of_key;
   #else
-    curRect = (MENU_IS(menuStatus)) ? rect_of_keySS : rect_of_key;
+    curRect = (MENU_IS(menuStatus)) ? rect_of_keySS : rect_of_key;  //TG Main Status page? or other page?
   #endif
 
   menuClearGaps();  // Use this function instead of GUI_Clear to eliminate the splash screen when clearing the screen.
@@ -945,7 +945,7 @@ void menuDrawPage(const MENUITEMS *menuItems)
 
   for (i = 0; i < ITEM_PER_PAGE; i++)
   {
-    menuDrawItem(&curMenuItems->items[i], i);
+    menuDrawItem(&curMenuItems->items[i], i);   //TG draw an icon and icon text label
     RAPID_PRINTING_COMM()  // perform backend printing loop between drawing icons to avoid printer idling
   }
 
@@ -991,7 +991,7 @@ void menuDrawListPage(const LISTITEMS *listItems)
   #endif
 }
 
-// Show live info text on icons
+// Show live info text on icons and optionally redraw the icon first
 void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon)
 {
   const GUI_RECT *iconRect = MENU_IS(menuPrinting) ? rect_of_keyPS : curRect;
@@ -1000,7 +1000,7 @@ void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon)
   if (redrawIcon)   // redraw the icon if requested
     ICON_ReadDisplay(iconPt.x, iconPt.y, liveicon->iconIndex);
 
-  for (uint8_t i = 0; i < LIVEICON_LINES; i++)
+  for (volatile uint8_t i = 0; i < LIVEICON_LINES; i++)
   {
     if (liveicon->enabled[i] == true)
     {
@@ -1045,11 +1045,10 @@ void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon)
       {
         GUI_SetTextMode(liveicon->lines[i].text_mode);
         GUI_SetBkColor(liveicon->lines[i].bk_color);
-
         GUI_DispString(iconPt.x + loc.x, iconPt.y + loc.y, liveicon->lines[i].text);
       }
       else
-      {
+      { //TG displays string on an icon using the icon's background at that char position for each character in the string
         GUI_DispStringOnIcon(liveicon->iconIndex, iconPt, loc, liveicon->lines[i].text);
       }
     }

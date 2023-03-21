@@ -19,7 +19,8 @@ typedef enum
   SOUND_KEYPRESS,
   SOUND_HEATED,
   SOUND_COOLED,
-} SOUND;
+  SOUND_RESUME,   //TG 3/19/23 added new sound for Resume reminder
+  } SOUND;
 
 #ifdef BUZZER_PIN
   void Buzzer_play(SOUND sound);
