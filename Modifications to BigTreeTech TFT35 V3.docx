@@ -577,7 +577,7 @@ The menu allows selecting from four PID presets, slow, normal, fast, and custom.
 A new feature setting was added called "Should M0 Pause". When this is turned off, incoming M0 Stops won't show an additional "pause" popup. This reduces the screen clutter by having one less prompt to answer.
 
 The arrangement of the Z-Axis homing and probing has been changed in Marlin Configuration. The Z endstop sensor is moved to the ZMAX connector on the SGEN board. The Z_HOME_DIR is changed from -1 to 1 so that the tool travels upwards to find home position. This position is Z_MAX_POS. Physically, this is 65mm up from the spoilboard, but logically it represents Home (ZERO).
-Then the Z_MIN_POS limit is -65mm to the spoilboard as the toll travels negative during a print. There is no ZMIN endstop, so we rely on software endstops to stop there. Then the configuration becomes:
+Then the Z_MIN_POS limit is -65mm to the spoilboard as the tool travels negative during a print. There is no ZMIN endstop, so we rely on software endstops to stop there. Then the configuration becomes:
  
 #define Z_MIN_POS -65 	//TG 9/30/2022 min travel of MPCNC (w/15.7mm tool length) just hits spoilboard (if Z Homing down use 0, Z Homing up use -65)
 #define X_MAX_POS X_BED_SIZE

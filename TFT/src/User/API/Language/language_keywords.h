@@ -432,9 +432,9 @@ extern "C" {
 #define LANG_KEY_PID_ON                       "label_PID On:"               //TG 7/17/22 new
 #define LANG_KEY_PID_OFF                      "label_PID Off:"              //TG 7/17/22 new
 #define LANG_KEY_AVR_RST                      "label_AVR Reset:"            //TG 7/17/22 new
-#define LANG_KEY_AVR_DSP0                     "label_AVR Display0:"         //TG 7/17/22 new
-#define LANG_KEY_AVR_DSP1                     "label_AVR Display1:"         //TG 7/17/22 new
-#define LANG_KEY_AVR_DSP2                     "label_AVR Display2:"         //TG 7/17/22 new
+//#define LANG_KEY_AVR_DSP0                     "label_AVR Display0:"         //TG 7/17/22 new - took out 3/25/23 for new probe icons
+//#define LANG_KEY_AVR_DSP1                     "label_AVR Display1:"         //TG 7/17/22 new - took out 3/25/23 for new probe icons
+//#define LANG_KEY_AVR_DSP2                     "label_AVR Display2:"         //TG 7/17/22 new - took out 3/25/23 for new probe icons
 #define LANG_KEY_AVR_CTL                      "label_AVR Control:"          //TG 7/17/22 new
 #define LANG_KEY_MARLIN_INT                   "label_Marlin_Int:"           //TG 7/17/22 new
 #define LANG_KEY_PIDRUN_INT                   "label_PIDRUN_Int:"           //TG 7/17/22 new
@@ -445,6 +445,9 @@ extern "C" {
 //#define LANG_KEY_Z_0                          "label_Z to 0mm:"
 //#define LANG_KEY_Z_300                        "label_Z to 300mm:"
 #define LANG_KEY_DISABLED_FOR_CNC             "label_disabled_for_cnc:"     //TG 3/2/23 added
+#define LANG_KEY_P_SPOILBOARD                 "label_SpoilBoard:"           //TG 3/25/23 new
+#define LANG_KEY_P_STOCK_HEIGHT               "label_Stock:"                //TG 3/25/23 new
+#define LANG_KEY_P_TOOL_LENGTH                "label_Tool:"                 //TG 3/25/23 new
 
 #ifdef __cplusplus
 }

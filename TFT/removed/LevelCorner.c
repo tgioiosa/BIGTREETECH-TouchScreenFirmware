@@ -142,7 +142,7 @@ void menuLevelCorner(void)
                                                getLevelEdgeDefault(), infoSettings.level_edge);
 
         if (curLevelEdge >= getLevelEdgeMin() && infoSettings.level_edge < getLevelEdgeMin())  // if new value is below min limit
-          popupDialog(DIALOG_TYPE_QUESTION, LABEL_WARNING, LABEL_LEVEL_CORNER_INFO, LABEL_CONFIRM, LABEL_CANCEL, setLevelEdgeMin, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, LABEL_WARNING, LABEL_LEVEL_CORNER_INFO, LABEL_CONFIRM, LABEL_CANCEL, NULL, setLevelEdgeMin, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
 
         break;
       }

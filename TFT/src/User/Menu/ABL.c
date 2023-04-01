@@ -39,7 +39,8 @@ void ablUpdateStatus(bool succeeded)
     if (savingEnabled && infoMachineSettings.EEPROM == 1)
     {
       sprintf(&tempMsg[strlen(tempMsg)], "\n %s", textSelect(LABEL_EEPROM_SAVE_INFO));
-      popupDialog(DIALOG_TYPE_SUCCESS, tempTitle.index, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+      popupDialog(DIALOG_TYPE_SUCCESS, tempTitle.index, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, 
+                  saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
     }
     else
     {
@@ -138,12 +139,14 @@ void menuUBLSaveLoad(void)
       case KEY_ICON_2:
       case KEY_ICON_3:
         ublSlot = key_num;
-        popupDialog(DIALOG_TYPE_QUESTION, UBLSaveLoadItems.title.index, LABEL_CONFIRMATION, LABEL_CONFIRM, LABEL_CANCEL, ublSaveloadConfirm, NULL, NULL);
+        popupDialog(DIALOG_TYPE_QUESTION, UBLSaveLoadItems.title.index, LABEL_CONFIRMATION, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL,
+                    ublSaveloadConfirm, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case KEY_ICON_7:
         if (ublSlotSaved == true && infoMachineSettings.EEPROM == 1)
-          popupDialog(DIALOG_TYPE_QUESTION, LABEL_ABL_SETTINGS_UBL, LABEL_ABL_SLOT_EEPROM, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, LABEL_ABL_SETTINGS_UBL, LABEL_ABL_SLOT_EEPROM, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL,
+                      saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
 
         ublSlotSaved = false;
         CLOSE_MENU();

@@ -198,7 +198,7 @@ void menuMPC(void)
           break;
 
         case KEY_ICON_6:
-          popupDialog(DIALOG_TYPE_QUESTION, mpcItems.title.index, LABEL_TUNE_START_INFO, LABEL_CONFIRM, LABEL_CANCEL, mpcStart, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, mpcItems.title.index, LABEL_TUNE_START_INFO, LABEL_CONFIRM, LABEL_CANCEL, NULL, mpcStart, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           break;
 
         case KEY_ICON_7:
@@ -242,7 +242,7 @@ void menuMPC(void)
             if (infoMachineSettings.EEPROM == 1)
             {
               sprintf(&tempMsg[strlen(tempMsg)], "\n %s", textSelect(LABEL_EEPROM_SAVE_INFO));
-              popupDialog(DIALOG_TYPE_SUCCESS, LABEL_MPC_TITLE, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+              popupDialog(DIALOG_TYPE_SUCCESS, LABEL_MPC_TITLE, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
             }
             else
             {

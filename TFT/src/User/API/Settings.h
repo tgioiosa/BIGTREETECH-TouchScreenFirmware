@@ -16,12 +16,12 @@ extern "C" {
 // Config version support
 // change if new elements/keywords are added/removed/changed in the configuration.h Format YYYYMMDD
 // this number should match CONFIG_VERSION in configuration.h
-#define CONFIG_SUPPPORT       20230228  //TG 10/15/22 updated
+#define CONFIG_SUPPPORT       20230328  //TG 10/15/22 updated
 
-#define FONT_FLASH_SIGN       20230228  //(YYYYMMDD) change if fonts require updating
-#define CONFIG_FLASH_SIGN     20230228  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		  //TG 10/15/22 updated
-#define LANGUAGE_FLASH_SIGN   20230228  //(YYYYMMDD) change if any keyword(s) in language pack is added or removed	//TG 10/15/22 updated
-#define ICON_FLASH_SIGN       20230228  //(YYYYMMDD) change if any icon(s) is added or removed						          //TG 12/25/22 updated
+#define FONT_FLASH_SIGN       20230328  //(YYYYMMDD) change if fonts require updating
+#define CONFIG_FLASH_SIGN     20230328  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		  //TG 10/15/22 updated
+#define LANGUAGE_FLASH_SIGN   20230328  //(YYYYMMDD) change if any keyword(s) in language pack is added or removed	//TG 10/15/22 updated
+#define ICON_FLASH_SIGN       20230328  //(YYYYMMDD) change if any icon(s) is added or removed						          //TG 12/25/22 updated
 
 #define FONT_CHECK_SIGN       (FONT_FLASH_SIGN + WORD_UNICODE_ADDR + FLASH_SIGN_ADDR)
 #define CONFIG_CHECK_SIGN     (CONFIG_FLASH_SIGN + STRINGS_STORE_ADDR + \
@@ -301,7 +301,11 @@ typedef struct    // defines storage for all settings THAT CAN SAVE/RECALL FROM 
   uint8_t  cutter_power_unit;   //TG 2/14/21 new
   uint8_t  vacuum_ctl_pin;      //TG 2/17/21 new
   uint8_t  should_M0_pause;     //TG 10/3/22 new
-  
+  float  zmin_absolute;         //TG 3/25/23 - added new for probe stock menu
+  float  zmax_absolute;         //TG 3/25/23 - added new for probe stock menu
+  float  spoilboard_absolute;   //TG 3/25/23 - added new for probe stock menu
+  float  probeThickness;        //TG 3/25/23 - added new for probe stock menu
+
   //????? from prev version, are these needed?????
   uint8_t leveling_invert_y_axis;
   uint8_t invert_axis[AXIS_NUM];
@@ -361,7 +365,7 @@ typedef enum
   BL_MBL,                  // Mesh Bed Leveling (MBL)
 } BL_TYPE;
 
-typedef struct
+typedef struct                  //TG 3/28/23 NOTE: MACHINESETTINGS does not store to EEPROM 
 {
   FW_TYPE firmwareType;
   uint8_t EEPROM;
@@ -382,7 +386,7 @@ typedef struct
   uint8_t babyStepping;
   uint8_t buildPercent;
   uint8_t softwareEndstops;
-  int8_t active_workspace;   //TG 10/4/22 - added setting for active workspace
+  int8_t active_workspace;      //TG 10/4/22 - added setting for active workspace
 } MACHINESETTINGS;
 
 typedef struct

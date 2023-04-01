@@ -57,6 +57,10 @@ void initSettings(void)
     infoSettings.spindle_rpm_max[i]   = default_max_spindleRPM[i];  //TG 2/5/21 new
   }
   infoSettings.should_M0_pause        = SHOULD_M0_PAUSE;           //TG 10/3/22 new parameter
+  infoSettings.zmin_absolute           = Z_MAX_POS; //TG 3/25/23 - initially CNC=0, 3Dprinter=82 to flag uninitialized
+  infoSettings.zmax_absolute           = Z_MAX_POS; //TG 3/25/23 - initially CNC=0, 3Dprinter=82 to flag uninitialized
+  infoSettings.spoilboard_absolute     = Z_MAX_POS; //TG 3/25/23 - initially CNC=0, 3Dprinter=82 to flag uninitialized
+  infoSettings.probeThickness          = -1;        //TG 3/25/23 - added new for probe stock menu
 
 // General Settings
   infoSettings.title_bg_color         = lcd_colors[TITLE_BACKGROUND_COLOR];
@@ -259,8 +263,7 @@ void initMachineSettings(void)
   infoMachineSettings.babyStepping            = DISABLED;
   infoMachineSettings.buildPercent            = DISABLED;
   infoMachineSettings.softwareEndstops        = ENABLED;
-  infoMachineSettings.active_workspace        = -1;
-
+  infoMachineSettings.active_workspace        = -1;     
   spindleControlInit();   //TG 2/4/21 added
 }
 
@@ -284,7 +287,6 @@ void setupMachine(FW_TYPE fwType)
     #elif BED_LEVELING_TYPE == 5
       infoMachineSettings.leveling = BL_MBL;
     #endif
-
   #endif
 
   if (infoSettings.long_filename != AUTO)

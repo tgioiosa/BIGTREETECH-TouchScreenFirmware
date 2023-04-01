@@ -832,8 +832,8 @@ void menuDrawTitle(void)
   else if (menuType == MENU_TYPE_FULLSCREEN)
   {
     if (curMenuRedrawHandle != NULL)
-      curMenuRedrawHandle();
     return;
+      curMenuRedrawHandle();
   }
 
   if (toastRunning())

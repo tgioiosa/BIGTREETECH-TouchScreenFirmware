@@ -216,7 +216,7 @@ void updateFeatureSettings(uint8_t item_index)
 #endif
 
     case SKEY_RESET_SETTINGS:
-      popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, resetSettings, NULL, NULL);
+      popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, resetSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
       break;
 
     default:

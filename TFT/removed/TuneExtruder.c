@@ -167,7 +167,7 @@ void menuTuneExtruder(void)
             LABELCHAR(tempStr, LABEL_TUNE_EXT_MARK120MM);
 
             sprintf(tempMsg, tempStr, textSelect(LABEL_EXTRUDE));
-            popupDialog(DIALOG_TYPE_QUESTION, tuneExtruderItems.title.index, (uint8_t *) tempMsg, LABEL_EXTRUDE, LABEL_CANCEL, extrudeFilament, NULL, NULL);
+            popupDialog(DIALOG_TYPE_QUESTION, tuneExtruderItems.title.index, (uint8_t *) tempMsg, LABEL_EXTRUDE, LABEL_CANCEL, NULL, extrudeFilament, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           }
           loadRequested = false;
           break;

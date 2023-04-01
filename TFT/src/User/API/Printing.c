@@ -269,7 +269,7 @@ void shutdownStart(void)
     mustStoreCmd(fanCmd[i], infoSettings.fan_max[i]);
   }
 
-  popupDialog(DIALOG_TYPE_INFO, LABEL_SHUT_DOWN, (uint8_t *)tempstr, LABEL_FORCE_SHUT_DOWN, LABEL_CANCEL, shutdown, NULL, shutdownLoop);
+  popupDialog(DIALOG_TYPE_INFO, LABEL_SHUT_DOWN, (uint8_t *)tempstr, LABEL_FORCE_SHUT_DOWN, LABEL_CANCEL, LABEL_NULL, shutdown, NULL, NULL, shutdownLoop); //TG 3/29/23 added NULL's for 3-button popup
 }
 
 void initPrintSummary(void)

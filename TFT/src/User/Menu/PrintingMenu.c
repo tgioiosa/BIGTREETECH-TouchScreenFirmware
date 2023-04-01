@@ -776,7 +776,7 @@ void menuPrinting(void)
       case PS_KEY_9:
         if (lastPrinting == true)  // if printing
         { // Stop button
-          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_STOP_PRINT, LABEL_CONFIRM, LABEL_CANCEL, abortPrint, NULL, NULL);
+          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_STOP_PRINT, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, abortPrint, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         }
         else
         { // Back button

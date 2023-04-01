@@ -10,7 +10,7 @@ void itemDisabledPopup(uint16_t L1)   //TG 2/28/23 - new function added to conca
   loadLabelText((uint8_t*)&tempstr1, L1);                               // get text string 1
   loadLabelText((uint8_t*)&tempstr2, LABEL_DISABLED_FOR_CNC);           // get text string 2
   strcat((char * __restrict__)tempstr1,(char * __restrict__)tempstr2);  // concatenate for msg
-  {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, tempstr1, LABEL_CONFIRM, LABEL_NULL, NULL, NULL, NULL);}  // show OK button only
+  {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, tempstr1, LABEL_CONFIRM, LABEL_NULL, LABEL_NULL, NULL, NULL, NULL, NULL);}  // show OK button only//TG 3/29/23 added NULL's for 3-button popup
 }
 
 void menuTuning(void)
@@ -122,7 +122,8 @@ void menuTuning(void)
             zOffsetSetMenu(true);  // use Probe Offset menu
             OPEN_MENU(menuZOffset);
           #else
-            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_DISCONNECT_PROBE, LABEL_CONTINUE, LABEL_CANCEL, deltaZOffset, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_DISCONNECT_PROBE, LABEL_CONTINUE, LABEL_CANCEL, LABEL_NULL
+                        deltaZOffset, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           #endif
         }
         */

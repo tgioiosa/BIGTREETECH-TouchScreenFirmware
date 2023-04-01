@@ -15,6 +15,13 @@ BUTTON bottomDoubleBtn[] = {
   {POPUP_RECT_DOUBLE_CANCEL,  NULL, 5, 1, MAT_RED,     MAT_RED,  MAT_LOWWHITE,   MAT_RED, WHITE,   MAT_RED},
 };
 
+BUTTON bottomTripleBtn[] = {  //TG 2/29/23 added 3-button option
+  {POPUP_RECT_TRIPLE_LEFT, NULL, 5, 1, DARKGREEN,   DARKGREEN,   MAT_LOWWHITE,    DARKGREEN, WHITE,     DARKGREEN},
+  {POPUP_RECT_TRIPLE_MIDDLE,  NULL, 5, 1, MAT_RED,     MAT_RED,     MAT_LOWWHITE,    MAT_RED, WHITE,       MAT_RED},
+  {POPUP_RECT_TRIPLE_RIGHT,  NULL, 5, 1, MAT_MAGENTA, MAT_MAGENTA,  MAT_LOWWHITE,   MAT_MAGENTA, WHITE,   MAT_MAGENTA},
+};
+
+const GUI_RECT tripleBtnRect[] = {POPUP_RECT_TRIPLE_LEFT, POPUP_RECT_TRIPLE_MIDDLE,POPUP_RECT_TRIPLE_RIGHT};  //TG 2/29/23 added 3-button option
 const GUI_RECT doubleBtnRect[] = {POPUP_RECT_DOUBLE_CONFIRM, POPUP_RECT_DOUBLE_CANCEL};
 static const GUI_RECT singleBtnRect = POPUP_RECT_SINGLE_CONFIRM;
 
@@ -36,6 +43,7 @@ static uint16_t buttonNum = 0;
 static const GUI_RECT * cur_btn_rect = NULL;
 static void (*action_ok)() = NULL;
 static void (*action_cancel)() = NULL;
+static void (*action_extra)() = NULL; //TG 3/29/23 added for 3-button popup 
 static void (*action_loop)() = NULL;
 
 static bool popup_redraw = false;
@@ -43,6 +51,7 @@ static uint8_t popup_title[X_MAX_CHAR];
 static uint8_t popup_msg[POPUP_MAX_CHAR];
 static uint8_t popup_ok[24];
 static uint8_t popup_cancel[24];
+static uint8_t popup_extra[24]; //TG 3/29/23 added for 3-button popup
 static DIALOG_TYPE popup_type;
 
 void windowReDrawButton(uint8_t position, uint8_t pressed)
@@ -60,7 +69,7 @@ void windowReDrawButton(uint8_t position, uint8_t pressed)
 }
 
 void popupDrawPage(DIALOG_TYPE type, BUTTON * btn, const uint8_t * title, const uint8_t * context, const uint8_t * yes,
-                   const uint8_t * no)
+                   const uint8_t * no, const uint8_t * extra)  //TG 3/29/23 added 'extra' button
 {
   if (btn != NULL)
   {
@@ -75,6 +84,10 @@ void popupDrawPage(DIALOG_TYPE type, BUTTON * btn, const uint8_t * title, const 
     if (no && no[0])
     {
       windowButton[buttonNum++].context = no;
+    }
+    if (extra && extra[0])  //TG 3/29/23 added 'extra' button
+    {
+      windowButton[buttonNum++].context = extra;
     }
 
     // draw a window with buttons bar
@@ -112,6 +125,12 @@ void menuDialog(void)
         CLOSE_MENU();
         if (action_cancel != NULL)
           action_cancel();
+        break;
+
+      case KEY_POPUP_EXTRA:   //TG 3/29/23 added for 3-button popup
+        CLOSE_MENU();
+        if (action_extra != NULL)
+          action_extra();
         break;
 
       default:
@@ -163,6 +182,11 @@ void _setDialogCancelTextStr(uint8_t * str)
   popup_strcpy(popup_cancel, str, sizeof(popup_cancel));
 }
 
+void _setDialogExtraTextStr(uint8_t * str)  //TG 3/29/23 added for 3-button popup
+{
+  popup_strcpy(popup_extra, str, sizeof(popup_extra));
+}
+
 void _setDialogTitleLabel(int16_t index)
 {
   uint8_t tempstr[MAX_LANG_LABEL_LENGTH] = {0};
@@ -191,25 +215,36 @@ void _setDialogCancelTextLabel(int16_t index)
   popup_strcpy(popup_cancel, tempstr, sizeof(popup_cancel));
 }
 
+void _setDialogExtraTextLabel(int16_t index) //TG 3/29/23 added for 3-button popup
+{
+  uint8_t tempstr[MAX_LANG_LABEL_LENGTH] = {0};
+  loadLabelText(tempstr, index);
+  popup_strcpy(popup_extra, tempstr, sizeof(popup_extra));
+}
+
 /**
  * @brief Show a popup with a message. Set dialog text before calling showDialog
  *
  * @param type the type of the dialog (alert, question, error, etc)
  * @param ok_action pointer to a function to perform if ok is pressed. (pass NULL if no action need to be performed)
  * @param cancel_action pointer to a function to perform if Cancel is pressed.(pass NULL if no action need to be performed)
+ * @param extra_action pointer to a function to perform if Extra is pressed.(pass NULL if no action need to be performed)
  * @param loop_action pointer to a function to perform whilst the dialog is active (visible/not answered)
 */
-void showDialog(DIALOG_TYPE type, void (*ok_action)(), void (*cancel_action)(), void (*loop_action)())
+//TG 3/29/23 modified for 3-button popup
+void showDialog(DIALOG_TYPE type, void (*ok_action)(), void (*cancel_action)(), void (*extra_action)(), void (*loop_action)())
 {
   if ((infoSettings.mode == MODE_MARLIN) || (infoSettings.mode == MODE_BLOCKED_MARLIN))  // if standard/blocked Marlin mode, then exit
     return;
 
-  popup_redraw = true;
+  popup_redraw = true;            // we want the popup drawn
   popup_type = type;
 
   action_ok = ok_action;
   action_cancel = cancel_action;
+  action_extra = extra_action;
   action_loop = loop_action;
+  
 }
 
 void loopPopup(void)    // called by loopFrontEnd()/loopProcess(), sets up dialog box and switches menu to menuDialog
@@ -222,21 +257,26 @@ void loopPopup(void)    // called by loopFrontEnd()/loopProcess(), sets up dialo
 
   LCD_WAKE();
 
-  if (popup_cancel[0])
+  if (popup_extra[0])  //TG 3/29/23 added for 3-button popup
   {
-    popupDrawPage(popup_type, bottomDoubleBtn, popup_title, popup_msg, popup_ok, popup_cancel);
+    popupDrawPage(popup_type, bottomTripleBtn, popup_title, popup_msg, popup_ok, popup_cancel, popup_extra);
+    cur_btn_rect = tripleBtnRect;  
+  }
+  else if (popup_cancel[0])
+  {
+    popupDrawPage(popup_type, bottomDoubleBtn, popup_title, popup_msg, popup_ok, popup_cancel, NULL); //TG 3/29/23 modified for 3-button popup
     cur_btn_rect = doubleBtnRect;
   }
   else if (popup_ok[0])  // show only ok button
   {
-    popupDrawPage(popup_type, &bottomSingleBtn, popup_title, popup_msg, popup_ok, NULL);
+    popupDrawPage(popup_type, &bottomSingleBtn, popup_title, popup_msg, popup_ok, NULL, NULL);  //TG 3/29/23 modified for 3-button popup
     cur_btn_rect = &singleBtnRect;
   }
   else  // if no button is requested
   {
     // display only a splash screen, avoiding to register the menuDialog handler
     // (the handler needs at least one button to allow to close the dialog box)
-    popupDrawPage(popup_type, NULL, popup_title, popup_msg, NULL, NULL);
+    popupDrawPage(popup_type, NULL, popup_title, popup_msg, NULL, NULL, NULL);  //TG 3/29/23 modified for 3-button popup
     return;
   }
 

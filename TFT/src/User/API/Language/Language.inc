@@ -435,10 +435,10 @@ X_WORD (KI)
 X_WORD (KD)
 X_WORD (PID_ON)
 X_WORD (PID_OFF)
-X_WORD (AVR_RST)
-X_WORD (AVR_DSP0)
-X_WORD (AVR_DSP1)
-X_WORD (AVR_DSP2)
+X_WORD (AVR_RST)      
+//X_WORD (AVR_DSP0)   - took out 3/25/23 for new probe icons
+//X_WORD (AVR_DSP1)   - took out 3/25/23 for new probe icons
+//X_WORD (AVR_DSP2)   - took out 3/25/23 for new probe icons
 X_WORD (AVR_CTL)
 X_WORD (MARLIN_INT)                  
 X_WORD (PIDRUN_INT)                 
@@ -447,3 +447,6 @@ X_WORD (SHOULD_M0_PAUSE)
 X_WORD (PROBE_STOCK)
 X_WORD (VFD_CONTROL)
 X_WORD (DISABLED_FOR_CNC)           //TG 3/2/23 added
+X_WORD (P_SPOILBOARD)           //TG 3/25/23 new
+X_WORD (P_STOCK_HEIGHT)         //TG 3/25/23 new
+X_WORD (P_TOOL_LENGTH)          //TG 3/25/23 new

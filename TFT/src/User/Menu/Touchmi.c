@@ -47,7 +47,8 @@ void menuTouchMi(void)
         mustStoreCmd("G28 X Y\n");
 
         if (infoMachineSettings.EEPROM == 1)
-          popupDialog(DIALOG_TYPE_QUESTION, touchmiItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, touchmiItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL,
+                      LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case KEY_ICON_3:

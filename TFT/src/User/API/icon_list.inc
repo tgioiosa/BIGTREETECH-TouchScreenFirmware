@@ -184,14 +184,17 @@ X_ICON (KI)                     //TG 7/17/22 new
 X_ICON (KD)                     //TG 7/17/22 new
 X_ICON (PID_ON)                 //TG 7/17/22 new
 X_ICON (PID_OFF)                //TG 7/17/22 new
-X_ICON (AVR_RST)                //TG 7/17/22 new
-X_ICON (AVR_DSP0)               //TG 7/17/22 new
-X_ICON (AVR_CTL)                //TG 7/17/22 new
-X_ICON (AVR_DSP1)               //TG 7/17/22 new
-X_ICON (AVR_DSP2)               //TG 7/17/22 new
+X_ICON (AVR_RST)                //TG 7/17/22 new 
+X_ICON (AVR_CTL)                //TG 7/17/22 new 
+//X_ICON (AVR_DSP0)               //TG 7/17/22 new  - took out 3/25/23 for new probe icons
+//X_ICON (AVR_DSP1)               //TG 7/17/22 new  - took out 3/25/23 for new probe icons
+//X_ICON (AVR_DSP2)               //TG 7/17/22 new  - took out 3/25/23 for new probe icons
 X_ICON (MARLIN_INT)             //TG 7/17/22 new
 X_ICON (PIDRUN_INT)             //TG 7/17/22 new
 X_ICON (CUST_SPEED)             //TG 7/17/22 new
 X_ICON (PROBE_STOCK)            //TG 10/12/22 new
 X_ICON (VFD_CONTROL)            //TG 12/26/22 new
+X_ICON (P_SPOILBOARD)           //TG 3/25/23 new
+X_ICON (P_STOCK_HEIGHT)         //TG 3/25/23 new
+X_ICON (P_TOOL_LENGTH)          //TG 3/25/23 new
 //after changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

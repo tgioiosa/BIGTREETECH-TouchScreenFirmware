@@ -66,21 +66,21 @@ void menuEepromSettings(void)
         // save to EEPROM
         if (infoMachineSettings.EEPROM == 1)
           popupDialog(DIALOG_TYPE_QUESTION, eepromSettingsItems.title.index, LABEL_EEPROM_SAVE_INFO,
-                      LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+                      LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case KEY_ICON_1:
         // restore from EEPROM
         if (infoMachineSettings.EEPROM == 1)
           popupDialog(DIALOG_TYPE_QUESTION, eepromSettingsItems.title.index, LABEL_EEPROM_RESTORE_INFO,
-                      LABEL_CONFIRM, LABEL_CANCEL, restoreEepromSettings, NULL, NULL);
+                      LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, restoreEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case KEY_ICON_2:
         // reset EEPROM
         if (infoMachineSettings.EEPROM == 1)
           popupDialog(DIALOG_TYPE_QUESTION, eepromSettingsItems.title.index, LABEL_EEPROM_RESET_INFO,
-                      LABEL_CONFIRM, LABEL_CANCEL, resetEepromSettings, NULL, NULL);
+                      LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, resetEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case KEY_ICON_7:

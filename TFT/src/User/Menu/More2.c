@@ -57,7 +57,7 @@ void menu2More(void)
     {
       case KEY_ICON_0:	//TG 2/28/23 modified this
         if (isPrinting() && !isPaused())  // currently printing and not paused?
-            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, isPauseTerminal, NULL, NULL);}
+            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, isPauseTerminal, NULL, NULL, NULL);} //TG 3/29/23 added NULL's for 3-button popup
         else
             {OPEN_MENU(menuTerminal);}
         break;
@@ -68,7 +68,7 @@ void menu2More(void)
             loadLabelText((uint8_t*)&tempstr1, LABEL_PROBE_STOCK);
             loadLabelText((uint8_t*)&tempstr2, LABEL_DISABLED_FOR_CNC);
             strcat((char * __restrict__)tempstr1,(char * __restrict__)tempstr2);
-            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, tempstr1, LABEL_CONFIRM, LABEL_CANCEL, NULL, NULL, NULL);}
+            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, tempstr1, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, NULL, NULL, NULL, NULL);} //TG 3/29/23 added NULL's for 3-button popup
         }
         else
             {OPEN_MENU(menuProbeStock);}
@@ -76,7 +76,7 @@ void menu2More(void)
 
       case KEY_ICON_2:  //TG 2/28/23
         if (isPrinting() && !isPaused())  // currently printing and not paused?
-            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, NULL, NULL, NULL);}
+            {popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, NULL, NULL, NULL, NULL);} //TG 3/29/23 added NULL's for 3-button popup
         else
         {
           #ifdef USING_AVR_TRIAC_CONTROLLER

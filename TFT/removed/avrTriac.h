@@ -43,7 +43,7 @@ void popupErrorOK(uint8_t* title, uint8_t* msg);
 void readMarlinAVRInfoBlock();
 void ResetAVRPopup();
 
-extern uint8_t CancelFlag;
+extern uint8_t popupResp;
 
 //  void toolSetCurrentIndex(uint8_t index);
 //  void drawSpindleStatusInIcon(void);

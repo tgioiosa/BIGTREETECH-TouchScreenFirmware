@@ -20,7 +20,7 @@ extern "C" {
 
 extern uint8_t spindleType[MAX_SPINDLE_COUNT];
 extern uint16_t lastSetSpindleSpeed[MAX_SPINDLE_COUNT];
-extern float stockTopZaxis;
+extern float probed_Z_pos;
 extern float Marlin_ZMAX_POS;
 
 typedef enum  {

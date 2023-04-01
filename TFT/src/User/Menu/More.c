@@ -51,7 +51,7 @@ void menuMore(void)
        case KEY_ICON_0:	//TG modified this
         if (isPrinting() && !isPaused())  // need paused before spindle     case KEY_ICON_0:
         {
-          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, isPauseSpindle, NULL, NULL);
+          popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, isPauseSpindle, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         }
         else
         {
@@ -83,7 +83,8 @@ void menuMore(void)
         #ifdef LOAD_UNLOAD_M701_M702
           if (isPrinting() && !isPaused())  // need paused before extrude
           {
-            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, isPauseLoadUnload, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_WARNING, LABEL_IS_PAUSE, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL
+                        isPauseLoadUnload, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           }
           else
           {

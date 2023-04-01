@@ -18,7 +18,7 @@
 #include "Settings.h"
 
 uint8_t UpdateFlag=0;         // for AVR EEPROM Update pop up box responses
-uint8_t CancelFlag=0;         // for general pop up msg box responses
+uint8_t popupResp=0;         // for general pop up msg box responses
 
 MENUITEMS triacItems = {
 // title
@@ -262,10 +262,10 @@ void menuTriac(void)
         
         if (AVRInfoBlock.EE_chksum != chksumStart)  // check sum has changed, post a popup msg to user
         { //***** CHANGES WERE DETECTED ********************************************************************************
-          CancelFlag = 0;   // clear flag first
+          popupResp = 0;   // clear flag first
           // ask user to CONFIRM or CANCEL updating the AVR EEPROM with changes, making them permanent
-          popupConfirmCancel((uint8_t *)"Settings Changed", (uint8_t *)"Update AVR EEPROM?"); // get result in CancelFlag
-          UpdateFlag = CancelFlag;
+          popupConfirmCancel((uint8_t *)"Settings Changed", (uint8_t *)"Update AVR EEPROM?"); // get result in popupResp
+          UpdateFlag = popupResp;
           
           //***** IF CHANGES ACCEPTED - SAVE TO AVR EEPROM ***********************************************************
           if (UpdateFlag == 0)                      // user CONFIRMS update 
@@ -284,7 +284,7 @@ void menuTriac(void)
             AVRInfoBlock.Update_EEPROM = 0;         // clear the update command after sending it once
             AVRInfoBlock.Reset_Flag = 0;            // clear the reset flag after sending it once
             //***** IF UPDATE WAS SUCCESSFUL ***************************************************************************
-            if (CancelFlag==0)     // popup msg that update is done, then return to previous menu
+            if (popupResp==0)     // popup msg that update is done, then return to previous menu
               popupReminder(DIALOG_TYPE_SUCCESS, (uint8_t *)"Settings Changed", (uint8_t *)"AVR Updated")
           }
           
@@ -391,13 +391,13 @@ uint16_t get_chksum()
 
 
 //TG function to display a popup with Confirm/Cancel keys over existing menu and wait for response
-//returns to original menu once a key was pressed with the global CancelFlag = 0(confirm) or 1(cancel)
-void clrCancel(){ CancelFlag = 0; }
-void setCancel(){ CancelFlag = 1; }
+//returns to original menu once a key was pressed with the global popupResp = 0(confirm) or 1(cancel)
+void clrCancel(){ popupResp = 0; }
+void setCancel(){ popupResp = 1; }
 
 void popupConfirmCancel(uint8_t* title, uint8_t* msg)
 {
-  CancelFlag = 0;
+  popupResp = 0;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL);     // sets the strings
   showDialog(DIALOG_TYPE_ALERT, clrCancel, setCancel, NULL);  // draws the dialog box
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
@@ -406,7 +406,7 @@ void popupConfirmCancel(uint8_t* title, uint8_t* msg)
 
 void popupErrorOK(uint8_t* title, uint8_t* msg)
 {
-  CancelFlag = 0;
+  popupResp = 0;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL);     // sets the strings
   showDialog(DIALOG_TYPE_ERROR, setCancel, NULL, NULL);  // draws the dialog box
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
@@ -449,12 +449,12 @@ uint8_t TFTtoMARLIN_wait(enum retcodes retmsg)
 }
 
 void ResetAVRPopup(){
-  uint8_t oldCancelFlag = CancelFlag;       // copy current CancelFlag since popupConfirmCancel() will overwite it
-  CancelFlag = 0;
-  popupConfirmCancel((uint8_t *)"No response from AVR", (uint8_t *)"System Restart?"); // get result in CancelFlag
-  if(!CancelFlag)
-    NVIC_SystemReset();                     // if we reset, we don't care about restoring CancelFlag
-  CancelFlag = oldCancelFlag;               // otherwise restore original value of CancelFlag
+  uint8_t oldCancelFlag = popupResp;       // copy current popupResp since popupConfirmCancel() will overwite it
+  popupResp = 0;
+  popupConfirmCancel((uint8_t *)"No response from AVR", (uint8_t *)"System Restart?"); // get result in popupResp
+  if(!popupResp)
+    NVIC_SystemReset();                     // if we reset, we don't care about restoring popupResp
+  popupResp = oldCancelFlag;               // otherwise restore original value of popupResp
 }
 
 

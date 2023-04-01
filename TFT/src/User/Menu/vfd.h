@@ -37,8 +37,10 @@ uint8_t TFTtoMARLIN_wait(msgcodes retmsg);
 void popupErrorOK(uint8_t* title, uint8_t* msg);
 void popupConfirmCancel(uint8_t* title, uint8_t* msg);
 void popupInfoOKOnly(uint8_t* title, uint8_t* msg);
-void popupQuestionOK(uint8_t* title, uint8_t* msg);
+void popupQuestionOKCancel(uint8_t* title, uint8_t* msg);
+void popupQuestionYesNo(uint8_t* title, uint8_t* msg);
 void popupSuccessOKOnly(uint8_t* title, uint8_t* msg);
+void popupThreeKeys(uint8_t* title, uint8_t* msg, uint8_t* confirmkeytext, uint8_t* cancelkeytext, uint8_t* extrakeytext); //TG 3/29/23 modified for 3-key popup
 
 typedef struct 
 {
@@ -61,7 +63,7 @@ extern iregBits inputReg;
 extern bool VFDpresent;       // true if VFD connected
 extern uint8_t vfdStatus;
 extern float vfdP;
-extern uint8_t CancelFlag;    // for general pop up msg box responses
+extern int8_t popupResp;      // for general pop up msg box responses
 extern float sw_ver;
 extern float cpu_ver;
 extern uint16_t f164;

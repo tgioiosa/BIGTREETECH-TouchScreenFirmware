@@ -18,7 +18,7 @@ void menuPrintRestore(void)
     loadLabelText((uint8_t*)cancelTxt, LABEL_CANCEL);
 
     popupDrawPage(DIALOG_TYPE_QUESTION, bottomDoubleBtn, textSelect(LABEL_POWER_FAILED), (uint8_t*)infoFile.path,
-                  (uint8_t*)okTxt, (uint8_t*)cancelTxt);
+                  (uint8_t*)okTxt, (uint8_t*)cancelTxt, NULL); //TG 3/29/23 added NULL for 3rd button
 
     while (MENU_IS(menuPrintRestore))
     {

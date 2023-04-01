@@ -65,7 +65,8 @@ void mblUpdateStatus(bool succeeded)
     if (infoMachineSettings.EEPROM == 1)
     {
       sprintf(&tempMsg[strlen(tempMsg)], "\n %s", textSelect(LABEL_EEPROM_SAVE_INFO));
-      popupDialog(DIALOG_TYPE_SUCCESS, LABEL_MBL_SETTINGS, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+      popupDialog(DIALOG_TYPE_SUCCESS, LABEL_MBL_SETTINGS, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL
+                  saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
     }
     else
     {

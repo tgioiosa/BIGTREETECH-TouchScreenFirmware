@@ -1,6 +1,6 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
-#define CONFIG_VERSION 20230228
+#define CONFIG_VERSION 20230328
 
 //====================================================================================================
 //=============================== Settings Configurable On config.ini ================================
@@ -44,7 +44,7 @@
 
 //TG 2/4/21 Spindle control options
 // Logically there can only be one spindle, although there can be multiple tool changes to it
-#define SPINDLE_MAX_RPM      {28000};
+#define SPINDLE_MAX_RPM      {24000};   //TG 3/28/23 New limit for 2.2KW Spindle
 #define SPINDLE_MAX_PWM      {1023};    //TG - 10/2/21 increased PWM resolution
 #define SPINDLE_SIGN_ID      {"S0:"};
 #define SPINDLE_DISPLAY_ID   {"S0"};
@@ -559,10 +559,13 @@
  */
 #define X_MIN_POS   0
 #define Y_MIN_POS   0
-#define Z_MIN_POS   0
+#define Z_MIN_POS -70   //TG 3/28/23 Zmin Spindle collet pos referenced to Zmax Spindle collet pos (total travel)
+                        //if Z Homes down(3D prntr) use 0, if Z Homes up(MPCNC) use -70
 #define X_MAX_POS 520
 #define Y_MAX_POS 520
-#define Z_MAX_POS 82  // actual physical machine limit is 82mm Zmax from MPCNC table (62.5mm if using a 19.5mm(3/4") spoilboard)
+#define Z_MAX_POS   0   //TG 3/28/23 Zmax Spindle collet pos referenced to MACHINE_Z_MIN surface
+                        //if Z Homes up(MPCNC) use 0, if Z Homes down(3D prntr) use +70
+#define MACHINE_Z_MIN -98.0 //TG 3/26/23 absolute location of CNC table w/r to Spindle shaft (collet removed) at Z_MAX_POS
 
 /**
  * X & Y Move Speeds/Feedrates

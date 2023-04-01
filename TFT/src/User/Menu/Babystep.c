@@ -152,7 +152,7 @@ void menuBabystep(void)
         if (infoMachineSettings.EEPROM == 1)
         {
           orig_z_offset = offsetSetValue(new_z_offset);  // set new Z offset. Required if current Z offset is not changed applying babystep changes (e.g. no BABYSTEP_ZPROBE_OFFSET is set in Marlin FW)
-          popupDialog(DIALOG_TYPE_QUESTION, babyStepItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, babyStepItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         }
         break;
 

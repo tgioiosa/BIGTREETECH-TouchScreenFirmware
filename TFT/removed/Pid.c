@@ -88,7 +88,7 @@ void pidResultAction(void)
       if (infoMachineSettings.EEPROM == 1)
       {
         sprintf(&tempMsg[strlen(tempMsg)], "\n %s", textSelect(LABEL_EEPROM_SAVE_INFO));
-        popupDialog(DIALOG_TYPE_SUCCESS, LABEL_PID_TITLE, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+        popupDialog(DIALOG_TYPE_SUCCESS, LABEL_PID_TITLE, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
       }
       else
       {
@@ -213,7 +213,7 @@ void menuPid(void)
           }
           else
           {
-            popupDialog(DIALOG_TYPE_QUESTION, pidItems.title.index, LABEL_TUNE_START_INFO, LABEL_CONFIRM, LABEL_CANCEL, pidStart, NULL, NULL);
+            popupDialog(DIALOG_TYPE_QUESTION, pidItems.title.index, LABEL_TUNE_START_INFO, LABEL_CONFIRM, LABEL_CANCEL, NULL, pidStart, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           }
           break;
 

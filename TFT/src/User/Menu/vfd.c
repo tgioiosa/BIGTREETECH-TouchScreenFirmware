@@ -22,7 +22,7 @@ float sw_ver;             // holds software version from VFD, only received from
 float cpu_ver;            // holds motor CPU version from VFD, only received from Marlin at startup
 uint16_t f164;            // holds baudrate setting from VFD, received on TFT request from Marlin
 uint16_t f165;            // holds start,parity,data,stop setting from VFD, received on TFT request from Marlin
-uint8_t CancelFlag=0;     // for general pop up msg box responses
+int8_t popupResp=-1;      // for general pop up msg box responses (-1 means none)
 
 void myclear(){inputReg.ac_voltage=inputReg.current_out=inputReg.dc_voltage=inputReg.fault_code=inputReg.total_hours=
                inputReg.freq_out=inputReg.freq_set=inputReg.speed_out=inputReg.temperature=0; }
@@ -73,7 +73,7 @@ void menuVFD(void)
   if(VFDpresent==false && skipVFDCheck==false)    //skipVFDCheck will always be false on entry unless user presses OK    
   {                                               //button, myOK() sets it true so the Dialogbox doesn't keep popping up
     popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"VFD not responding", (uint8_t *)"Is it powered on?", 
-                LABEL_CONFIRM, LABEL_CANCEL, myOK, myCancel, NULL);
+                LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, myOK, myCancel, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
  
     GUI_Clear(infoSettings.bg_color);
     GUI_SetColor(GRAY); 
@@ -191,8 +191,8 @@ char* toStr(float value, uint8_t dec_places)
 uint8_t msg_complete = 0;
 uint8_t TFTtoMARLIN_wait(msgcodes retmsg)
 {
-  uint16_t waitPeriod;
-  waitPeriod = isPrinting() ? 4000 : 2000;      // allow extra time for responses if printing
+  uint32_t waitPeriod;
+  waitPeriod = isPrinting() ? 400000 : 200000;      // allow extra time for responses if printing
   uint32_t start = OS_GetTimeMs() + waitPeriod; // timeout 2sec for response (4sec if printing);
   msg_complete = 0;                             // clear the response flag (sets in parseAck.c)
   
@@ -206,53 +206,74 @@ uint8_t TFTtoMARLIN_wait(msgcodes retmsg)
   return 0;                                     // response completed, no errors
 }
 
-//TG function to display a popup with Confirm/Cancel keys over existing menu and wait for response
-//returns to original menu once a key was pressed with the global CancelFlag = 0(confirm) or 1(cancel)
-void clrCancel(){ CancelFlag = 0; }
-void setCancel(){ CancelFlag = 1; }
+//TG function to display a popup with Confirm/Cancel/Extra keys over existing menu and wait for response, then returns to original menu once a key
+//was pressed with the global popupResp = KEY_POPUP_CONFIRM, KEY_POPUP_CANCEL, or KEY_POPUP_EXTRA  //TG 3/29/23 modified for 3-key popup
+void setRespConfirm(){ popupResp = KEY_POPUP_CONFIRM;}
+void setRespCancel(){ popupResp = KEY_POPUP_CANCEL;}
+void setRespExtra(){ popupResp = KEY_POPUP_EXTRA;}
 
-void popupErrorOK(uint8_t* title, uint8_t* msg)
+void popupErrorOK(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
-  CancelFlag = 0;
-  setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL);     // sets the strings
-  showDialog(DIALOG_TYPE_ERROR, setCancel, NULL, NULL);  // draws the dialog box
+  popupResp = -1;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);// sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_ERROR, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
   (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
-void popupInfoOKOnly(uint8_t* title, uint8_t* msg)
+void popupInfoOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
-  CancelFlag = 0;
-  setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL);     // sets the strings
-  showDialog(DIALOG_TYPE_INFO, setCancel, NULL, NULL);  // draws the dialog box
+  popupResp = -1;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL, LABEL_NULL); // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_INFO, setRespConfirm, NULL, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
   (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
-void popupQuestionOK(uint8_t* title, uint8_t* msg)
+void popupQuestionYesNo(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
-  CancelFlag = 0;
-  setDialogText(title, msg, (uint8_t*)"Yes", (uint8_t*)"No");     // sets the strings
-  showDialog(DIALOG_TYPE_QUESTION, clrCancel, setCancel, NULL);  // draws the dialog box
+  popupResp = -1;
+  setDialogText(title, msg, (uint8_t*)"Yes", (uint8_t*)"No", LABEL_NULL);     // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_QUESTION, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
   (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
-void popupSuccessOKOnly(uint8_t* title, uint8_t* msg)
+void popupQuestionOKCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
-  CancelFlag = 0;
-  setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL);   // sets the strings
-  showDialog(DIALOG_TYPE_SUCCESS, clrCancel, NULL, NULL);  // draws the dialog box
+  popupResp = -1;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);     // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_QUESTION, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
   (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
-void popupConfirmCancel(uint8_t* title, uint8_t* msg)
+void popupSuccessOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
-  CancelFlag = 0;
-  setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL);     // sets the strings
-  showDialog(DIALOG_TYPE_ALERT, clrCancel, setCancel, NULL);  // draws the dialog box
+  popupResp = -1;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL, LABEL_NULL);   // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_SUCCESS, setRespConfirm, NULL, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
   loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
   (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
+
+void popupConfirmCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
+{
+  popupResp = -1;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);         // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_ALERT, setRespConfirm, setRespCancel, NULL, NULL);   // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
+  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+}
+
+void popupThreeKeys(uint8_t* title, uint8_t* msg, uint8_t* confirmkeytext, uint8_t* cancelkeytext, uint8_t* extrakeytext) //TG 3/29/23 modified for 3-key popup
+{
+  popupResp = -1;
+  setDialogText(title, msg, confirmkeytext, cancelkeytext, extrakeytext);            // sets the strings //TG 3/29/23 added NULL's for 3-button popup
+  showDialog(DIALOG_TYPE_ALERT, setRespConfirm, setRespCancel, setRespExtra, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
+  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+}
+
+
 #endif // #ifdef USING_VFD_CONTROLLER

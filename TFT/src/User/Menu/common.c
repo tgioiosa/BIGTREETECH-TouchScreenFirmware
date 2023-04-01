@@ -453,7 +453,8 @@ NOZZLE_STATUS warmupNozzle(void)
       sprintf(tempStr, (char *)textSelect(LABEL_HEAT_HOTEND), infoSettings.min_ext_temp);
       strcat(tempMsg, "\n");
       strcat(tempMsg, tempStr);
-      popupDialog(DIALOG_TYPE_ERROR, LABEL_WARNING, (uint8_t *)tempMsg, LABEL_CONFIRM, LABEL_CANCEL, heatToMinTemp, NULL, NULL);
+      popupDialog(DIALOG_TYPE_ERROR, LABEL_WARNING, (uint8_t *)tempMsg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL
+                  heatToMinTemp, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
 
       return COLD;
     }
@@ -497,7 +498,8 @@ NOZZLE_STATUS warmupNozzle(void)
     {
       if (heatGetTargetTemp(i) > 0)
       {
-        popupDialog(DIALOG_TYPE_QUESTION, LABEL_WARNING, LABEL_HEATERS_ON, LABEL_CONFIRM, LABEL_CANCEL, heatCoolDown, NULL, NULL);
+        popupDialog(DIALOG_TYPE_QUESTION, LABEL_WARNING, LABEL_HEATERS_ON, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL
+                    heatCoolDown, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
       }
     }

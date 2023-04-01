@@ -271,7 +271,7 @@ void menuParameterSettings(void)
       case KEY_BACK:
         if (parametersChanged && infoMachineSettings.EEPROM == 1)
         {
-          popupDialog(DIALOG_TYPE_QUESTION, title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+          popupDialog(DIALOG_TYPE_QUESTION, title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           parametersChanged = false;
         }
         else
@@ -300,18 +300,18 @@ void menuParameterSettings(void)
           uint8_t curIndex_e = (curIndex - enabledParameterCount);
           if (curIndex_e == P_SAVE_SETTINGS)
           {
-            popupDialog(DIALOG_TYPE_ALERT, title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
             parametersChanged = false;
             break;
           }
           else if (curIndex_e == P_RESET_SETTINGS)
           {
-            popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, resetEepromSettings, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, resetEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
             break;
           }
           else if (curIndex_e == P_RESTORE_SETTINGS)
           {
-            popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESTORE, LABEL_EEPROM_RESTORE_INFO, LABEL_CONFIRM, LABEL_CANCEL, restoreEepromSettings, NULL, NULL);
+            popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESTORE, LABEL_EEPROM_RESTORE_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, restoreEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
             break;
           }
         }

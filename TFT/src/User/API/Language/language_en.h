@@ -428,9 +428,9 @@
     #define STRING_PID_ON                 "PID On"                  //TG 7/17/22 new
     #define STRING_PID_OFF                "PID Off"                 //TG 7/17/22 new
     #define STRING_AVR_RST                "Restart AVR"             //TG 7/17/22 new
-    #define STRING_AVR_DSP0               "AVR LCD pg 0"            //TG 7/17/22 new
-    #define STRING_AVR_DSP1               "AVR LCD pg 1"            //TG 7/17/22 new
-    #define STRING_AVR_DSP2               "AVR LCD pg 2"            //TG 7/17/22 new
+    //#define STRING_AVR_DSP0               "AVR LCD pg 0"            //TG 7/17/22 new - took out 3/25/23 for new probe icons
+    //#define STRING_AVR_DSP1               "AVR LCD pg 1"            //TG 7/17/22 new - took out 3/25/23 for new probe icons
+    //#define STRING_AVR_DSP2               "AVR LCD pg 2"            //TG 7/17/22 new - took out 3/25/23 for new probe icons
     #define STRING_AVR_CTL                "AVR Control"             //TG 7/17/22 new
     #define STRING_MARLIN_INT             "Marlin_Int"              //TG 7/17/22 new
     #define STRING_PIDRUN_INT             "PIDRUN_Int"              //TG 7/17/22 new
@@ -439,5 +439,8 @@
     #define STRING_PROBE_STOCK            "Probe Stk"               //TG 10/12/22 new
     #define STRING_VFD_CONTROL            "VFD Control"             //TG 12/26/22 new
     #define STRING_DISABLED_FOR_CNC       " disabled for CNC!"      //TG  2/28/23 new
+    #define  STRING_P_SPOILBOARD          "SpoilBoard"              //TG 3/25/23 new
+    #define  STRING_P_STOCK_HEIGHT        "Stock"                   //TG 3/25/23 new
+    #define  STRING_P_TOOL_LENGTH         "Tool"                    //TG 3/25/23 new
 
 #endif

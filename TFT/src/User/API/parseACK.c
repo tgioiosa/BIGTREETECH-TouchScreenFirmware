@@ -57,7 +57,7 @@ bool hostDialog = false;
 
 struct HOST_ACTION
 {
-  char prompt_begin[30];
+  char prompt_begin[90];    //TG 3/24/23 increased, was 30, extra len needed for some popups
   char prompt_button[2][20];
   bool prompt_show;         // show popup reminder or not
   uint8_t button;           // number of buttons
@@ -375,19 +375,19 @@ void hostActionCommands(void)
     {
       case 0: //single-button message alert dialog, doesn't send a host response to Marlin
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Message", (uint8_t *)hostAction.prompt_begin,
-                    LABEL_CONFIRM, LABEL_NULL, setRunoutAlarmFalse, NULL, NULL);
+                    LABEL_CONFIRM, LABEL_NULL, LABEL_NULL, setRunoutAlarmFalse, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case 1: //one-button dialog
         //TG the (btn0)-ok_action breakAndContinue() when button pressed is what tells Marlin to end waiting for user (sends M108) 
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Action command", (uint8_t *)hostAction.prompt_begin,
-                    (uint8_t *)hostAction.prompt_button[0], LABEL_NULL, breakAndContinue, NULL, NULL);
+                    (uint8_t *)hostAction.prompt_button[0], LABEL_NULL, LABEL_NULL, breakAndContinue, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
 
       case 2: //two-button dialog
       //TG (btn0)-ok_action resumeAndPurge() sends "M876 S0\n", btn(1)-cancel_action resumeAndContinue() sends "M876 S1\n" to Marlin
         popupDialog(DIALOG_TYPE_ALERT, (uint8_t *)"Action command", (uint8_t *)hostAction.prompt_begin,
-                    (uint8_t *)hostAction.prompt_button[0], (uint8_t *)hostAction.prompt_button[1], resumeAndPurge, resumeAndContinue, NULL);
+                    (uint8_t *)hostAction.prompt_button[0], (uint8_t *)hostAction.prompt_button[1], LABEL_NULL, resumeAndPurge, resumeAndContinue, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
         break;
     }
   }
@@ -693,7 +693,7 @@ void parseACK(void)  // ***** this is the main msg parser for RECEIVED serial da
     else if (!infoMachineSettings.promptSupport && ack_seen("paused for user"))
     {
       popupDialog(DIALOG_TYPE_QUESTION, (uint8_t *)"Printer is Paused", (uint8_t *)"Paused for user\ncontinue?",
-                    LABEL_CONFIRM, LABEL_NULL, breakAndContinue, NULL, NULL);
+                    LABEL_CONFIRM, LABEL_NULL, LABEL_NULL, breakAndContinue, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
     }
     // parse host action commands. Required "HOST_ACTION_COMMANDS" and other settings in Marlin
     else if (ack_starts_with("//action:"))
@@ -805,7 +805,7 @@ void parseACK(void)  // ***** this is the main msg parser for RECEIVED serial da
       {
         if (ack_continue_seen("x:")) infoSettings.machine_size_min[X_AXIS] = ack_value();
         if (ack_continue_seen("y:")) infoSettings.machine_size_min[Y_AXIS] = ack_value();
-        if (ack_continue_seen("z:")) infoSettings.machine_size_min[Z_AXIS] = ack_value();
+        if (ack_continue_seen("z:")) infoSettings.machine_size_min[Z_AXIS] = (int16_t)ack_value();
       }
 
       if (ack_continue_seen("max:"))
@@ -962,7 +962,7 @@ void parseACK(void)  // ***** this is the main msg parser for RECEIVED serial da
           if (infoMachineSettings.EEPROM == 1)
           {
             popupDialog(DIALOG_TYPE_SUCCESS, LABEL_DELTA_CONFIGURATION, LABEL_EEPROM_SAVE_INFO,
-                        LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+                        LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup
           }
           else
           {
@@ -1581,7 +1581,7 @@ void parseACK(void)  // ***** this is the main msg parser for RECEIVED serial da
       // this one is ALWAYS needed for spindle in ALL contoller cases
       else if(ack_seen("M7986")){   
       if(ack_seen("T")){
-        stockTopZaxis = ack_value();  // get value
+        probed_Z_pos = ack_value();  // get value
         if(ack_seen("Z")){
           Marlin_ZMAX_POS = ack_value();  // get value
           msg_complete = comp_7986;

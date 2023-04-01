@@ -229,8 +229,8 @@ void menuZOffset(void)    //TG this menu can use HomeOffsetMenu or ProbeOffsetMe
 
           // save to EEPROM
           case 2:
-            if (infoMachineSettings.EEPROM == 1)
-              popupDialog(DIALOG_TYPE_QUESTION, zOffsetItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+            if (infoMachineSettings.EEPROM == 1)    //TG 3/29/23 added NULL's for 3-button popup
+              popupDialog(DIALOG_TYPE_QUESTION, zOffsetItems.title.index, LABEL_EEPROM_SAVE_INFO, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL, saveEepromSettings, NULL, NULL, NULL);
             break;
 
           // set level Z pos (shim)

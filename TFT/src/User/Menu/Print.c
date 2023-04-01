@@ -166,7 +166,7 @@ bool printPageItemSelected(uint16_t index)
 
       // confirm file selection
       popupDialog(DIALOG_TYPE_QUESTION, LABEL_PRINT, (uint8_t *)temp_info, LABEL_CONFIRM, LABEL_CANCEL,
-                  startPrinting, exitFolder, NULL);
+                  LABEL_NULL, startPrinting, exitFolder, NULL, NULL); //TG 3/29/23 added NULL's for 3-button popup 
 
       hasUpdate = false;
     }

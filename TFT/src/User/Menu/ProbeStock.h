@@ -10,12 +10,18 @@ extern "C" {
 #include "coordinate.h"
 #include "Configuration.h"
 
+float getProbeThickness();
+float getMIN_Z_Position();
+float probeDowntoTarget(float target, char* tname, char* title, char* msg);
+float doProbeSpoilBoard(bool skipProbeThk, bool skipMinZ);
+void doProbeToolLength(bool skipProbeThk);
+float doProbeStock(bool skipProbeThk, bool skipMinZ, bool skipTool);
+void doHomeAll();
 void menuProbeStock(void);
-void doProbeStock(void);
-void stopProbeStock(void);
 void updateProbeStockDisplay(void);
 void marlinError(void);
 void displayProgress(char* msg);
+
 
 #ifdef __cplusplus
 }
