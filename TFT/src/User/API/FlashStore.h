@@ -9,6 +9,7 @@ extern "C" {
 #include <stdint.h>
 #include "Settings.h"
 
+//TG Should this be 768 as it was in v26?
 #define PARA_SIZE (128 * 3)  // Max size of settings buffer to read/write
 
 extern int32_t TSC_Para[7];

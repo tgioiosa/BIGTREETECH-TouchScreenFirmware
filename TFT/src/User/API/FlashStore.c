@@ -1,3 +1,8 @@
+/* Flash read and write to the parameter storage area PARA_SIZE=768 dwords, SIGN_ADDRESS=0x08004000
++   so the parameter storage are in flash is from 0x0800400 - 0x08004300 (768 dwords), but there is room
++   for more up to 0x08007FF0. If more features are added that need settings stored add them to
++   readStoredPara() and storePara() below, also adjust PARA_SIZE upwards!
++*/
 #include "FlashStore.h"
 #include "HAL_Flash.h"
 #include <string.h>
@@ -49,22 +54,22 @@ void readStoredPara(void)
   uint32_t sign = 0;
 
 #ifdef I2C_EEPROM  // added I2C_EEPROM suppport for MKS_TFT35_V1_0
-  EEPROM_FlashRead(data, PARA_SIZE);
+  EEPROM_FlashRead(data, PARA_SIZE);    //TG  read parameters into data[] array
 #else
   HAL_FlashRead(data, PARA_SIZE);
 #endif
 
   sign = byteToWord(data + (index += 4), 4);
-  if (sign == TSC_SIGN)
+  if (sign == TSC_SIGN)   //TG  compare word32 at 0x8004000 to 0x20201205(TSC_SIGN)
   {
     paraStatus |= PARA_TSC_EXIST;  // If the touch screen calibration parameter already exists
-    for (int i = 0; i < sizeof(TSC_Para) / sizeof(TSC_Para[0]); i++)
+    for (int i = 0; i < sizeof(TSC_Para) / sizeof(TSC_Para[0]); i++)  //TG  get next 7 dwords of cal data
     {
       TSC_Para[i] = byteToWord(data + (index += 4), 4);
     }
   }
 
-  sign = byteToWord(data + (index += 4), 4);
+  sign = byteToWord(data + (index += 4), 4);  //TG  compare word32 at 0x8004028 to 0x20202712(PARA_SIGN)
   if (sign != PARA_SIGN)  // If the settings parameter is illegal, reset settings parameter
   {
     paraStatus |= PARA_NOT_STORED;

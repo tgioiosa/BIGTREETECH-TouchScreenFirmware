@@ -12,10 +12,10 @@ extern "C" {
 #define W25QXX_SECTOR_SIZE (0x1000)  // 4096-4K
 
 #ifndef LOGO_MAX_SIZE
-  #define LOGO_MAX_SIZE            0x4B000
-  #define WORD_UNICODE_SIZE       0x480000
-  #define BYTE_ASCII_SIZE           0x1000
-  #define LARGE_FONT_SIZE           0x3000
+  #define LOGO_MAX_SIZE            0x4B000  //TG  307Kb, 77K dwords
+  #define WORD_UNICODE_SIZE       0x480000  //TG  4,718,592 bytes,  1,179,648 dwords
+  #define BYTE_ASCII_SIZE           0x1000  //TG  4096 bytes
+  #define LARGE_FONT_SIZE           0x3000  //TG  12,288 bytes
   #define _8X16_FONT_SIZE           0x1000
   #define FLASH_SIGN_SIZE           0x1000  // store status of last font/icon/config update
   #define LANGUAGE_SIZE            0x15000  // Language pack size
@@ -25,7 +25,7 @@ extern "C" {
   #define CUSTOM_GCODE_MAX_SIZE     0x5000  // custom gocdes max size
   #define ICON_MAX_SIZE             0x5000
   #define INFOBOX_MAX_SIZE          0xB000
-  #define SMALL_ICON_MAX_SIZE       0x2000
+  #define SMALL_ICON_MAX_SIZE       0x2000  //TG  8192 bytes
 #endif
 
 // address in spiflash W25Qxx
@@ -76,9 +76,9 @@ enum
   //ICON_RESERVE
 
   // Preview should be in the last place before ICON_NULL to save flash storage space
-  ICON_PREVIEW,
+  ICON_PREVIEW,   //TG space allocated for preview icon of print file if available
   // Back ground sign
-  ICON_NULL
+  ICON_NULL       //TG space for blank background used to clear icons
 };
 
 // This List is Auto-Generated. Please add new icons in small_icon_list.inc only

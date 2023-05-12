@@ -376,7 +376,7 @@ double numPadFloat(uint8_t * title, double old_val, double reset_val, bool negat
   }
 }
 
-// Numpad for integer numbers
+// Numpad for integer numbers  //TG displays a number pad on screen for numerical input
 int32_t numPadInt(uint8_t* title, int32_t old_val, int32_t reset_val, bool negative)
 {
   NUM_KEY_VALUES key_num = NUM_KEY_IDLE;

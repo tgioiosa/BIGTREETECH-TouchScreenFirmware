@@ -42,7 +42,7 @@ const char * const smallIconBmpName[] = {
   // add new icons in small_icon_list.inc only
 };
 
-BMPUPDATE_STAT bmpDecode(char * bmp, uint32_t addr)
+BMPUPDATE_STAT bmpDecode(char * bmp, uint32_t addr)  //TG opens bmp file on SD card, reads it and stores to W25Q64 SPI Flash
 {
   FIL bmpFile;
   char magic[2];
@@ -150,7 +150,7 @@ static inline bool updateIcon(char * rootDir)
 
   if (bmpState == BMP_SUCCESS)
   {
-    LOGO_ReadDisplay();
+    LOGO_ReadDisplay();   //TG Read the logo bitmap from SD card into W25Q64 SPI Flash
     found++;
   }
   else

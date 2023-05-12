@@ -17,8 +17,8 @@ int main(void)
     dbg_print("Main Startup: Generic debug output is enabled.\n");
   #endif
 
-  for (; ;)
-  {
-    (*infoMenu.menu[infoMenu.cur])();
+  for (; ;)                             // infinite loop on whatever menu is currently at the top
+  {                                     // of infoMenu.menu stack, after restart this will be menuStatus
+     (*infoMenu.menu[infoMenu.cur])();
   }
 }

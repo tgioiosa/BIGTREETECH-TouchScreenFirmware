@@ -17,7 +17,7 @@ extern "C" {
 #define SS_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + infobox
 #define TM_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + tempbox
 #define LISTITEM_PER_PAGE 5
-#define LIVEICON_LINES    3
+#define LIVEICON_LINES    5
 
 #define CENTER_Y          ((exhibitRect.y1 - exhibitRect.y0) / 2 + exhibitRect.y0)
 #define CENTER_X          ((exhibitRect.x1 - exhibitRect.x0 - BYTE_WIDTH) / 2 + exhibitRect.x0)
@@ -206,6 +206,9 @@ void menuDrawPage(const MENUITEMS * menuItems);
 void menuDrawListPage(const LISTITEMS *listItems);
 
 void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon);
+// Display info for Level Corner feature in ABL menu
+void showLevelCornerLiveInfo(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
+void showTextOnIcon(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
 void displayExhibitHeader(const char * titleStr, const char * unitStr);
 void displayExhibitValue(const char * valueStr);
 

@@ -1,7 +1,7 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
 
-#define CONFIG_VERSION 20220518
+#define CONFIG_VERSION 20220518   //TG - this must match the value in Settings.h
 
 //====================================================================================================
 //=============================== Settings Configurable On config.ini ================================
@@ -485,9 +485,9 @@
  *   Unit: [feedrate in mm/min]
  *   Value range: [min: 10, max: 12000]
  */
-#define SPEED_Z_SLOW   500   // Default: 500
-#define SPEED_Z_NORMAL 1000  // Default: 1000
-#define SPEED_Z_FAST   2000  // Default: 2000
+#define SPEED_Z_SLOW   300  //TG 6/30/21
+#define SPEED_Z_NORMAL 420  //TG 6/30/21
+#define SPEED_Z_FAST   600  //TG 6/30/21
 
 /**
  * Extruder Speeds/Feedrates
@@ -711,9 +711,9 @@
  *                hotend temp: [min: 20, max: 1000]
  *                bed temp:    [min: 20, max: 400]
  */
-#define PREHEAT_LABELS {"PLA", "PETG", "ABS", "WOOD", "TPU", "NYLON"}  // Default: {"PLA", "PETG", "ABS", "WOOD", "TPU", "NYLON"}
-#define PREHEAT_HOTEND {200,   240,    230,   170,    220,   250}      // Default: {200,   240,    230,   170,    220,   250}
-#define PREHEAT_BED    { 60,    70,     90,    50,     50,    90}      // Default: { 60,    70,     90,    50,     50,    90}
+#define PREHEAT_LABELS {"PLA", "PETG", "ABS", "TPE", "TPU", "NYLON"}  // Default: {"PLA", "PETG", "ABS", "WOOD", "TPU", "NYLON"}
+#define PREHEAT_HOTEND {210,   240,    245,   230,    220,   257}      // Default: {200,   240,    230,   170,    220,   250}
+#define PREHEAT_BED    { 65,    78,    100,    50,     50,    75}      // Default: { 60,    70,     90,    50,     50,    90}
 
 //================================================================================
 //============================ Power Supply Settings =============================

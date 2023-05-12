@@ -47,10 +47,11 @@ void HW_Init(void)
     GPIO_PinRemapConfig(GPIO_Remap_USART2, ENABLE);
   #endif
 
-  XPT2046_Init();
-  OS_TimerInitMs();  // system clock timer, cycle 1ms, called after XPT2046_Init()
-  W25Qxx_Init();
-  LCD_Init();
+  XPT2046_Init();     //TG init Touchscreen controller
+  OS_TimerInitMs();   // system clock timer, cycle 1ms, called after XPT2046_Init()
+  W25Qxx_Init();		  //TG init W25Q64 - 64Mbit flash chip for fonts, icons, names storage
+  LCD_Init();			    //TG init LCD to rgb, set screen black, and enable backlight
+  
 
   #ifdef I2C_EEPROM  // added I2C_EEPROM support for MKS_TFT35_V1_0
     i2C_Init_EEPROM();
@@ -67,9 +68,9 @@ void HW_Init(void)
   #endif
 
   LCD_RefreshDirection(infoSettings.rotated_ui);  // refresh display direction after reading settings
-  scanUpdates();                                  // scan icon, fonts and config files
-  checkflashSign();                               // check font/icon/config signature in SPI flash for update
-  initMachineSettings();                          // load default machine settings
+  scanUpdates();                                  // scan icon, fonts and config files for updates (boot.c)
+  checkflashSign();                               // check font/icon/config signature in SPI flash for update if needed
+  initMachineSettings();                          // load default machine settings, sets infoMachineSettings.isMarlinFirmware = -1
 
   #if !defined(MKS_TFT)
     // causes hang if we deinit spi1

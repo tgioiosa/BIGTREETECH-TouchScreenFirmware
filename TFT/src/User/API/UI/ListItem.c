@@ -5,8 +5,11 @@
 
 #define CUSTOM_VAL_LEN 7
 
+//TG 2/12/21  Dynamic arrays is a method to temporarily store and retrieve names or values of the
+// list items on one page at a time. For example the Features list first page has 5 items, the 3rd
+// item (index=2 starting from zero) can have it's value stored in dynamic_text_value[2] chars[0-9]
 char * dynamic_label[LISTITEM_PER_PAGE];
-char dynamic_text_value[LISTITEM_PER_PAGE][10];
+char dynamic_text_value[LISTITEM_PER_PAGE][10];  //TG allow 10 list item value strings of 7 chars max
 
 void setDynamicLabel(uint8_t i, char * label)
 {

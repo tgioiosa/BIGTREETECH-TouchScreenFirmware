@@ -378,6 +378,10 @@ extern "C" {
 #define LANG_KEY_Z_ALIGN                      "label_z_align:"
 #define LANG_KEY_MACROS                       "label_macros:"
 #define LANG_KEY_MESH_VALID                   "label_mesh_valid:"
+#define LANG_KEY_TGMENU                       "label_TG Menu:"      //TG 5/11/23
+#define LANG_KEY_Z_0                          "label_Z to 0mm:"     //TG 5/11/23
+#define LANG_KEY_Z_300                        "label_Z to 300mm:"   //TG 5/11/23  
+#define LANG_KEY_M503                         "label_Read EEPROM:"  //TG 5/11/23    
 #define LANG_KEY_CONNECT_PROBE                "label_connect_probe:"
 #define LANG_KEY_DISCONNECT_PROBE             "label_disconnect_probe:"
 #define LANG_KEY_CALIBRATION                  "label_calibration:"

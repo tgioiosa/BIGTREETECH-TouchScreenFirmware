@@ -147,5 +147,10 @@ X_ICON (Z_ALIGN)
 X_ICON (MESH_EDITOR)
 X_ICON (BRIGHTNESS)
 X_ICON (MESH_VALID)
+X_ICON (MESH_VALID)
+X_ICON (TGMENU)             //TG 1/12/20 new
+X_ICON (Z_0)                //TG 1/12/20 new
+X_ICON (Z_300)              //TG 1/12/20 new
+X_ICON (M503)               //TG 1/12/20 new
 X_ICON (DELTA_CALIBRATE)
 // After changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

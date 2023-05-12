@@ -181,6 +181,7 @@ void ackPopupInfo(const char * info)
     BUZZER_PLAY(SOUND_NOTIFY);
 
   // set echo message in status screen
+  //TG  set echo message in status screen, echomagic is char array "echo:"
   if (info == magic_echo || info == magic_message)
   {
     // ignore all messages if parameter settings is open
@@ -199,7 +200,7 @@ void ackPopupInfo(const char * info)
   }
 }
 
-bool processKnownEcho(void)
+bool processKnownEcho(void)  //TG  returns true for known echo msgs found in knownEcho array
 {
   bool isKnown = false;
   uint8_t i;
@@ -353,6 +354,13 @@ void hostActionCommands(void)
   }
 }
 
+/* 
+   Look for any incoming message in dmaL2Cache(RAM) and then parse each token found (ending with \n) until the
+   UART Rx DMA buffer is empty. Error msgs will be handled if the word "Error:" is seen, but none of the other
+   parsed tokens is processed yet till one these cases are detected: "@" and "T:" or  "@" and "B:" or just "T0:"
+   After pasring, if the source of the message was not the printer(SERIAL_PORT], echo the dmaL2Cache on to all  
+   other active serial ports (up to _UART_CNT which is currently 6).
+*/
 void parseACK(void)
 {
   while ((ack_len = Serial_Get(SERIAL_PORT, ack_cache, ACK_CACHE_SIZE)) != 0)  // if some data have been retrieved
@@ -365,7 +373,7 @@ void parseACK(void)
 
     bool avoid_terminal = false;
 
-    if (infoHost.connected == false)  // not connected to printer
+    if (infoHost.connected == false)  //TG  not connected to Marlin yet, keep looking for @, T, T0 in message
     {
       // parse error information even though not connected to printer
       if (ack_seen(magic_error)) ackPopupInfo(magic_error);
@@ -402,7 +410,7 @@ void parseACK(void)
         storeCmd("M115\n");  // as last command to identify the FW type!
       }
 
-      infoHost.connected = true;
+      infoHost.connected = true;  //TG  if we saw any of the above strings in msg, then set connected flag!
       requestCommandInfo.inJson = false;
     }
 
@@ -514,6 +522,10 @@ void parseACK(void)
     //----------------------------------------
 
     // parse and store temperatures
+    //TG 1/9/20 depending on # extruders/hotends we will see from Marlin:
+    //  0 hotends = no T: or T0:      1 hotend = T: but not T0:     >1 hotend = T: and T0:, T1:, T2:,......
+    //  B: or C: if they are defined will be present
+    //  The heaterID[] array will be adjusted according to HOTEND_NUM size in Configuration.h 
     else if ((ack_seen("@") && ack_seen("T:")) || ack_seen("T0:"))
     {
       uint8_t heaterIndex = NOZZLE0;
@@ -752,8 +764,9 @@ void parseACK(void)
       if (memcmp((char *)getDialogMsgStr(), "Mean: ", 6) == 0)
       {
         levelingSetProbedPoint(-1, -1, ack_value());  // save probed Z value
-        sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", (char *)getDialogMsgStr(), ack_value());
-
+        SetLevelCornerPosition(5, ack_value());
+        SetLevelCornerPosition(0, 5);
+        sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", (char *)getDialogMsgStr(), GetLevelCornerPosition(5));
         popupReminder(DIALOG_TYPE_INFO, (uint8_t *)"Repeatability Test", (uint8_t *)tmpMsg);
       }
     }
@@ -841,33 +854,46 @@ void parseACK(void)
     {
       mblUpdateStatus(true);
     }
-    // parse G30, feedback to get the 4 corners Z value returned by Marlin for LevelCorner menu
+    // G30 feedback to get the 4 corners Z value returned by Marlin for LevelCorner function
     else if (ack_seen("Bed X: "))
     {
-      float x = ack_value();
-      float y = 0;
-
-      if (ack_continue_seen("Y: ")) y = ack_value();
-      if (ack_continue_seen("Z: ")) levelingSetProbedPoint(x, y, ack_value());  // save probed Z value
-    }
-    #if DELTA_PROBE_TYPE != 0
-      // parse and store Delta calibration settings
-      else if (ack_seen("Calibration OK"))
+      float valy = 0;
+      float valx = ack_value();
+      if (ack_seen("Y: ")) valy = ack_value();
+      if ((valx < 100) && (valy < 100))
       {
-        BUZZER_PLAY(SOUND_SUCCESS);
-
-          if (infoMachineSettings.EEPROM == 1)
-          {
-            popupDialog(DIALOG_TYPE_SUCCESS, LABEL_DELTA_CONFIGURATION, LABEL_EEPROM_SAVE_INFO,
-                        LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
-          }
-          else
-          {
-            popupReminder(DIALOG_TYPE_SUCCESS, LABEL_DELTA_CONFIGURATION, LABEL_PROCESS_COMPLETED);
-          }
+        if (ack_seen("Z: "))
+        {
+          SetLevelCornerPosition(1,ack_value());
+          SetLevelCornerPosition(0, 1);
         }
-      #endif
-
+      }
+      else if ((valx > 100) && (valy < 100))
+      {
+        if (ack_seen("Z: "))
+        {
+          SetLevelCornerPosition(2,ack_value());
+          SetLevelCornerPosition(0, 2);
+        }
+      }
+      else if ((valx > 100) && (valy > 100))
+      {
+        if (ack_seen("Z: "))
+        {
+          SetLevelCornerPosition(3,ack_value());
+          SetLevelCornerPosition(0, 3);
+        }
+      }
+      else if ((valx < 100) && (valy > 100))
+      {
+        if (ack_seen("Z: "))
+        {
+          SetLevelCornerPosition(4,ack_value());
+          SetLevelCornerPosition(0, 4);
+        }
+      }
+    }
+  
     //----------------------------------------
     // Parameter / M503 / M115 parsed responses
     //----------------------------------------
@@ -1256,7 +1282,7 @@ void parseACK(void)
     //----------------------------------------
 
     // parse error messages
-    else if (ack_seen(magic_error))
+    else if (ack_seen(magic_error))  // msg starts with "Error:"
     {
       ackPopupInfo(magic_error);
     }
@@ -1309,7 +1335,7 @@ void parseACK(void)
     }
 
   parse_end:
-    if (!avoid_terminal && MENU_IS(menuTerminal))
+    if (!avoid_terminal && MENU_IS(menuTerminal)) // should we copy the msg to the Gcode Terminal cache?
       terminalCache(ack_cache, ack_len, ack_port_index, SRC_TERMINAL_ACK);
 
     #ifdef SERIAL_PORT_2
