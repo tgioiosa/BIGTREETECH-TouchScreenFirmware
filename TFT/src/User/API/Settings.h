@@ -14,12 +14,12 @@ extern "C" {
 // Config version support
 // change if new elements/keywords are added/removed/changed in the configuration.h Format YYYYMMDD
 // this number should match CONFIG_VERSION in configuration.h
-#define CONFIG_SUPPPORT 20220518
+#define CONFIG_SUPPPORT 20230511
 
 #define FONT_FLASH_SIGN       20210522  // (YYYYMMDD) change if fonts require updating
-#define CONFIG_FLASH_SIGN     20220518  // (YYYYMMDD) change if any keyword(s) in config.ini is added or removed
-#define LANGUAGE_FLASH_SIGN   20230209  // (YYYYMMDD) change if any keyword(s) in language pack is added or removed
-#define ICON_FLASH_SIGN       20220712  // (YYYYMMDD) change if any icon(s) is added or removed
+#define CONFIG_FLASH_SIGN     20230511  // (YYYYMMDD) change if any keyword(s) in config.ini is added or removed
+#define LANGUAGE_FLASH_SIGN   20230511  // (YYYYMMDD) change if any keyword(s) in language pack is added or removed
+#define ICON_FLASH_SIGN       20230511  // (YYYYMMDD) change if any icon(s) is added or removed
 
 #define FONT_CHECK_SIGN       (FONT_FLASH_SIGN + WORD_UNICODE_ADDR + FLASH_SIGN_ADDR)
 #define CONFIG_CHECK_SIGN     (CONFIG_FLASH_SIGN + STRINGS_STORE_ADDR + \
@@ -53,8 +53,9 @@ extern "C" {
 #define DISABLED  0
 #define ENABLED   1
 #define AUTO      2
-#define HIGH      1
 #define LOW       0
+#define HIGH      1
+#define UNDEFINED 3
 
 enum
 {
@@ -167,6 +168,7 @@ typedef enum
 typedef struct
 {
   uint16_t CRC_checksum;
+
   // General Settings
   uint8_t  serial_port[MAX_SERIAL_PORT_COUNT];
   uint8_t  general_settings;  // emulated M600 / emulated M109-M190 / file comment parsing toggles (Bit Values)
@@ -373,10 +375,10 @@ void initSettings(void);
 // Save settings to Flash only if CRC does not match
 void saveSettings(void);
 
-// Init Machine settings data with default values
+// Init machine settings data with default values
 void initMachineSettings(void);
 
-// setup machine setting
+// Setup machine settings
 void setupMachine(FW_TYPE fwType);
 
 float flashUsedPercentage(void);

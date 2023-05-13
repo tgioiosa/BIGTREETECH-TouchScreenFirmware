@@ -1,9 +1,8 @@
-#include <stdlib.h>  // first to avoid conflicts with strtod function
+#include <stdlib.h>  // first to avoid conflicts with strtod() function
 
 #include "my_misc.h"
 #include "printf/printf.h"
 #include <stddef.h>
-#include <string.h>
 
 #define CRC_POLY 0xA001
 
@@ -20,7 +19,7 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-// Calculate CRC16 checksum
+// calculate CRC16 checksum
 uint32_t calculateCRC16(const uint8_t *data, uint32_t length)
 {
   uint16_t crc = 0xFFFF;
@@ -43,9 +42,8 @@ uint32_t calculateCRC16(const uint8_t *data, uint32_t length)
   return crc;
 }
 
-// string convert to uint8, MSB
-// "2C" to 0x2C
-uint8_t string_2_uint8_t(const uint8_t *string)
+// string convert to uint8, MSB ("2C" to 0x2C)
+uint8_t string_2_uint8(const uint8_t *str)
 {
   uint8_t rtv = 0;
 
@@ -53,12 +51,12 @@ uint8_t string_2_uint8_t(const uint8_t *string)
   {
     rtv <<= 4;
 
-    if (string[i] >= '0' && string[i] <= '9')
-      rtv |= string[i] - '0';
-    else if (string[i] >= 'A' && string[i] <= 'F')
-      rtv |= string[i] - 'A' + 0xA;
-    else if (string[i] >= 'a' && string[i] <= 'f')
-      rtv |= string[i] - 'a' + 0xA;
+    if (str[i] >= '0' && str[i] <= '9')
+      rtv |= str[i] - '0';
+    else if (str[i] >= 'A' && str[i] <= 'F')
+      rtv |= str[i] - 'A' + 0xA;
+    else if (str[i] >= 'a' && str[i] <= 'f')
+      rtv |= str[i] - 'a' + 0xA;
     else
       rtv |= 0;
   }
@@ -66,57 +64,67 @@ uint8_t string_2_uint8_t(const uint8_t *string)
   return rtv;
 }
 
-// uint8 convert to string, MSB
-// 0x2C to "2C"
-uint8_t *uint8_2_string(uint8_t num, uint8_t *string)
+// uint8 convert to string, MSB (0x2C to "2C")
+uint8_t *uint8_2_string(uint8_t num, uint8_t *str)
 {
   for (unsigned char i = 0; i < 2; i++)
   {
     uint8_t _4bits = (num & 0xF0) >> 4;
 
     if (_4bits <= 9)
-      string[i] = _4bits + '0';
+      str[i] = _4bits + '0';
     else if (_4bits >= 0xA && _4bits <= 0xF)
-      string[i] = _4bits - 0xA + 'A';
+      str[i] = _4bits - 0xA + 'A';
     else
-      string[i] = 'F';
+      str[i] = 'F';
 
     num <<= 4;
   }
 
-  return string;
+  return str;
 }
 
 // string convert to uint32, MSB
-uint32_t string_2_uint32(const uint8_t *string, const uint8_t bytes_num)
+uint32_t string_2_uint32(const uint8_t *str, const uint8_t bytes_num)
 {
   uint32_t rtv = 0;
 
   for (uint8_t i = 0; i < bytes_num; i++)
   {
     rtv <<= 8;
-    rtv |= string_2_uint8_t(string + 2 * i);
+    rtv |= string_2_uint8(str + 2 * i);
   }
 
   return rtv;
 }
 
 // uint32 convert to string, MSB
-uint8_t *uint32_2_string(uint32_t num, uint8_t bytes_num, uint8_t *string)
+uint8_t *uint32_2_string(uint32_t num, uint8_t bytes_num, uint8_t *str)
 {
   for (uint8_t i = 0; i < bytes_num; i++)
   {
     uint8_t bit = (bytes_num - i - 1) * 8;
     uint8_t _8bits = (num & (0xFF << bit)) >> bit;
 
-    uint8_2_string(_8bits, string + 2 * i);
+    uint8_2_string(_8bits, str + 2 * i);
   }
 
-  return string;
+  return str;
 }
 
-// convert string to double (without exponential support)
-double stringToDouble(char *str, char **endptr)
+// convert time to string with given formatting
+void time_2_string(char *buf, char *str_format, uint32_t time)
+{
+  uint8_t hour = HOURS(time);
+  uint8_t min = MINUTES(time);
+  uint8_t sec = SECONDS(time);
+
+  sprintf(buf, str_format, hour, min, sec);
+}
+
+// light weight strtod() function without exponential support.
+// Convert string to double (without exponential support)
+double strtod_ligth(char *str, char **endptr)
 {
   char *p = str;
   double val = 0.0;
@@ -166,14 +174,44 @@ double stringToDouble(char *str, char **endptr)
   return val * sign;
 }
 
-// convert time to string with given formatting
-void timeToString(char *buf, char *strFormat, uint32_t time)
+// light weight and safe strncpy() function with padding:
+// - copy "src" to "dest" for a maximum of "n-1" characters
+// - if null terminating character is found in "src" the rest in "dest" is padded with '\0'
+// - "dest" always ends with '\0'
+void strncpy_pad(char *dest, const char *src, size_t n)
 {
-  uint8_t hour = HOURS(time);
-  uint8_t min = MINUTES(time);
-  uint8_t sec = SECONDS(time);
+  // if "src" is not NULL, proceed first with the copy.
+  // Otherwise, proceed only padding "dest" with '\0'
+  if (src != NULL)
+  {
+    while (n > 1 && *src != '\0')
+    {
+      *dest++ = *src++;
+      n--;
+    }
+  }
 
-  sprintf(buf, strFormat, hour, min, sec);
+  memset(dest, '\0', n);  // NOTE: safe even in case value 0 was passed for "n" (memset() function will do nothing)
+}
+
+// light weight and safe strncpy() function without padding:
+// - copy "src" to "dest" for a maximum of "n-1" characters
+// - if null terminating character is found in "src" the copy stops there
+// - "dest" always ends with '\0'
+void strncpy_no_pad(char *dest, const char *src, size_t n)
+{
+  // if "src" is not NULL, proceed with the copy
+  if (src != NULL)
+  {
+    while (n > 1 && *src != '\0')
+    {
+      *dest++ = *src++;
+      n--;
+    }
+  }
+
+  if (n != 0)  // safe in case value 0 was passed for "n"
+    *dest = '\0';
 }
 
 // strip out any leading " ", "/" or ":" character that might be in the string

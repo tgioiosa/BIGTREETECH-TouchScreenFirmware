@@ -94,6 +94,7 @@ void menuManualLeveling(void)
         break;
 
       case KEY_ICON_7:
+        probeHeightMove(infoSettings.level_z_raise);
         CLOSE_MENU();
         break;
 
@@ -104,5 +105,5 @@ void menuManualLeveling(void)
     loopProcess();
   }
 
-  saveSettings();  // Save settings
+  saveSettings();  // save settings
 }

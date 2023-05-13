@@ -64,6 +64,7 @@ void mblUpdateStatus(bool succeeded)
     if (infoMachineSettings.EEPROM == 1)
     {
       sprintf(&tempMsg[strlen(tempMsg)], "\n %s", textSelect(LABEL_EEPROM_SAVE_INFO));
+
       popupDialog(DIALOG_TYPE_SUCCESS, LABEL_MBL_SETTINGS, (uint8_t *) tempMsg, LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
     }
     else
@@ -84,10 +85,7 @@ void mblNotifyError(bool isStarted)
 {
   LABELCHAR(tempMsg, LABEL_MBL);
 
-  if (!isStarted)
-    sprintf(&tempMsg[strlen(tempMsg)], " %s", textSelect(LABEL_OFF));
-  else
-    sprintf(&tempMsg[strlen(tempMsg)], " %s", textSelect(LABEL_ON));
+  sprintf(&tempMsg[strlen(tempMsg)], " %s", isStarted ? textSelect(LABEL_ON) : textSelect(LABEL_OFF));
 
   addToast(DIALOG_TYPE_ERROR, tempMsg);
 }
@@ -184,7 +182,7 @@ void menuMBL(void)
         if (!mblRunning)
           mblNotifyError(false);
         else
-          probeHeightMove(unit, -1);
+          probeHeightMove(-unit);
         break;
 
       case KEY_INFOBOX:
@@ -200,7 +198,7 @@ void menuMBL(void)
         if (!mblRunning)
           mblNotifyError(false);
         else
-          probeHeightMove(unit, 1);
+          probeHeightMove(unit);
         break;
 
       // change unit
@@ -217,7 +215,7 @@ void menuMBL(void)
         if (!mblRunning)
           mblNotifyError(false);
         else
-          probeHeightMove(curValue.axis[Z_AXIS], -1);
+          probeHeightMove(-curValue.axis[Z_AXIS]);
         break;
 
       // start MBL or move to next mesh point

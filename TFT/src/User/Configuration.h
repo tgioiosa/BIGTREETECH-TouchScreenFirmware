@@ -1,7 +1,7 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
 
-#define CONFIG_VERSION 20220518   //TG - this must match the value in Settings.h
+#define CONFIG_VERSION 20230511   //TG - this must match the value in Settings.h
 
 //====================================================================================================
 //=============================== Settings Configurable On config.ini ================================

@@ -12,12 +12,12 @@ extern "C" {
 #define IDLE_TOUCH 0xFFFF
 
 #define ITEM_PER_PAGE     8
-#define PS_TOUCH_OFFSET   2  // printing screen icon index offset for touch input
+#define PS_TOUCH_OFFSET   2                            // printing screen icon index offset for touch input
 #define MENU_RECT_COUNT   (ITEM_PER_PAGE * 2 + 1)      // 8 items + title bar
 #define SS_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + infobox
 #define TM_RECT_COUNT     (ITEM_PER_PAGE * 2 + 1 + 1)  // 8 items + title bar + tempbox
 #define LISTITEM_PER_PAGE 5
-#define LIVEICON_LINES    5
+#define LIVEICON_LINES    3
 
 #define CENTER_Y          ((exhibitRect.y1 - exhibitRect.y0) / 2 + exhibitRect.y0)
 #define CENTER_X          ((exhibitRect.x1 - exhibitRect.x0 - BYTE_WIDTH) / 2 + exhibitRect.x0)
@@ -112,16 +112,8 @@ typedef enum
   SYS_STATUS_BUSY,
   SYS_STATUS_DISCONNECTED,
   SYS_STATUS_LISTENING,
-  SYS_STATUS_NORMAL
+  SYS_STATUS_VOL_CHANGE
 } SYS_STATUS;
-
-typedef struct
-{
-  GUI_RECT rect;
-  uint32_t time;
-  uint8_t status;
-  uint16_t inf;
-} REMINDER;
 
 typedef enum
 {
@@ -180,11 +172,10 @@ extern const GUI_RECT rect_of_titleBar[1];
 void setMenuType(MENU_TYPE type);
 MENU_TYPE getMenuType(void);
 
-void reminderMessage(int16_t inf, SYS_STATUS status);
-void volumeReminderMessage(int16_t inf, SYS_STATUS status);
+void setReminderMsg(int16_t inf, SYS_STATUS status);
 void notificationDot(void);
 
-void busyIndicator(SYS_STATUS status);
+void drawBusySign(void);
 
 MENUITEMS *getCurMenuItems(void);
 LISTITEMS *getCurListItems(void);
@@ -206,9 +197,6 @@ void menuDrawPage(const MENUITEMS * menuItems);
 void menuDrawListPage(const LISTITEMS *listItems);
 
 void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon);
-// Display info for Level Corner feature in ABL menu
-void showLevelCornerLiveInfo(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
-void showTextOnIcon(uint8_t index, uint8_t Levelindex, const LIVE_INFO * liveicon, const ITEM * item);
 void displayExhibitHeader(const char * titleStr, const char * unitStr);
 void displayExhibitValue(const char * valueStr);
 

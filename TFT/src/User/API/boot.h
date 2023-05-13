@@ -18,11 +18,11 @@ extern "C" {
   #define LARGE_FONT_SIZE           0x3000  //TG  12,288 bytes
   #define _8X16_FONT_SIZE           0x1000
   #define FLASH_SIGN_SIZE           0x1000  // store status of last font/icon/config update
-  #define LANGUAGE_SIZE            0x15000  // Language pack size
+  #define LANGUAGE_SIZE            0x16000  // Language pack size     //TG 5/12/23 **increased was 0x15000
   #define STRINGS_STORE_MAX_SIZE    0x1000  // label strings max size
   #define PREHEAT_STORE_MAX_SIZE    0x1000  // preheat setting max size
   #define PRINT_GCODES_MAX_SIZE     0x5000  // start/end/cancel gcodes max size
-  #define CUSTOM_GCODE_MAX_SIZE     0x5000  // custom gocdes max size
+  #define CUSTOM_GCODE_MAX_SIZE     0x4000  // custom gocdes max size //TG 5/12/23 **decreased was 0x5000
   #define ICON_MAX_SIZE             0x5000
   #define INFOBOX_MAX_SIZE          0xB000
   #define SMALL_ICON_MAX_SIZE       0x2000  //TG  8192 bytes

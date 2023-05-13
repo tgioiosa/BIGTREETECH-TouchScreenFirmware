@@ -48,7 +48,7 @@ bool mountFS(void)
       return mountUSBDisk();
 
     case FS_ONBOARD_MEDIA:
-      if (isPrintingFromHost())
+      if (isPrintingFromOnboard())
         return true;  // no mount while printing
       else
         return mountGcodeSDCard();
@@ -217,7 +217,7 @@ bool addFile(bool isFile, const char * shortName, const char * longName)
   if (sName == NULL)  // in case of error, exit
     return false;
 
-  strncpy(sName, shortName, sNameLen);  // copy to "sName" and set to NULL the flag for filename extension check, if any
+  strncpy_pad(sName, shortName, sNameLen);  // copy to "sName" and set to NULL the flag for filename extension check, if any
 
   //
   // get long name, if any
@@ -237,7 +237,7 @@ bool addFile(bool isFile, const char * shortName, const char * longName)
       return false;
     }
 
-    strncpy(lName, longName, lNameLen);  // copy to "lName" and set to NULL the flag for filename extension check, if any
+    strncpy_pad(lName, longName, lNameLen);  // copy to "lName" and set to NULL the flag for filename extension check, if any
   }
 
   //
@@ -357,9 +357,9 @@ bool getPrintTitle(char * buf, uint8_t len)
     return false;
   }
 
-  strncpy(buf, getFS(), len);  // set source and set the flag for filename extension check
-  strcat(buf, strPtr);         // append filename
-  hideExtension(buf);          // hide filename extension if filename extension feature is disabled
+  strncpy_pad(buf, getFS(), len);  // set source and set the flag for filename extension check
+  strcat(buf, strPtr);             // append filename
+  hideExtension(buf);              // hide filename extension if filename extension feature is disabled
 
   return true;
 }
@@ -387,7 +387,7 @@ void loopVolumeSource(void)
                                                     {LABEL_TFT_USB_REMOVED, LABEL_TFT_USB_INSERTED}};
 
       volumeSrcStatus[i] = (*volumeInserted[i])();
-      volumeReminderMessage(labelSDStates[i][volumeSrcStatus[i]], SYS_STATUS_NORMAL);
+      setReminderMsg(labelSDStates[i][volumeSrcStatus[i]], SYS_STATUS_VOL_CHANGE);
     }
   }
 }

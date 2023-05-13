@@ -55,8 +55,8 @@ struct HOST_ACTION
 {
   char prompt_begin[30];
   char prompt_button[2][20];
-  bool prompt_show;         // show popup reminder or not
-  uint8_t button;           // number of buttons
+  bool prompt_show;           // show popup reminder or not
+  uint8_t button;             // number of buttons
 } hostAction;
 
 void setHostDialog(bool isHostDialog)
@@ -74,7 +74,8 @@ void setCurrentAckSrc(SERIAL_PORT_INDEX portIndex)
   ack_port_index = portIndex;
 }
 
-static bool ack_starts_with(const char * str)  // checks if the cache starts with the given parameter
+// checks if the cache starts with the given parameter
+static bool ack_starts_with(const char * str)
 {
   uint16_t i = 0;
 
@@ -90,10 +91,11 @@ static bool ack_starts_with(const char * str)  // checks if the cache starts wit
   return false;
 }
 
+// searches the first appearance of the given string from the start
+// of the cache, on success sets the current index of the cache
+// ("ack_index") next to the position where the found string ended
 static bool ack_seen(const char * str)
-{ // searches the first appearance of the given string from the start
-  // of the cache, on success sets the current index of the cache
-  // ("ack_index") next to the position where the found string ended
+{
   uint16_t i;
 
   for (ack_index = 0, i = 0; ack_cache[ack_index] != '\0'; ack_index++, i = 0)
@@ -111,9 +113,10 @@ static bool ack_seen(const char * str)
   return false;
 }
 
+// unlike "ack_seen()", this starts the search from the current index, where previous
+// search left off and retains "ack_index" if the searched string is not found
 static bool ack_continue_seen(const char * str)
-{ // unlike "ack_seen()", this starts the search from the current index, where previous
-  // search left off and retains "ack_index" if the searched string is not found
+{
   uint16_t tmp_index;
   uint16_t i;
 
@@ -215,7 +218,7 @@ bool processKnownEcho(void)  //TG  returns true for known echo msgs found in kno
   }
 
   // display the busy indicator
-  busyIndicator(SYS_STATUS_BUSY);
+  drawBusySign();
 
   if (isKnown)
   {
@@ -244,18 +247,18 @@ void hostActionCommands(void)
 
     if (ack_continue_seen("Time Left"))  // parsing printing time left
     {
-      // format: Time Left <XX>h<YY>m<ZZ>s (e.g. Time Left 02h04m06s)
+      // format: "Time Left <XX>h<YY>m<ZZ>s" (e.g. "Time Left 02h04m06s")
       parsePrintRemainingTime((char *)ack_cache + ack_index);
     }
     else if (ack_continue_seen("Layer Left"))  // parsing printing layer left
     {
-      // format: Layer Left <XXXX>/<YYYY> (e.g. Layer Left 51/940)
+      // format: "Layer Left <XXXX>/<YYYY>" (e.g. "Layer Left 51/940")
       setPrintLayerNumber(ack_value());
       setPrintLayerCount(ack_second_value());
     }
     else if (ack_continue_seen("Data Left"))  // parsing printing data left
     {
-      // format: Data Left <XXXX>/<YYYY> (e.g. Data Left 123/12345)
+      // format: "Data Left <XXXX>/<YYYY>" (e.g. "Data Left 123/12345")
       setPrintProgressData(ack_value(), ack_second_value());
     }
     else
@@ -373,10 +376,15 @@ void parseACK(void)
 
     bool avoid_terminal = false;
 
-    if (infoHost.connected == false)  //TG  not connected to Marlin yet, keep looking for @, T, T0 in message
+    //----------------------------------------
+    // TFT to printer connection handling
+    //----------------------------------------
+
+    if (infoHost.connected == false) //TG  not connected to Marlin yet, keep looking for @, T, T0 in message 
     {
       // parse error information even though not connected to printer
-      if (ack_seen(magic_error)) ackPopupInfo(magic_error);
+      if (ack_seen(magic_error))
+        ackPopupInfo(magic_error);
 
       // the first response should be such as "T:25/50\n"
       // the "T:0" response is specifically for Marlin when EXTRUDER_COUNT:0
@@ -389,9 +397,14 @@ void parseACK(void)
           break;
       }
 
-      if (infoSettings.ext_count < infoSettings.hotend_count) infoSettings.ext_count = infoSettings.hotend_count;
-      if (ack_seen(heaterID[BED])) infoSettings.bed_en = ENABLED;
-      if (ack_seen(heaterID[CHAMBER])) infoSettings.chamber_en = ENABLED;
+      if (infoSettings.ext_count < infoSettings.hotend_count)
+        infoSettings.ext_count = infoSettings.hotend_count;
+
+      if (ack_seen(heaterID[BED]))
+        infoSettings.bed_en = ENABLED;
+
+      if (ack_seen(heaterID[CHAMBER]))
+        infoSettings.chamber_en = ENABLED;
 
       updateNextHeatCheckTime();
 
@@ -410,11 +423,14 @@ void parseACK(void)
         storeCmd("M115\n");  // as last command to identify the FW type!
       }
 
-      infoHost.connected = true;  //TG  if we saw any of the above strings in msg, then set connected flag!
+      infoHost.connected = true;
       requestCommandInfo.inJson = false;
     }
 
-    /* onboard media gcode command response start */
+    //----------------------------------------
+    // Onboard media response handling
+    //----------------------------------------
+
     if (requestCommandInfo.inWaitResponse)
     {
       if (ack_seen(requestCommandInfo.startMagic))
@@ -482,9 +498,11 @@ void parseACK(void)
       requestCommandInfo.inJson = false;
       goto parse_end;
     }
-    /* onboard media gcode command response end */
 
-    /* RepRap response handle */
+    //----------------------------------------
+    // RepRap response handling
+    //----------------------------------------
+
     if (!requestCommandInfo.inWaitResponse && !requestCommandInfo.inResponse && infoMachineSettings.firmwareType == FW_REPRAPFW)
     {
       if (strchr(ack_cache, '{') != NULL)
@@ -501,10 +519,14 @@ void parseACK(void)
       infoHost.wait = false;
       goto parse_end;
     }
-    /* RepRap response handle end */
 
-    if (ack_starts_with("ok"))  // handle "ok" response
-    { // it is checked first (and not later on) because it is the most frequent response during printing
+    //----------------------------------------
+    // "ok" response handling
+    //----------------------------------------
+
+    // it is checked first (and not later on) because it is the most frequent response during printing
+    if (ack_starts_with("ok"))
+    {
       infoHost.wait = false;
 
       // if regular "ok\n" response or ADVANCED_OK response (Marlin) (e.g. "ok N10 P15 B3\n")
@@ -512,20 +534,21 @@ void parseACK(void)
         goto parse_end;  // there's nothing else to check for
     }
 
-    if (ack_starts_with("wait"))  // suppress "wait" from terminal
-    { // it is checked second (and not later on) because it is the most frequent response during printer idle
-      avoid_terminal = !infoSettings.terminal_ack;
+    //----------------------------------------
+    // "wait" response handling
+    //----------------------------------------
+
+    // it is checked second (and not later on) because it is the most frequent response during printer idle
+    if (ack_starts_with("wait"))
+    {
+      avoid_terminal = !infoSettings.terminal_ack;  // suppress "wait" from terminal
     }
 
     //----------------------------------------
     // Pushed / polled / on printing parsed responses
     //----------------------------------------
 
-    // parse and store temperatures
-    //TG 1/9/20 depending on # extruders/hotends we will see from Marlin:
-    //  0 hotends = no T: or T0:      1 hotend = T: but not T0:     >1 hotend = T: and T0:, T1:, T2:,......
-    //  B: or C: if they are defined will be present
-    //  The heaterID[] array will be adjusted according to HOTEND_NUM size in Configuration.h 
+    // parse and store temperatures (e.g. "ok T:16.13 /0.00 B:16.64 /0.00 @:0 B@:0\n")
     else if ((ack_seen("@") && ack_seen("T:")) || ack_seen("T0:"))
     {
       uint8_t heaterIndex = NOZZLE0;
@@ -555,16 +578,17 @@ void parseACK(void)
     else if (ack_starts_with("X:") || ack_seen("C: X:"))  // Smoothieware axis position starts with "C: X:"
     {
       coordinateSetAxisActual(X_AXIS, ack_value());
+
       if (ack_continue_seen("Y:"))
       {
         coordinateSetAxisActual(Y_AXIS, ack_value());
+
         if (ack_continue_seen("Z:"))
         {
           coordinateSetAxisActual(Z_AXIS, ack_value());
+
           if (ack_continue_seen("E:"))
-          {
             coordinateSetAxisActual(E_AXIS, ack_value());
-          }
         }
       }
 
@@ -609,6 +633,7 @@ void parseACK(void)
     {
       if (ack_seen("S"))
         fanSetCurSpeed(MAX_COOLING_FAN_COUNT, ack_value());
+
       if (ack_seen("I"))
         fanSetCurSpeed(MAX_COOLING_FAN_COUNT + 1, ack_value());
 
@@ -618,7 +643,7 @@ void parseACK(void)
     else if (!infoMachineSettings.promptSupport && ack_seen("paused for user"))
     {
       popupDialog(DIALOG_TYPE_QUESTION, (uint8_t *)"Printer is Paused", (uint8_t *)"Paused for user\ncontinue?",
-                    LABEL_CONFIRM, LABEL_NULL, breakAndContinue, NULL, NULL);
+                  LABEL_CONFIRM, LABEL_NULL, breakAndContinue, NULL, NULL);
     }
     // parse host action commands. Required "HOST_ACTION_COMMANDS" and other settings in Marlin
     else if (ack_starts_with("//action:"))
@@ -744,8 +769,7 @@ void parseACK(void)
     {
       char tmpMsg[100];
 
-      strcpy (tmpMsg, "Mean: ");
-      sprintf (&tmpMsg[strlen(tmpMsg)], "%0.5f", ack_value());
+      sprintf(tmpMsg, "Mean: %0.5f", ack_value());
 
       if (ack_continue_seen("Min: "))
         sprintf(&tmpMsg[strlen(tmpMsg)], "\nMin: %0.5f", ack_value());
@@ -760,13 +784,13 @@ void parseACK(void)
     else if (ack_seen("Standard Deviation: "))
     {
       char tmpMsg[100];
+      char * dialogMsg = (char *)getDialogMsgStr();
 
-      if (memcmp((char *)getDialogMsgStr(), "Mean: ", 6) == 0)
+      if (memcmp(dialogMsg, "Mean: ", 6) == 0)
       {
         levelingSetProbedPoint(-1, -1, ack_value());  // save probed Z value
-        SetLevelCornerPosition(5, ack_value());
-        SetLevelCornerPosition(0, 5);
-        sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", (char *)getDialogMsgStr(), GetLevelCornerPosition(5));
+        sprintf(tmpMsg, "%s\nStandard Deviation: %0.5f", dialogMsg, ack_value());
+
         popupReminder(DIALOG_TYPE_INFO, (uint8_t *)"Repeatability Test", (uint8_t *)tmpMsg);
       }
     }
@@ -818,7 +842,7 @@ void parseACK(void)
       else
       {
         caseLightSetState(true);
-        caseLightSetBrightness(ack_value());
+        caseLightSetPercent(ack_value());
       }
     }
     // parse and store M420 V1 T1, mesh data (e.g. from Mesh Editor menu)
@@ -845,7 +869,7 @@ void parseACK(void)
       if (ack_seen("Z") || (ack_seen("Z:"))) setParameter(P_PROBE_OFFSET, AXIS_INDEX_Z, ack_value());
     }
     // parse G29 (ABL) + M118, ABL completed message (ABL, BBL, UBL) (e.g. from ABL menu)
-    else if (ack_seen("ABL Completed"))
+    else if (ack_starts_with("ABL Completed"))
     {
       ablUpdateStatus(true);
     }
@@ -854,46 +878,32 @@ void parseACK(void)
     {
       mblUpdateStatus(true);
     }
-    // G30 feedback to get the 4 corners Z value returned by Marlin for LevelCorner function
+    // parse G30, feedback to get the 4 corners Z value returned by Marlin for LevelCorner menu
     else if (ack_seen("Bed X: "))
     {
-      float valy = 0;
-      float valx = ack_value();
-      if (ack_seen("Y: ")) valy = ack_value();
-      if ((valx < 100) && (valy < 100))
-      {
-        if (ack_seen("Z: "))
-        {
-          SetLevelCornerPosition(1,ack_value());
-          SetLevelCornerPosition(0, 1);
-        }
-      }
-      else if ((valx > 100) && (valy < 100))
-      {
-        if (ack_seen("Z: "))
-        {
-          SetLevelCornerPosition(2,ack_value());
-          SetLevelCornerPosition(0, 2);
-        }
-      }
-      else if ((valx > 100) && (valy > 100))
-      {
-        if (ack_seen("Z: "))
-        {
-          SetLevelCornerPosition(3,ack_value());
-          SetLevelCornerPosition(0, 3);
-        }
-      }
-      else if ((valx < 100) && (valy > 100))
-      {
-        if (ack_seen("Z: "))
-        {
-          SetLevelCornerPosition(4,ack_value());
-          SetLevelCornerPosition(0, 4);
-        }
-      }
+      float x = ack_value();
+      float y = 0;
+
+      if (ack_continue_seen("Y: "))
+        y = ack_value();
+
+      if (ack_continue_seen("Z: "))
+        levelingSetProbedPoint(x, y, ack_value());  // save probed Z value
     }
-  
+    #if DELTA_PROBE_TYPE != 0
+      // parse and store Delta calibration settings
+      else if (ack_seen("Calibration OK"))
+      {
+        BUZZER_PLAY(SOUND_SUCCESS);
+
+        if (infoMachineSettings.EEPROM == 1)
+          popupDialog(DIALOG_TYPE_SUCCESS, LABEL_DELTA_CONFIGURATION, LABEL_EEPROM_SAVE_INFO,
+                      LABEL_CONFIRM, LABEL_CANCEL, saveEepromSettings, NULL, NULL);
+        else
+          popupReminder(DIALOG_TYPE_SUCCESS, LABEL_DELTA_CONFIGURATION, LABEL_PROCESS_COMPLETED);
+      }
+    #endif
+
     //----------------------------------------
     // Parameter / M503 / M115 parsed responses
     //----------------------------------------
@@ -979,7 +989,7 @@ void parseACK(void)
     {
       setParameter(P_AUTO_RETRACT, 0, ack_value());
     }
-    // parse and store hotend PID (M301), bed PID (M304)
+    // parse and store hotend PID (M301) and bed PID (M304)
     else if (ack_starts_with("M301") || ack_starts_with("M304"))
     {
       PARAMETER_NAME param = ack_starts_with("M301") ? P_HOTEND_PID : P_BED_PID;
@@ -1027,20 +1037,16 @@ void parseACK(void)
       {
         pValue = ack_value();
 
-        if (setAxis & SET_X)
-            setParameter(P_INPUT_SHAPING, 0, pValue);
-        if (setAxis & SET_Y)
-            setParameter(P_INPUT_SHAPING, 2, pValue);
+        if (setAxis & SET_X) setParameter(P_INPUT_SHAPING, 0, pValue);
+        if (setAxis & SET_Y) setParameter(P_INPUT_SHAPING, 2, pValue);
       }
 
       if (ack_seen("D"))
       {
         pValue = ack_value();
 
-        if (setAxis & SET_X)
-            setParameter(P_INPUT_SHAPING, 1, pValue);
-        if (setAxis & SET_Y)
-            setParameter(P_INPUT_SHAPING, 3, pValue);
+        if (setAxis & SET_X) setParameter(P_INPUT_SHAPING, 1, pValue);
+        if (setAxis & SET_Y) setParameter(P_INPUT_SHAPING, 3, pValue);
       }
     }
     // parse and store Delta configuration / Delta tower angle (M665) and Delta endstop adjustments (M666)

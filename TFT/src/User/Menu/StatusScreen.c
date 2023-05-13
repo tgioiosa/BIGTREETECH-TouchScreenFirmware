@@ -202,17 +202,17 @@ void drawStatus(void)
 
 void statusScreen_setMsg(const uint8_t *title, const uint8_t *msg)
 {
-  strncpy(msgTitle, (char *)title, sizeof(msgTitle));
-  strncpy(msgBody, (char *)msg, sizeof(msgBody));
+  strncpy_no_pad(msgTitle, (char *)title, sizeof(msgTitle));
+  strncpy_no_pad(msgBody, (char *)msg, sizeof(msgBody));
   msgNeedRefresh = true;
 }
 
 void statusScreen_setReady(void)
 {
-  strncpy(msgTitle, (char *)textSelect(LABEL_STATUS), sizeof(msgTitle));
+  strncpy_no_pad(msgTitle, (char *)textSelect(LABEL_STATUS), sizeof(msgTitle));
 
   if (infoHost.connected == false)
-    strncpy(msgBody, (char *)textSelect(LABEL_UNCONNECTED), sizeof(msgBody));
+    strncpy_no_pad(msgBody, (char *)textSelect(LABEL_UNCONNECTED), sizeof(msgBody));
   else
     snprintf(msgBody, sizeof(msgBody), "%s %s", (char *)machine_type, (char *)textSelect(LABEL_READY));
 
@@ -309,12 +309,12 @@ void menuStatus(void)
     switch (key_num)
     {
       case KEY_ICON_0:
-        heatSetCurrentIndex(-1);  // set last used hotend index
+        heatSetCurrentIndex(LAST_NOZZLE);  // preselect last selected nozzle for "Heat" menu
         OPEN_MENU(menuHeat);
         break;
 
       case KEY_ICON_1:
-        heatSetCurrentIndex(-2);  // set last used bed index
+        heatSetCurrentIndex(BED);  // preselect the bed for "Heat" menu
         OPEN_MENU(menuHeat);
         break;
 

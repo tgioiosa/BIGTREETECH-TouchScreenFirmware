@@ -4,7 +4,6 @@
 void loadNotificationItems(void)
 {
   LISTITEMS * itemlist = getCurListItems();
-  uint8_t n = 0;
 
   for (uint8_t i = 0; i < MAX_MSG_COUNT; i++)
   {
@@ -28,7 +27,6 @@ void loadNotificationItems(void)
       }
 
       itemlist->items[i].titlelabel.address = tempNotify->text;
-      n++;
     }
     else
     {
@@ -37,14 +35,13 @@ void loadNotificationItems(void)
 
     menuDrawListItem(&itemlist->items[i], i);
   }
-  //return n;
 }
 
 void menuNotification(void)
 {
   LISTITEMS notificationItems = {
     LABEL_NOTIFICATIONS,
-    // icon            ItemType    Item Title     item value text(only for custom value)
+    // icon            item type   item title     item value text(only for custom value)
     {
       {CHARICON_NULL,  LIST_LABEL, LABEL_DYNAMIC, LABEL_NULL},
       {CHARICON_NULL,  LIST_LABEL, LABEL_DYNAMIC, LABEL_NULL},

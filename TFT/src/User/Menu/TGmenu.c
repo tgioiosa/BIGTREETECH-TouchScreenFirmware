@@ -1,6 +1,5 @@
 
 #include "TGmenu.h"
-#include "SendGcode.h"
 #include "includes.h"
   
 //extern char gcodeBuf[CMD_MAX_CHAR];
@@ -22,10 +21,10 @@ static bool ublSlotSaved = false;
     {{ICON_Z_0,                     LABEL_Z_0},
      {ICON_Z_300,                   LABEL_Z_300},
      {ICON_M503,                    LABEL_M503},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
-     {ICON_BACKGROUND,              LABEL_BACKGROUND},
+     {ICON_NULL,                    LABEL_NULL},
+     {ICON_NULL,                    LABEL_NULL},
+     {ICON_NULL,                    LABEL_NULL},
+     {ICON_NULL,                    LABEL_NULL},
      {ICON_BACK,                    LABEL_BACK}}
   };
 
