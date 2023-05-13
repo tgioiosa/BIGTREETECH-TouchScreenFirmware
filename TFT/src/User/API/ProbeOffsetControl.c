@@ -12,7 +12,7 @@ void probeOffsetEnable(float shim)
   probeHeightEnable();  // temporary disable software endstops and save ABL state
 
   // Z offset gcode sequence start
-  probeHeightHome();  // home, disable ABL and raise nozzle
+  probeHeightHome();  // home, disable ABL and raise nozzle  forces a G28 Home
 
   float probedZ = 0.0f;
 

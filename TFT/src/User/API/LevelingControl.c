@@ -84,7 +84,7 @@ void levelingProbePoint(LEVELING_POINT point)
   levelingGetPointCoords(coords);
 
   if (coordinateIsKnown() == false)
-    probeHeightHomeAndRaise();  // home and raise nozzle
+    probeHeightHomeAndRaise();  // home (force G28) and raise nozzle, this is a 2nd homing
 
   if (infoSettings.touchmi_sensor != 0)
   {
