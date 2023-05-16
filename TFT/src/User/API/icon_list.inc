@@ -151,5 +151,6 @@ X_ICON (TGMENU)             //TG 1/12/20 new
 X_ICON (Z_0)                //TG 1/12/20 new
 X_ICON (Z_300)              //TG 1/12/20 new
 X_ICON (M503)               //TG 1/12/20 new
+X_ICON (NOZZLE_CLEAN)       //TG 5/14/23 new
 X_ICON (DELTA_CALIBRATE)
 // After changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

@@ -375,8 +375,8 @@
     #define STRING_Z_0                    "Z to 0mm"    //TG 5/11/23
     #define STRING_Z_300                  "Z to 300"    //TG 5/11/23
     #define STRING_M503                   "Read EEP"    //TG 5/11/23
+    #define STRING_NOZZLE_CLEAN           "Clean"       //TG 5/11/23
     #define STRING_CONNECT_PROBE          "Connect probe before starting the process. Make sure to disconnect it afterwards."
     #define STRING_DISCONNECT_PROBE       "Make sure you have disconnected probe before using this feature."
     #define STRING_CALIBRATION            "Calibrate"
-
 #endif

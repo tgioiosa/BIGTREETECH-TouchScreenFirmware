@@ -15,6 +15,7 @@ void infoSetAccessPoint(uint8_t *ssid, uint8_t ssid_len);
 void infoSetIPAddress(uint8_t *ip, uint8_t ip_len);
 void menuInfo(void);
 void menuSettings(void);
+void infoSetSourceCodeURL(uint8_t *name, uint8_t name_len);  //TG 5/14/23 added for enhanced info display
 
 #ifdef __cplusplus
 }

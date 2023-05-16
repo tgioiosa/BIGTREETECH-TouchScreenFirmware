@@ -1184,9 +1184,20 @@ void parseACK(void)
       if (ack_seen("FIRMWARE_URL:"))  // for Smoothieware
         string_end = ack_index - sizeof("FIRMWARE_URL:");
       else if (ack_seen("SOURCE_CODE_URL:"))  // for Marlin
-        string_end = ack_index - sizeof("SOURCE_CODE_URL:");
+        string_end = ack_index - sizeof("SOURCE_CODE_URL:");  //TG set string_end ptr to start of "SOURCE_CODE_URL:"
+      else if ((infoMachineSettings.firmwareType == FW_REPRAPFW) && ack_seen("ELECTRONICS"))  // For RepRapFirmware
+        string_end = ack_index - sizeof("ELECTRONICS");
 
-      infoSetFirmwareName(string, string_end - string_start);  // set firmware name
+      infoSetFirmwareName(string, string_end - string_start);   // Set firmware name
+        
+      //TG 2/24/23 added new code to obtain source code folder name from Marlin
+      string = (uint8_t *)&ack_cache[ack_index];
+      string_start = ack_index;
+      if (ack_seen("PROTOCOL_VERSION:"))
+      { //TG set string_end ptr to start of "SOURCE_CODE_URL:" 
+        string_end = ack_index - sizeof("PROTOCOL_VERSION:");     
+        infoSetSourceCodeURL(string, string_end - string_start);  // Set src code folder name
+      }
 
       if (ack_seen("MACHINE_TYPE:"))
       {
@@ -1201,7 +1212,7 @@ void parseACK(void)
           string_end = ack_index - sizeof("EXTRUDER_COUNT:");
         }
 
-        infoSetMachineType(string, string_end - string_start);  // set firmware name
+        infoSetMachineType(string, string_end - string_start);  // set achine type name
       }
     }
     else if (ack_starts_with("Cap:"))
@@ -1345,7 +1356,7 @@ void parseACK(void)
       terminalCache(ack_cache, ack_len, ack_port_index, SRC_TERMINAL_ACK);
 
     #ifdef SERIAL_PORT_2
-      if (ack_port_index == PORT_1)
+      if (ack_port_index == PORT_1)  //TG - WiFi port is considered a supplementary port
       {
         if (infoHost.wait == false && !ack_starts_with("ok"))
         { // if the ACK message is not related to a gcode originated by the TFT and it is not "ok", it is a spontaneous
@@ -1364,5 +1375,17 @@ void parseACK(void)
           ack_port_index = PORT_1;
       }
     #endif
-  }
-}
+  } //while ((ack_len = Serial_Get(SERIAL_PORT, ack_cache, ACK_CACHE_SIZE)) != 0)
+} //parseAck() 
+
+/*TG 2/24/23 THIS MAY NOT BE NEEDED ANYMORE 
+// ***********************************************************************************
+// //TG           name          device    connected to      index
+//               -----------   --------  ---------------   -----
+//               SERIAL_PORT_2 _USART1   WiFi expansion    0
+//               SERIAL_PORT   _USART2   printer(Marlin)   1  TFT
+//               SERIAL_PORT_3 _USART3   ??                2
+//               SERIAL_PORT_4 _UART4    ??                3
+//                             _UART5    ??                4
+// ***********************************************************************************
+*/

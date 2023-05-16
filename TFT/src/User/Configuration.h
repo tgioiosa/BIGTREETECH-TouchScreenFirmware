@@ -36,7 +36,7 @@
  *                P4: [min: 0, max: 9]
  *   Options: [OFF (port disabled): 0, 2400: 1, 9600: 2, 19200: 3, 38400: 4, 57600: 5, 115200: 6, 250000: 7, 500000: 8, 1000000: 9]
  */
-#define SP_1 6  // Default: 6
+#define SP_1 7  // Default: 6
 #define SP_2 0  // Default: 0
 #define SP_3 0  // Default: 0
 #define SP_4 0  // Default: 0
@@ -463,9 +463,9 @@
 #define X_MIN_POS   0  // Default: 0
 #define Y_MIN_POS   0  // Default: 0
 #define Z_MIN_POS   0  // Default: 0
-#define X_MAX_POS 235  // Default: 235
-#define Y_MAX_POS 235  // Default: 235
-#define Z_MAX_POS 250  // Default: 250
+#define X_MAX_POS 310  // Default: 235  #//TG 5/16/23
+#define Y_MAX_POS 295  // Default: 235  #//TG 5/16/23
+#define Z_MAX_POS 390  // Default: 250  #//TG 5/16/23
 
 /**
  * X & Y Move Speeds/Feedrates
@@ -474,9 +474,9 @@
  *   Unit: [feedrate in mm/min]
  *   Value range: [min: 10, max: 12000]
  */
-#define SPEED_XY_SLOW   1000  // Default: 1000
-#define SPEED_XY_NORMAL 3000  // Default: 3000
-#define SPEED_XY_FAST   5000  // Default: 5000
+#define SPEED_XY_SLOW   1000  // Default: 1000 =  17mm/s
+#define SPEED_XY_NORMAL 5400  // Default: 3000 =  90mm/s  #//TG 5/16/23 raised speeds
+#define SPEED_XY_FAST   9000  // Default: 5000 = 150mm/s  #//TG 5/16/23 raised speeds
 
 /**
  * Z Speeds/Feedrates
@@ -485,9 +485,9 @@
  *   Unit: [feedrate in mm/min]
  *   Value range: [min: 10, max: 12000]
  */
-#define SPEED_Z_SLOW   300  //TG 6/30/21
-#define SPEED_Z_NORMAL 420  //TG 6/30/21
-#define SPEED_Z_FAST   600  //TG 6/30/21
+#define SPEED_Z_SLOW   300  //TG 6/30/21  =  5mm/s
+#define SPEED_Z_NORMAL 420  //TG 6/30/21  =  7mm/s
+#define SPEED_Z_FAST   1200  //TG 6/30/21 = 20mm/s  #//TG 5/16/23 raised speeds
 
 /**
  * Extruder Speeds/Feedrates
@@ -496,9 +496,9 @@
  *   Unit: [feedrate in mm/min]
  *   Value range: [min: 10, max: 12000]
  */
-#define EXTRUDE_SLOW_SPEED     60  // Default: 60
-#define EXTRUDE_NORMAL_SPEED  600  // Default: 600
-#define EXTRUDE_FAST_SPEED   1200  // Default: 1200
+#define EXTRUDE_SLOW_SPEED     60  // Default: 60   =  1mm/s
+#define EXTRUDE_NORMAL_SPEED  600  // Default: 600  = 10mm/s
+#define EXTRUDE_FAST_SPEED   2400  // Default: 1200 = 40mm/s  #//TG 5/16/23 raised speeds
 
 /**
  * Auto Load Bed Leveling Data

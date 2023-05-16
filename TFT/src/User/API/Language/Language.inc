@@ -385,6 +385,6 @@ X_WORD (TGMENU) //TG 5/11/23
 X_WORD (Z_0)    //TG 5/11/23
 X_WORD (Z_300)  //TG 5/11/23  
 X_WORD (M503)   //TG 5/11/23
-
+X_WORD (NOZZLE_CLEAN) //TG 5/11/23
 
 // After changing/adding/removing a word, change the LANGUAGE_FLASH_SIGN in Settings.h
