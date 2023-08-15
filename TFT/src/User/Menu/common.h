@@ -38,6 +38,8 @@ extern uint8_t currentTool;     // current hotend index
 extern uint8_t currentBCIndex;  // current bed/chamber index
 extern uint8_t currentFan;      // current fan index
 extern uint8_t currentSpeedID;  // current speed/flow index
+extern float fil_width;         //TG 8/12/23 holds Filament Width value from Marlin(via parseAck.c)
+extern float fil_vol;           //TG 8/12/23 holds Filament Volumetric Ratio from Marlin(via parseAck.c)
 
 extern const ITEM itemTool[MAX_HEATER_COUNT];
 extern const ITEM itemDegreeSteps[ITEM_DEGREE_NUM];

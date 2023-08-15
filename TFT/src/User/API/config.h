@@ -169,6 +169,8 @@ extern "C" {
 #define CONFIG_START_GCODE            "start_gcode:"
 #define CONFIG_END_GCODE              "end_gcode:"
 #define CONFIG_CANCEL_GCODE           "cancel_gcode:"
+#define CONFIG_FIL_WIDTH				      "fil_width:"	//TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 
 //-----------------------------Limits
 #define MAX_SIZE_LIMIT         2000  // machine size over this will not be parsed.

@@ -385,6 +385,9 @@ X_WORD (TGMENU) //TG 5/11/23
 X_WORD (Z_0)    //TG 5/11/23
 X_WORD (Z_300)  //TG 5/11/23  
 X_WORD (M503)   //TG 5/11/23
-X_WORD (NOZZLE_CLEAN) //TG 5/11/23
-
+X_WORD (NOZZLE_CLEAN)     //TG 5/11/23
+X_WORD (STATUS_WIDTH)			//TG 8/14/2023 - added by ICON generator
+X_WORD (PRINTING_WIDTH)		//TG 8/14/2023 - added by ICON generator
+X_WORD (FIL_WIDTH)			  //TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 // After changing/adding/removing a word, change the LANGUAGE_FLASH_SIGN in Settings.h

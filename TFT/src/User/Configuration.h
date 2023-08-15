@@ -1,7 +1,7 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
 
-#define CONFIG_VERSION 20230511   //TG - this must match the value in Settings.h
+#define CONFIG_VERSION  20230815  //TG - this must match the value in Settings.h
 
 //====================================================================================================
 //=============================== Settings Configurable On config.ini ================================
@@ -1411,5 +1411,13 @@
  *                    "RGB565 bitmap" and "Classic" are used as fallback.
  */
 #define THUMBNAIL_PARSER 0  // Default: 0
+
+
+/**
+ * FIL_WIDTH added by ICON generator
+ * on=1  off=0
+ */
+#define FIL_WIDTH 0			//TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 
 #endif

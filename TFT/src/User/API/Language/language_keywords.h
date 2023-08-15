@@ -385,7 +385,11 @@ extern "C" {
 #define LANG_KEY_CONNECT_PROBE                "label_connect_probe:"
 #define LANG_KEY_DISCONNECT_PROBE             "label_disconnect_probe:"
 #define LANG_KEY_CALIBRATION                  "label_calibration:"
-#define LANG_KEY_NOZZLE_CLEAN                 "label_Clean:"  //TG 5/14/23
+#define LANG_KEY_NOZZLE_CLEAN                 "label_Clean:"        //TG 5/14/23
+#define LANG_KEY_STATUS_WIDTH						      "label_Width:"	      //TG 8/14/2023 - added by ICON generator
+#define LANG_KEY_PRINTING_WIDTH						    "label_Width:"	      //TG 8/14/2023 - added by ICON generator
+#define LANG_KEY_FIL_WIDTH						        "label_Fil_Width:"	  //TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 #ifdef __cplusplus
 }
 #endif

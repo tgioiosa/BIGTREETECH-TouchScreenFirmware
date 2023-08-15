@@ -379,4 +379,8 @@
     #define STRING_CONNECT_PROBE          "Connect probe before starting the process. Make sure to disconnect it afterwards."
     #define STRING_DISCONNECT_PROBE       "Make sure you have disconnected probe before using this feature."
     #define STRING_CALIBRATION            "Calibrate"
+	#define STRING_STATUS_WIDTH			  "Width"			//TG 8/14/2023 - added by ICON generator
+	#define STRING_PRINTING_WIDTH		  "Width"			//TG 8/14/2023 - added by ICON generator
+	#define STRING_FIL_WIDTH			  "Fil_Width"		//TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 #endif

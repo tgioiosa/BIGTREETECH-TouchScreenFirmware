@@ -47,8 +47,8 @@ enum
 
 const uint8_t printingIcon[] = {ICON_PRINTING_NOZZLE, ICON_PRINTING_BED,    ICON_PRINTING_FAN,
                                 ICON_PRINTING_TIMER,  ICON_PRINTING_ZLAYER, ICON_PRINTING_SPEED};
-
-const uint8_t printingIcon2nd[] = {ICON_PRINTING_CHAMBER, ICON_PRINTING_FLOW};
+//TG 8/12/23 added third item for fan/filament - use new icon for printing_width
+const uint8_t printingIcon2nd[] = {ICON_PRINTING_CHAMBER, ICON_PRINTING_FLOW, ICON_PRINTING_WIDTH};
 
 const char * const speedId[2] = {"Speed", "Flow "};
 
@@ -194,14 +194,17 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
 
   lvIcon.enabled[2] = false;
 
+  //TG 8/12/23 Handle icons that toggle
   if (icon_pos == ICON_POS_BED && currentBCIndex != 0)  // Bed & Chamber
-    lvIcon.iconIndex = printingIcon2nd[0];
+    lvIcon.iconIndex = printingIcon2nd[0]; //TG Chamber
   else if (icon_pos == ICON_POS_SPD && currentSpeedID != 0)  // Speed & Flow
-    lvIcon.iconIndex = printingIcon2nd[1];
+    lvIcon.iconIndex = printingIcon2nd[1]; //TG Flow
+  else if (icon_pos == ICON_POS_FAN && currentSpeedID != 0 && infoSettings.fil_width != 0)   //TG 8/12/23 Fan & Filament  
+    lvIcon.iconIndex = printingIcon2nd[2]; //TG Filament Width 
   else
     lvIcon.iconIndex = printingIcon[icon_pos];
 
-  if (draw_type & LIVE_INFO_TOP_ROW)
+  if (draw_type & LIVE_INFO_TOP_ROW)  //TG process top row text
   {
     lvIcon.enabled[0] = true;
     lvIcon.lines[0].h_align = LEFT;
@@ -223,7 +226,10 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
         break;
 
       case ICON_POS_FAN:
-        lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
+        if(currentSpeedID == 1 && infoSettings.fil_width == 1)  //TG 1,1 equals filament width display
+          sprintf((char*)lvIcon.lines[0].text, "%4.3f", fil_width);   //TG 8/12/23 added
+        else
+          lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
         break;
 
       case ICON_POS_TIM:
@@ -243,7 +249,7 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
         break;
 
       case ICON_POS_SPD:
-        lvIcon.lines[0].text = (uint8_t *)speedId[currentSpeedID];
+        lvIcon.lines[0].text = (uint8_t *)speedId[currentSpeedID];  //TG 8/12/23 toggle Speed/Flow
         break;
 
       default:
@@ -255,7 +261,7 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
     lvIcon.enabled[0] = false;
   }
 
-  if (draw_type & LIVE_INFO_BOTTOM_ROW)
+  if (draw_type & LIVE_INFO_BOTTOM_ROW)  //TG process bottom row text
   {
     lvIcon.enabled[1] = true;
     lvIcon.lines[1].h_align = CENTER;
@@ -279,10 +285,18 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
         break;
 
       case ICON_POS_FAN:
-        if (infoSettings.fan_percentage == 1)
-          sprintf(tempstrBottom, "%3d%%", fanGetCurPercent(currentFan));  // 4 chars
-        else
-          sprintf(tempstrBottom, "%3d ", fanGetCurSpeed(currentFan));  // 4 chars
+        //TG 8/12/23 added for toggling between fan and filament width
+        if(currentSpeedID == 1 && infoSettings.fil_width == 1)  // 1,1 = show filament width status  
+        {
+          sprintf(tempstrBottom, "%4.1f", fil_vol);   //TG 8/12/23 added
+        }        
+        else // 0 = show fan status
+        {
+          if (infoSettings.fan_percentage == 1)
+            sprintf(tempstrBottom, "%3d%%", fanGetCurPercent(currentFan));  // 4 chars
+          else
+            sprintf(tempstrBottom, "%3d ", fanGetCurSpeed(currentFan));  // 4 chars
+        }
         break;
 
       case ICON_POS_TIM:
@@ -322,13 +336,13 @@ static inline void toggleInfo(void)
 {
   if (nextScreenUpdate(TOGGLE_TIME))
   {
-    if (infoSettings.hotend_count > 1)
+    if (infoSettings.hotend_count > 1)  //TG cycle thru all hotends
     {
       currentTool = (currentTool + 1) % infoSettings.hotend_count;
       reDrawPrintingValue(ICON_POS_EXT, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
     }
 
-    if (infoSettings.chamber_en == 1)
+    if (infoSettings.chamber_en == 1) //TG alternate between BED/CHAMBER
     {
       TOGGLE_BIT(currentBCIndex, 0);
       reDrawPrintingValue(ICON_POS_BED, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
@@ -338,17 +352,19 @@ static inline void toggleInfo(void)
       reDrawPrintingValue(ICON_POS_BED, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
     }
 
-    if ((infoSettings.fan_count + infoSettings.ctrl_fan_en) > 1)
-    {
-      do
-      {
-        currentFan = (currentFan + 1) % MAX_COOLING_FAN_COUNT;
-      } while (!fanIsValid(currentFan));
-
-      reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
-    }
-
     TOGGLE_BIT(currentSpeedID, 0);
+    
+    if(currentSpeedID == 0 ) //TG 8/12/23 added to select only when fan is being displayed
+    {if ((infoSettings.fan_count + infoSettings.ctrl_fan_en) > 1 )
+      { //TG cycle thru all fans
+        do
+        {
+          currentFan = (currentFan + 1) % MAX_COOLING_FAN_COUNT;
+        } while (!fanIsValid(currentFan));
+      }
+    }
+    reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
+  
     reDrawPrintingValue(ICON_POS_SPD, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
 
     speedQuery();
@@ -399,7 +415,7 @@ static void reDrawProgress(uint8_t oldProgress)
     reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_TOP_ROW);
 }
 
-static inline void drawLiveInfo(void)
+static inline void drawLiveInfo(void)   //TG redraw all six printing status items
 {
   for (uint8_t i = 0; i < COUNT(printingIcon); i++)
   {
@@ -561,11 +577,14 @@ void menuPrinting(void)
     }
 
     // check fan speed change
-    if (nowFan[currentFan] != fanGetCurSpeed(currentFan))
-    {
-      nowFan[currentFan] = fanGetCurSpeed(currentFan);
-      reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_BOTTOM_ROW);
+    if(currentSpeedID == 0)   //TG 8/12/23 added to select only when fan is being displayed
+    {  
+      if (nowFan[currentFan] != fanGetCurSpeed(currentFan))
+      {
+        nowFan[currentFan] = fanGetCurSpeed(currentFan);
+      }
     }
+    reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_BOTTOM_ROW);
 
     // check print time change
     if (time != getPrintTime())

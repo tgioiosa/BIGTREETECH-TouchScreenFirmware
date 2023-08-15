@@ -45,6 +45,8 @@ const uint8_t bedIcons[2] = {ICON_STATUS_BED, ICON_STATUS_CHAMBER};
 
 const uint8_t speedIcons[2] = {ICON_STATUS_SPEED, ICON_STATUS_FLOW};
 
+const uint8_t fanIcons[2] = {ICON_STATUS_FAN, ICON_STATUS_WIDTH};  //TG 8/12/23 added new status_width icon
+
 static int8_t lastConnectionStatus = -1;
 static bool msgNeedRefresh = false;
 
@@ -148,16 +150,25 @@ void drawStatus(void)
   #endif
 
   // FAN
-  lvIcon.iconIndex = ICON_STATUS_FAN;
-  lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
-
-  if (infoSettings.fan_percentage == 1)
-    sprintf(tempstr, "%3d%%", fanGetCurPercent(currentFan));
-  else
-    sprintf(tempstr, "%3d", fanGetCurSpeed(currentFan));
+  //TG 8/12/23 changed, was always ICON_STATUS_FAN, now it toggles between FAN and FIL_WIDTH
+  if(currentSpeedID == 1 && infoSettings.fil_width == 1) //TG if fil_width=1 and currentSpeedID=1
+  {
+    lvIcon.iconIndex = fanIcons[1];
+    lvIcon.lines[0].text = (uint8_t *)" FilW";
+    sprintf(tempstr, "%4.3f", fil_width);
+  }
+  else //TG always true if fil_width=0 or currentSpeedID=0 
+  {  
+    lvIcon.iconIndex = fanIcons[0];
+    lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
+    if (infoSettings.fan_percentage == 1)
+      sprintf(tempstr, "%3d%%", fanGetCurPercent(currentFan));
+    else
+      sprintf(tempstr, "%3d", fanGetCurSpeed(currentFan));
+  }
 
   lvIcon.lines[1].text = (uint8_t *)tempstr;
-  showLiveInfo(2, &lvIcon, false);
+  showLiveInfo(2, &lvIcon, true);
 
   #ifdef TFT70_V3_0
     // SPEED
@@ -270,8 +281,9 @@ static inline void toggleTool(void)
       } while (!fanIsValid(currentFan));
     }
 
-    // switch speed/flow
+    // switch speed/flow and Fan/Fil Width
     TOGGLE_BIT(currentSpeedID, 0);
+
     drawStatus();
 
     // gcode queries must be call after drawStatus

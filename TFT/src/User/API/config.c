@@ -1150,6 +1150,14 @@ void parseConfigKey(uint16_t index)
       break;
     }
 
+	case C_INDEX_FIL_WIDTH:  	//TG 8/14/2023 - added by ICON generator
+	{
+		/* Put your code here */
+    infoSettings.fil_width = getOnOff();
+	}
+
+//TG >>>> ICON generator insertion marker <<<<
+
     default:
       break;
   }

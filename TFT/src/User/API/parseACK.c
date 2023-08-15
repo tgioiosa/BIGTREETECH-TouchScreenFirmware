@@ -571,6 +571,17 @@ void parseACK(void)
         heaterIndex++;
       }
 
+      //TG 8/12/23 - parse and store the Filament Width and Volumetric Ratio - modified Marlin AutoReportTemp::report()
+      // to append this at end of line 
+      if (ack_seen("FIL:"))
+      {
+        fil_width = ack_value();
+      }
+      if (ack_seen("VOL:"))
+      {
+        fil_vol = ack_value();
+      }      
+
       avoid_terminal = !infoSettings.terminal_ack;
       updateNextHeatCheckTime();
     }

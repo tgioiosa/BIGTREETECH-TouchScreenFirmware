@@ -153,4 +153,7 @@ X_ICON (Z_300)              //TG 1/12/20 new
 X_ICON (M503)               //TG 1/12/20 new
 X_ICON (NOZZLE_CLEAN)       //TG 5/14/23 new
 X_ICON (DELTA_CALIBRATE)
+X_ICON (STATUS_WIDTH)				//TG 8/14/2023 - added by ICON generator
+X_ICON (PRINTING_WIDTH)			//TG 8/14/2023 - added by ICON generator
+//TG >>>> ICON generator insertion marker <<<<
 // After changing/adding/removing an icon, change the ICON_FLASH_SIGN in Settings.h

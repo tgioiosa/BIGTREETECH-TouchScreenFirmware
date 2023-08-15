@@ -180,7 +180,12 @@ void initSettings(void)
     infoSettings.led_color[i]         = default_led_color[i];
   }
 
+    infoSettings.fil_width = FIL_WIDTH;			//TG 8/14/2023 - added by ICON generator
+
+//TG >>>> ICON generator insertion marker <<<<
   resetConfig();
+
+
 
   // Calculate checksum excluding the CRC variable in infoSettings
   infoSettings.CRC_checksum = calculateCRC16((uint8_t*)&infoSettings + sizeof(infoSettings.CRC_checksum),

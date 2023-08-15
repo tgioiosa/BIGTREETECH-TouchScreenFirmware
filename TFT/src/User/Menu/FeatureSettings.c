@@ -47,6 +47,7 @@ typedef enum
   SKEY_START_GCODE_ENABLED,
   SKEY_END_GCODE_ENABLED,
   SKEY_CANCEL_GCODE_ENABLED,
+  SKEY_FIL_WIDTH,			        //TG 8/14/2023 - added by ICON generator
   SKEY_RESET_SETTINGS,        // keep reset always at the bottom of the settings menu list
   SKEY_COUNT                  // keep this always at the end
 } SKEY_LIST;
@@ -119,6 +120,18 @@ void updateFeatureSettings(uint8_t item_index)
     case SKEY_CANCEL_GCODE_ENABLED:
       TOGGLE_BIT(infoSettings.send_gcodes, (item_index - SKEY_START_GCODE_ENABLED));
       break;
+
+   case SKEY_FIL_WIDTH:  	//TG 8/14/2023 - added by ICON generator
+		TOGGLE_BIT(infoSettings.fil_width, 0);
+    if(infoSettings.fil_width == 1)
+    {
+      mustStoreCmd("M405 D14\n");   //TG turn fil width ON with dist from nozzle to filament sensor measure point
+    }
+    else
+    {
+      mustStoreCmd("M406\n");       //TG turn fil width OFF
+    }
+		break;
 
     case SKEY_RESET_SETTINGS:
       popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, resetSettings, NULL, NULL);
@@ -196,6 +209,10 @@ void loadFeatureSettings(LISTITEM * item, uint16_t item_index, uint8_t itemPos)
         item->icon = iconToggle[GET_BIT(infoSettings.send_gcodes, (item_index - SKEY_START_GCODE_ENABLED))];
         break;
 
+      case SKEY_FIL_WIDTH:	//TG 8/14/2023 - added by ICON generator
+		    item->icon = iconToggle[infoSettings.fil_width];
+		    break;
+
       case SKEY_RESET_SETTINGS:
         break;
 
@@ -235,6 +252,8 @@ void menuFeatureSettings(void)
     {CHARICON_TOGGLE_ON,   LIST_TOGGLE,        LABEL_START_GCODE_ENABLED,    LABEL_NULL},
     {CHARICON_TOGGLE_ON,   LIST_TOGGLE,        LABEL_END_GCODE_ENABLED,      LABEL_NULL},
     {CHARICON_TOGGLE_ON,   LIST_TOGGLE,        LABEL_CANCEL_GCODE_ENABLED,   LABEL_NULL},
+	
+	  {CHARICON_TOGGLE_ON,   LIST_TOGGLE,        LABEL_FIL_WIDTH,			LABEL_NULL},	//TG 8/14/2023 - added by ICON generator
     // keep reset settings always at the bottom of the settings menu list
     {CHARICON_BLANK,       LIST_MOREBUTTON,    LABEL_SETTINGS_RESET,         LABEL_NULL}
   };

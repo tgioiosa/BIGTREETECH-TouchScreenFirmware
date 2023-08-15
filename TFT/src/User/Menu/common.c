@@ -10,7 +10,9 @@ SCROLL scrollLine;
 uint8_t currentTool = NOZZLE0;
 uint8_t currentBCIndex = 0;
 uint8_t currentFan = 0;
-uint8_t currentSpeedID = 0;
+uint8_t currentSpeedID = 0;   //TG 8/12/23 used for Speed/Flow and now also Fan/Filament index
+float fil_width = 0.0;        //TG 8/12/23 holds Filament Width value from Marlin(via parseAck.c)
+float fil_vol = 0.0;          //TG 8/12/23 holds Filament Volumetric Ratio from Marlin(via parseAck.c)
 
 // Icons list for tool change
 const ITEM itemTool[MAX_HEATER_COUNT] =
