@@ -354,15 +354,15 @@ static inline void toggleInfo(void)
 
     TOGGLE_BIT(currentSpeedID, 0);
     
-    if(currentSpeedID == 0 ) //TG 8/12/23 added to select only when fan is being displayed
-    {if ((infoSettings.fan_count + infoSettings.ctrl_fan_en) > 1 )
-      { //TG cycle thru all fans
-        do
-        {
-          currentFan = (currentFan + 1) % MAX_COOLING_FAN_COUNT;
-        } while (!fanIsValid(currentFan));
-      }
+    //if(currentSpeedID == 0 ) //TG 8/12/23 added to select only when fan is being displayed
+    if ((infoSettings.fan_count + infoSettings.ctrl_fan_en) > 1 )
+    { //TG cycle thru all fans
+      do
+      {
+        currentFan = (currentFan + 1) % MAX_COOLING_FAN_COUNT;
+      } while (!fanIsValid(currentFan));  //TG loop till a valid fan is found
     }
+    
     reDrawPrintingValue(ICON_POS_FAN, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
   
     reDrawPrintingValue(ICON_POS_SPD, LIVE_INFO_ICON | LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);

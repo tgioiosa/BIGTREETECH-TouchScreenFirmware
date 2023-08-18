@@ -122,14 +122,17 @@ void updateFeatureSettings(uint8_t item_index)
       break;
 
    case SKEY_FIL_WIDTH:  	//TG 8/14/2023 - added by ICON generator
-		TOGGLE_BIT(infoSettings.fil_width, 0);
+		TOGGLE_BIT(infoSettings.fil_width, 0);  //TG - when=1 the LCD displays filament width and vol ratio in %.
     if(infoSettings.fil_width == 1)
     {
-      mustStoreCmd("M405 D14\n");   //TG turn fil width ON with dist from nozzle to filament sensor measure point
+      mustStoreCmd("M200 D1.75 S0\n");  //TG - Set the filament’s current diameter and disable volumetric extrusion. 
+      mustStoreCmd("M404 W1.75\n");     //TG - This value is used to determine the percentage difference when auto-adjusting flow
+                                        //     in response to the measured filament width. Set to same as slicer default.
+      mustStoreCmd("M405 D14\n");       //TG turn fil width ON and set dist from nozzle to filament sensor measure point in cm.
     }
     else
     {
-      mustStoreCmd("M406\n");       //TG turn fil width OFF
+      mustStoreCmd("M406\n");           //TG turn fil width OFF
     }
 		break;
 
