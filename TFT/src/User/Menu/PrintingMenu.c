@@ -227,7 +227,7 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
 
       case ICON_POS_FAN:
         if(currentSpeedID == 1 && infoSettings.fil_width == 1)  //TG 1,1 equals filament width display
-          sprintf((char*)lvIcon.lines[0].text, "%4.3f", fil_width);   //TG 8/12/23 added
+          sprintf((char*)lvIcon.lines[0].text, "%4.3f", fil_width_meas);   //TG 8/12/23 added
         else
           lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
         break;

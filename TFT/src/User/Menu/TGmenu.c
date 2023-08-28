@@ -6,6 +6,9 @@
 //char* gcodeBufPtr = &gcodeBuf[0];
 
 COORDINATE oldpos;  //TG 5/16/23 for remembering xyz position before/after nozzle clean
+volatile int16_t N_FW = 0;    //TG 8/27/23 N factor(adc offset to apply) for Marlin filament width calculation
+char tempstr[40];             //TG 8/27/23 sprintf buffer
+uint8_t CancelFlag=0;         // for general pop up msg box responses
 
 void menuTGmenu(void)
 {
@@ -24,7 +27,7 @@ static bool ublSlotSaved = false;
      {ICON_Z_300,                   LABEL_Z_300},
      {ICON_M503,                    LABEL_M503},
      {ICON_NOZZLE_CLEAN,            LABEL_NOZZLE_CLEAN},
-     {ICON_NULL,                    LABEL_NULL},
+     {ICON_PARAMETER,               LABEL_FIL_CAL},     //TG 8/27/23 - added filament width sensor calibration
      {ICON_NULL,                    LABEL_NULL},
      {ICON_NULL,                    LABEL_NULL},
      {ICON_BACK,                    LABEL_BACK}}
@@ -70,6 +73,46 @@ static bool ublSlotSaved = false;
         storeCmd("G1 Z%3.4f F%d\n",oldpos.axis[Z_AXIS],infoSettings.z_speed[infoSettings.move_speed]);
         break;
 
+      case KEY_ICON_4:  //TG 8/27/23 - added filament width sensor calibration
+        {
+          sprintf(tempstr, "Input the actual measured\nfilament diameter\nPress OK to iterate ...");
+          popupInfoOKOnly((uint8_t*)"Fil Width Sensor", (uint8_t*)tempstr);
+          volatile float val = numPadFloat((uint8_t*)"Real Filament Width",fil_width_meas,1.75,true);
+          uint32_t start = OS_GetTimeMs() + 1000; 
+          while(1)
+          {  
+            if(OS_GetTimeMs()==start)
+            {
+              //compare actual to fil_width_meas(from Marlin) and calculate N(adc offset) needed to make them match
+              volatile int16_t new_NFW = (val - fil_width_meas) * ((float)4095 / (float)3.3) - 1.0126;
+
+              if (new_NFW < -1 || new_NFW > 0)  //only change the offset if it is not between zero(and -1) from equation above)
+              { 
+                N_FW += new_NFW;                        //adjust to new required offset
+                infoSettings.adc_offset_N = N_FW;       //copy to settings structure
+                send_adc_offset_to_Marlin();            //send updated N_FW to Marlin and wait up to 1 second for ok response
+                saveSettings();                         //and to EEPROM
+                sprintf(tempstr, "Iterating.....\nactual  : %4.3fmm\nmeasured: %4.3fmm\nadc offset: %d lsb stored\nContinue? ...", val, fil_width_meas,N_FW);
+                Buzzer_play(SOUND_NOTIFY);
+                popupQuestionOK((uint8_t*)"Fil Width Sensor", (uint8_t*)tempstr);
+                if(CancelFlag==1) break;                //if "No" was selected, exit out
+                start = OS_GetTimeMs() + 2000; 
+              }
+              else
+              {
+                Buzzer_play(SOUND_SUCCESS);
+                popupInfoOKOnly((uint8_t*)"Fil Width Sensor", (uint8_t*)"Iteration completed\nFilament Sensor Calibrated!");
+                break;
+              }
+              
+            }
+            loopProcess();
+          }
+        }
+        
+        menuDrawPage(&TGmenuItems);
+        break;
+      
       case KEY_ICON_7:
         infoMenu.cur--;
         break;
@@ -81,3 +124,32 @@ static bool ublSlotSaved = false;
     loopProcess();
   }
 }
+
+//TG function to display a popup with Confirm/Cancel keys over existing menu and wait for response
+//returns to original menu once a key was pressed with the global CancelFlag = 0(confirm) or 1(cancel)
+void clrCancel(){ CancelFlag = 0; }
+void setCancel(){ CancelFlag = 1; }
+
+void popupInfoOKOnly(uint8_t* title, uint8_t* msg)
+{
+  CancelFlag = 0;
+  setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL);     // sets the strings
+  showDialog(DIALOG_TYPE_INFO, setCancel, NULL, NULL);  // draws the dialog box
+  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+}
+void popupQuestionOK(uint8_t* title, uint8_t* msg)
+{
+  CancelFlag = 0;
+  setDialogText(title, msg, (uint8_t*)"Yes", (uint8_t*)"No");     // sets the strings
+  showDialog(DIALOG_TYPE_QUESTION, clrCancel, setCancel, NULL);  // draws the dialog box
+  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+}
+
+void send_adc_offset_to_Marlin()
+{            
+  sprintf(tempstr, "M7800 S%i\n", infoSettings.adc_offset_N);
+  gcodeSendAndWaitForOK(tempstr,1500);    //send updated N_FW to Marlin and wait up to 1 second for ok response
+}
+

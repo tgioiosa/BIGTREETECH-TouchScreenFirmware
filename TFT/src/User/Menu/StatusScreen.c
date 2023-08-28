@@ -155,7 +155,7 @@ void drawStatus(void)
   {
     lvIcon.iconIndex = fanIcons[1];
     lvIcon.lines[0].text = (uint8_t *)" FilW";
-    sprintf(tempstr, "%4.3f", fil_width);
+    sprintf(tempstr, "%4.3f", fil_width_meas);
   }
   else //TG always true if fil_width=0 or currentSpeedID=0 
   {  

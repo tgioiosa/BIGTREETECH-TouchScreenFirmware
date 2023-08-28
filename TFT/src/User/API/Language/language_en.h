@@ -382,5 +382,6 @@
 	#define STRING_STATUS_WIDTH			  "Width"			//TG 8/14/2023 - added by ICON generator
 	#define STRING_PRINTING_WIDTH		  "Width"			//TG 8/14/2023 - added by ICON generator
 	#define STRING_FIL_WIDTH			  "Fil_Width"		//TG 8/14/2023 - added by ICON generator
+    #define STRING_FIL_CAL			      "Fil_Cal"		    //TG 8/28/2023 - added by TG
 //TG >>>> ICON generator insertion marker <<<<
 #endif

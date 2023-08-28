@@ -97,6 +97,30 @@ bool storeCmd(const char * format, ...)
   return true;
 }
 
+//TG 12/27/22 Added this useful routine which sends a gcode to the queue and then waits for Marlin to rece
+//and finish executing the gcode. Marlin sends an "ok" after a gcode has completed processing. Not suitabl
+//waiting on a Marlin response value string because the "ok/n" is parsed first and the value code may not 
+//parsed in a timely manner.
+uint8_t gcodeSendAndWaitForOK(char* cmd, uint16_t timeout)
+{
+    mustStoreCmd(cmd);
+    uint32_t start = OS_GetTimeMs() + timeout;    // timeout for response
+    while (infoHost.wait==false)                  // wait for sendQueueCmd() to set this true as msg gets sent to serial port  
+    {
+      loopProcess();
+      if(OS_GetTimeMs() >= start)                 // exceeded timeout with no response? 
+       break;                                     // timed out - goto next loop
+    }
+    start = OS_GetTimeMs() + timeout;             // timeout for response
+    while (infoHost.wait==true)                   // now wait for parseAck to set this false upon receiving "ok" from Marlin
+    {
+      loopProcess();
+      if(OS_GetTimeMs() >= start)                 // exceeded timeout with no response? 
+        return 1;                                 // timed out
+    }
+    return 0;
+}
+
 // Store gcode cmd to cmdQueue queue.
 // This command will be sent to the printer by sendQueueCmd().
 // If the cmdQueue queue is full, a reminder message is displayed

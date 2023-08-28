@@ -181,6 +181,7 @@ void initSettings(void)
   }
 
     infoSettings.fil_width = FIL_WIDTH;			//TG 8/14/2023 - added by ICON generator
+    infoSettings.adc_offset_N = 0;          //TG 8/27/23 default for filament sensor calibration
 
 //TG >>>> ICON generator insertion marker <<<<
   resetConfig();

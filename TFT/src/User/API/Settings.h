@@ -280,6 +280,7 @@ typedef struct
   uint8_t  send_gcodes;  // send printing gcodes toggles (Bit Values)
   
   uint8_t	fil_width;	   //TG 8/14/2023 - added by ICON generator
+  int16_t adc_offset_N;  //TG 8/27/23 added for filament sensor
 //TG >>>> ICON generator insertion marker <<<<
 } SETTINGS;
 

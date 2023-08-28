@@ -389,6 +389,7 @@ extern "C" {
 #define LANG_KEY_STATUS_WIDTH						      "label_Width:"	      //TG 8/14/2023 - added by ICON generator
 #define LANG_KEY_PRINTING_WIDTH						    "label_Width:"	      //TG 8/14/2023 - added by ICON generator
 #define LANG_KEY_FIL_WIDTH						        "label_Fil_Width:"	  //TG 8/14/2023 - added by ICON generator
+#define LANG_KEY_FIL_CAL						          "label_Fil_Cal:"	    //TG 8/28/2023 - added by TG
 //TG >>>> ICON generator insertion marker <<<<
 #ifdef __cplusplus
 }

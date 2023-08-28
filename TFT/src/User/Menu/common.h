@@ -38,8 +38,13 @@ extern uint8_t currentTool;     // current hotend index
 extern uint8_t currentBCIndex;  // current bed/chamber index
 extern uint8_t currentFan;      // current fan index
 extern uint8_t currentSpeedID;  // current speed/flow index
-extern float fil_width;         //TG 8/12/23 holds Filament Width value from Marlin(via parseAck.c)
+extern float fil_width_meas;    //TG 8/12/23 holds Filament Width value from Marlin(via parseAck.c)
 extern float fil_vol;           //TG 8/12/23 holds Filament Volumetric Ratio from Marlin(via parseAck.c)
+extern uint8_t msg_complete;    //TG 8/27/23 for signaling that a message was responded to by Marlin
+typedef enum retcodes{          // enum codes for gcodeSendAndWaitForAnswer()
+  base        = 0x0,
+  comp_8000,                    //TG 8/27/23 M8000 Marlin Filament sensor adc offset received ok
+  } msgcodes;
 
 extern const ITEM itemTool[MAX_HEATER_COUNT];
 extern const ITEM itemDegreeSteps[ITEM_DEGREE_NUM];

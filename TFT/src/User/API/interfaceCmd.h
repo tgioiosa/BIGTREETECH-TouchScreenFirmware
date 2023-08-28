@@ -26,6 +26,7 @@ bool isWritingMode(void);
 
 bool storeCmd(const char * format, ...);
 void mustStoreCmd(const char * format, ...);
+uint8_t gcodeSendAndWaitForOK(char* cmd, uint16_t timeout); //TG 8/27/23 added
 void mustStoreScript(const char * format, ...);
 bool storeCmdFromUART(const CMD cmd, const SERIAL_PORT_INDEX portIndex);
 void mustStoreCacheCmd(const char * format, ...);

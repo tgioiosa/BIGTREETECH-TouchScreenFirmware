@@ -425,6 +425,8 @@ void parseACK(void)
 
       infoHost.connected = true;
       requestCommandInfo.inJson = false;
+      
+      send_adc_offset_to_Marlin();    //TG 8/27/23 update Marlin filament sensor offset once connected
     }
 
     //----------------------------------------
@@ -575,7 +577,7 @@ void parseACK(void)
       // to append this at end of line 
       if (ack_seen("FIL:"))
       {
-        fil_width = ack_value();
+        fil_width_meas = ack_value();
       }
       if (ack_seen("VOL:"))
       {
@@ -1361,7 +1363,11 @@ void parseACK(void)
         setParameter(P_FILAMENT_DIAMETER, 0, getParameter(P_FILAMENT_DIAMETER, 1) > 0.01f ? 1 : 0);
       }
     }
-
+    //TG 8/27/23 added for filament sensor calibration
+    else if (ack_seen("M7800 ok")){
+      msg_complete = comp_8000;
+    }
+    
   parse_end:
     if (!avoid_terminal && MENU_IS(menuTerminal)) // should we copy the msg to the Gcode Terminal cache?
       terminalCache(ack_cache, ack_len, ack_port_index, SRC_TERMINAL_ACK);
