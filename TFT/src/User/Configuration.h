@@ -1,6 +1,6 @@
 #ifndef _CONFIGURATION_H_
 #define _CONFIGURATION_H_
-#define CONFIG_VERSION 20230328
+#define CONFIG_VERSION 20231219
 
 //====================================================================================================
 //=============================== Settings Configurable On config.ini ================================
@@ -228,7 +228,7 @@
 #define TITLE_BACKGROUND_COLOR  1  // Title background color (Default: 1)
 #define MENU_BACKGROUND_COLOR   1  // Menu background color (Default: 1)
 #define MENU_FONT_COLOR         0  // Menu font color (Default: 0)
-#define REMINDER_FONT_COLOR     2  // Reminder font color, such as: "No print attached", "Busy processing", etc. (Default: 2)
+#define REMINDER_FONT_COLOR     6  // Reminder font color, such as: "No print attached", "Busy processing", etc. (Default: 2)
 #define STATUS_FONT_COLOR       5  // Status (e.g. volume reminder, ABL probing point etc.) font color, such as: "Card inserted", "Card removed" (Default: 5)
 #define STATUS_XYZ_BG_COLOR    15  // Background color for X Y Z position display in Status Screen menu (Default: 15)
 #define LIST_BORDER_COLOR      16  // List View border color (Default: 15)    //TG 3/2/23 changed
@@ -563,9 +563,9 @@
                         //if Z Homes down(3D prntr) use 0, if Z Homes up(MPCNC) use -70
 #define X_MAX_POS 520
 #define Y_MAX_POS 520
-#define Z_MAX_POS   0   //TG 3/28/23 Zmax Spindle collet pos referenced to MACHINE_Z_MIN surface
+#define Z_MAX_POS   0   //TG 3/28/23 Zmax Spindle (bottom of collet/nut) pos referenced to MACHINE_Z_MIN surface
                         //if Z Homes up(MPCNC) use 0, if Z Homes down(3D prntr) use +70
-#define MACHINE_Z_MIN -98.0 //TG 3/26/23 absolute location of CNC table w/r to Spindle shaft (collet removed) at Z_MAX_POS
+#define MACHINE_Z_MIN -87.5 //TG 3/26/23 absolute location of CNC table w/r to Spindle shaft (bottom of collet/nut) at Z_MAX_POS
 
 /**
  * X & Y Move Speeds/Feedrates

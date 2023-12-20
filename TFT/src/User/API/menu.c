@@ -1492,6 +1492,6 @@ void loopProcessToCondition(CONDITION_CALLBACK condCallback)
     }
   }
 
-  if (invokedUI)  // if a UI was invoked, load a dummy menu just to force the caller also to refresh its menu
-    OPEN_MENU(menuDummy);
+  //if (invokedUI)  // if a UI was invoked, load a dummy menu just to force the caller also to refresh its menu
+  //  OPEN_MENU(menuDummy);
 }

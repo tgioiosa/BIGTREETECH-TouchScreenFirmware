@@ -10,7 +10,7 @@ extern "C" {
 #include "variants.h"  // for RCC_ClocksTypeDef
 #include "uart.h"      // for _UART_CNT
 
-#define MAX_MENU_DEPTH 10        // Max sub menu depth
+#define MAX_MENU_DEPTH 12        //TG 12/17/23 increased, was 10 Max sub menu depth
 typedef void (* FP_MENU)(void);
 
 typedef struct

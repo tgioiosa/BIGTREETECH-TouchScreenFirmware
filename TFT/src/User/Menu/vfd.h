@@ -41,7 +41,8 @@ void popupQuestionOKCancel(uint8_t* title, uint8_t* msg);
 void popupQuestionYesNo(uint8_t* title, uint8_t* msg);
 void popupSuccessOKOnly(uint8_t* title, uint8_t* msg);
 void popupThreeKeys(uint8_t* title, uint8_t* msg, uint8_t* confirmkeytext, uint8_t* cancelkeytext, uint8_t* extrakeytext); //TG 3/29/23 modified for 3-key popup
-
+bool isValidKeyReturned(void);
+bool check_for_Dialog_popup_and_Wait(void);
 typedef struct 
 {
   uint16_t  freq_out;

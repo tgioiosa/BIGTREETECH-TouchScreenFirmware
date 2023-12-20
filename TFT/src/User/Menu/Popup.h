@@ -32,6 +32,7 @@ void _setDialogMsgLabel(int16_t index);
 void _setDialogOkTextLabel(int16_t index);
 void _setDialogCancelTextLabel(int16_t index);
 void _setDialogExtraTextLabel(int16_t index); //TG 3/29/23 added for 3-button popup
+uint8_t *getDialogTitle(void);
 
 #define setDialogTitle(x) _Generic(((x+0)), const uint8_t*: _setDialogTitleStr, \
                                                   uint8_t*: _setDialogTitleStr, \

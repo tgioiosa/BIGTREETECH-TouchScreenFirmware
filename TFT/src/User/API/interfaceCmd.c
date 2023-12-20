@@ -168,15 +168,17 @@ bool storeCmd(const char * format,...)
 //parsed in a timely manner.
 uint8_t gcodeSendAndWaitForOK(char* cmd, uint16_t timeout)
 {
-    storeCmd(cmd);
-    uint32_t start = OS_GetTimeMs() + timeout;    // timeout for response
-    while (infoHost.wait==false)                  // wait for sendQueueCmd() to set this true as msg gets sent to serial port 
-    {
-      loopProcess();
-      if(OS_GetTimeMs() >= start)                 // exceeded timeout with no response? 
-       break;                                     // timed out - goto next loop
-    }
-    start = OS_GetTimeMs() + timeout;             // timeout for response
+    mustStoreCmd(cmd);
+
+    uint32_t start = OS_GetTimeMs() + timeout/2;  // timeout for response
+      while (infoHost.wait==false)                // wait for sendQueueCmd() to set this true as msg gets sent to serial port 
+      {
+        loopProcess();
+        if(OS_GetTimeMs() >= start)               // exceeded timeout with no response? 
+         break;                                   // timed out - goto next loop
+      }
+
+    start = OS_GetTimeMs() + timeout/2;           // timeout for response
     while (infoHost.wait==true)                   // now wait for parseAck to set this false upon receiving "ok" from Marlin
     {
       loopProcess();

@@ -16,10 +16,10 @@ extern "C" {
 // Config version support
 // change if new elements/keywords are added/removed/changed in the configuration.h Format YYYYMMDD
 // this number should match CONFIG_VERSION in configuration.h
-#define CONFIG_SUPPPORT       20230328  //TG 10/15/22 updated
+#define CONFIG_SUPPPORT       20231219  //TG 10/15/22 updated
 
 #define FONT_FLASH_SIGN       20230328  //(YYYYMMDD) change if fonts require updating
-#define CONFIG_FLASH_SIGN     20230328  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		  //TG 10/15/22 updated
+#define CONFIG_FLASH_SIGN     20231219  //(YYYYMMDD) change if any keyword(s) in config.ini is added or removed		  //TG 10/15/22 updated
 #define LANGUAGE_FLASH_SIGN   20230328  //(YYYYMMDD) change if any keyword(s) in language pack is added or removed	//TG 10/15/22 updated
 #define ICON_FLASH_SIGN       20230328  //(YYYYMMDD) change if any icon(s) is added or removed						          //TG 12/25/22 updated
 
@@ -301,7 +301,8 @@ typedef struct    // defines storage for all settings THAT CAN SAVE/RECALL FROM 
   uint8_t  cutter_power_unit;   //TG 2/14/21 new
   uint8_t  vacuum_ctl_pin;      //TG 2/17/21 new
   uint8_t  should_M0_pause;     //TG 10/3/22 new
-  float  zmin_absolute;         //TG 3/25/23 - added new for probe stock menu
+  float  zmin_machine;          //TG 12/18/23 - actual machine zmin by design
+  float  zmin_absolute;         //TG 3/25/23 - working zmin, measured value
   float  zmax_absolute;         //TG 3/25/23 - added new for probe stock menu
   float  spoilboard_absolute;   //TG 3/25/23 - added new for probe stock menu
   float  probeThickness;        //TG 3/25/23 - added new for probe stock menu

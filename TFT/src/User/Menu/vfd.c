@@ -192,7 +192,7 @@ uint8_t msg_complete = 0;
 uint8_t TFTtoMARLIN_wait(msgcodes retmsg)
 {
   uint32_t waitPeriod;
-  waitPeriod = isPrinting() ? 400000 : 200000;      // allow extra time for responses if printing
+  waitPeriod = isPrinting() ? 4000 : 2000;      // allow extra time for responses if printing
   uint32_t start = OS_GetTimeMs() + waitPeriod; // timeout 2sec for response (4sec if printing);
   msg_complete = 0;                             // clear the response flag (sets in parseAck.c)
   
@@ -206,8 +206,8 @@ uint8_t TFTtoMARLIN_wait(msgcodes retmsg)
   return 0;                                     // response completed, no errors
 }
 
-//TG function to display a popup with Confirm/Cancel/Extra keys over existing menu and wait for response, then returns to original menu once a key
-//was pressed with the global popupResp = KEY_POPUP_CONFIRM, KEY_POPUP_CANCEL, or KEY_POPUP_EXTRA  //TG 3/29/23 modified for 3-key popup
+//TG function to display a popup with Confirm/Cancel/Extra keys over existing menu and wait for response, then returns to original menu on
+//a keypress, with global popupResp = KEY_POPUP_CONFIRM, KEY_POPUP_CANCEL, or KEY_POPUP_EXTRA  //TG 3/29/23 modified for 3-key popup
 void setRespConfirm(){ popupResp = KEY_POPUP_CONFIRM;}
 void setRespCancel(){ popupResp = KEY_POPUP_CANCEL;}
 void setRespExtra(){ popupResp = KEY_POPUP_EXTRA;}
@@ -217,8 +217,11 @@ void popupErrorOK(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key 
   popupResp = -1;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);// sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_ERROR, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupInfoOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
@@ -226,17 +229,24 @@ void popupInfoOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-k
   popupResp = -1;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL, LABEL_NULL); // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_INFO, setRespConfirm, NULL, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupQuestionYesNo(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
 {
+  if (MENU_IS(menuDialog)) CLOSE_MENU(); // close any pending menu first
   popupResp = -1;
   setDialogText(title, msg, (uint8_t*)"Yes", (uint8_t*)"No", LABEL_NULL);     // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_QUESTION, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupQuestionOKCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
@@ -244,8 +254,11 @@ void popupQuestionOKCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified f
   popupResp = -1;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);     // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_QUESTION, setRespConfirm, setRespCancel, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupSuccessOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
@@ -253,8 +266,11 @@ void popupSuccessOKOnly(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 
   popupResp = -1;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_NULL, LABEL_NULL);   // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_SUCCESS, setRespConfirm, NULL, NULL, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupConfirmCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 3-key popup
@@ -262,8 +278,11 @@ void popupConfirmCancel(uint8_t* title, uint8_t* msg) //TG 3/29/23 modified for 
   popupResp = -1;
   setDialogText(title, msg, LABEL_CONFIRM, LABEL_CANCEL, LABEL_NULL);         // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_ALERT, setRespConfirm, setRespCancel, NULL, NULL);   // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//  loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
 void popupThreeKeys(uint8_t* title, uint8_t* msg, uint8_t* confirmkeytext, uint8_t* cancelkeytext, uint8_t* extrakeytext) //TG 3/29/23 modified for 3-key popup
@@ -271,9 +290,40 @@ void popupThreeKeys(uint8_t* title, uint8_t* msg, uint8_t* confirmkeytext, uint8
   popupResp = -1;
   setDialogText(title, msg, confirmkeytext, cancelkeytext, extrakeytext);            // sets the strings //TG 3/29/23 added NULL's for 3-button popup
   showDialog(DIALOG_TYPE_ALERT, setRespConfirm, setRespCancel, setRespExtra, NULL);  // draws the dialog box //TG 3/29/23 added NULL's for 3-button popup
-  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
-  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
+  loopProcessToCondition(&isValidKeyReturned);
+  asm("nop");
+//loopPopup();
+//  loopProcess();                      // allows loop popup() to be called and set menu ptr ahead
+//  (*infoMenu.menu[infoMenu.cur])();   // switch the menu to the showDialog menu
 }
 
+
+//TG 12/19/23 added - simple function to detect a currently unexpected open Dialog Popup, which usually occurs
+//when an unexpected Marlin error prompt is received. If detected, just loop here until the user responds to it and
+//the Dialog popup is Closed. Return true for Error, false for No Error
+bool check_for_Dialog_popup_and_Wait(void)
+{ bool result = false;
+  
+  if (MENU_IS_NOT(menuDialog)) 
+    result = false;                         //no dialog box in effect, just return with NULL
+  else {
+    char* title = (char*)getDialogTitle();  //capture Dialog title string
+    while ((MENU_IS(menuDialog))==true)
+    {
+      menuDialog();                         //we must keep servicing the menuDialog (just calling loopProcess()
+      loopProcess();                        //won't run the dialog handler for a notification popup)
+    }
+    // see if dialog was Error: or Warning:
+    if (strcmp(title, magic_error)==0 || strcmp(title, magic_warning)==0)
+      result = true;
+  }
+  return result;
+}
+
+//TG 12/19/23 added this as a CONDITION_CALLBACK function used for loopProcessToCondition()
+bool isValidKeyReturned(void)
+{
+  return (popupResp < 0);
+}
 
 #endif // #ifdef USING_VFD_CONTROLLER

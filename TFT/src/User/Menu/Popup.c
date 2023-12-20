@@ -222,6 +222,11 @@ void _setDialogExtraTextLabel(int16_t index) //TG 3/29/23 added for 3-button pop
   popup_strcpy(popup_extra, tempstr, sizeof(popup_extra));
 }
 
+uint8_t *getDialogTitle(void)   //TG 12/18/23 added this new function
+{
+  return (uint8_t *)popup_title;
+}
+
 /**
  * @brief Show a popup with a message. Set dialog text before calling showDialog
  *

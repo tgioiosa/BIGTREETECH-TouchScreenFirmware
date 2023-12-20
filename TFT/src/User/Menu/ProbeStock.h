@@ -21,7 +21,7 @@ void menuProbeStock(void);
 void updateProbeStockDisplay(void);
 void marlinError(void);
 void displayProgress(char* msg);
-
+void displayMessage(char* msg, bool clear);
 
 #ifdef __cplusplus
 }
