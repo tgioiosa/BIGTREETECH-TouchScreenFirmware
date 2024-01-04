@@ -74,6 +74,7 @@ static bool ublSlotSaved = false;
         break;
 
       case KEY_ICON_4:  //TG 8/27/23 - added filament width sensor calibration
+        if (infoSettings.fil_width)
         {
           sprintf(tempstr, "Input the actual measured\nfilament diameter\nPress OK to iterate ...");
           popupInfoOKOnly((uint8_t*)"Fil Width Sensor", (uint8_t*)tempstr);
@@ -108,6 +109,10 @@ static bool ublSlotSaved = false;
             }
             loopProcess();
           }
+        }
+        else
+        {
+          popupInfoOKOnly((uint8_t*)"Fil Width Sensor", (uint8_t*)"Fil Width must be ENABLED in Feature Settings!\n");  //TG 1/4/24 added
         }
         
         menuDrawPage(&TGmenuItems);

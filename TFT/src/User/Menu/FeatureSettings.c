@@ -52,6 +52,7 @@ typedef enum
   SKEY_COUNT                  // keep this always at the end
 } SKEY_LIST;
 
+
 void resetSettings(void)
 {
   initSettings();
@@ -129,10 +130,10 @@ void updateFeatureSettings(uint8_t item_index)
       mustStoreCmd("M404 W1.75\n");     //TG - This value is used to determine the percentage difference when auto-adjusting flow
                                         //     in response to the measured filament width. Set to same as slicer default.
       mustStoreCmd("M405 D14\n");       //TG turn fil width ON and set dist from nozzle to filament sensor measure point in cm.
-    }
+    }                                   //TG start using it to adjust flow
     else
     {
-      mustStoreCmd("M406\n");           //TG turn fil width OFF
+      mustStoreCmd("M406\n");           //TG turn fil width OFF, stop using it to adjust flow
     }
 		break;
 
