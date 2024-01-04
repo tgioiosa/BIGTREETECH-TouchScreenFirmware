@@ -122,20 +122,10 @@ void updateFeatureSettings(uint8_t item_index)
       TOGGLE_BIT(infoSettings.send_gcodes, (item_index - SKEY_START_GCODE_ENABLED));
       break;
 
-   case SKEY_FIL_WIDTH:  	//TG 8/14/2023 - added by ICON generator
-		TOGGLE_BIT(infoSettings.fil_width, 0);  //TG - when=1 the LCD displays filament width and vol ratio in %.
-    if(infoSettings.fil_width == 1)
-    {
-      mustStoreCmd("M200 D1.75 S0\n");  //TG - Set the filament’s current diameter and disable volumetric extrusion. 
-      mustStoreCmd("M404 W1.75\n");     //TG - This value is used to determine the percentage difference when auto-adjusting flow
-                                        //     in response to the measured filament width. Set to same as slicer default.
-      mustStoreCmd("M405 D14\n");       //TG turn fil width ON and set dist from nozzle to filament sensor measure point in cm.
-    }                                   //TG start using it to adjust flow
-    else
-    {
-      mustStoreCmd("M406\n");           //TG turn fil width OFF, stop using it to adjust flow
-    }
-		break;
+    case SKEY_FIL_WIDTH:  	//TG 8/14/2023 - added by ICON generator
+	  	TOGGLE_BIT(infoSettings.fil_width, 0);  //TG - when=1 the LCD displays filament width and vol ratio in %.
+      setFilamentWidthState();  // send the state to Marlin
+	  	break;
 
     case SKEY_RESET_SETTINGS:
       popupDialog(DIALOG_TYPE_ALERT, LABEL_SETTINGS_RESET, LABEL_SETTINGS_RESET_INFO, LABEL_CONFIRM, LABEL_CANCEL, resetSettings, NULL, NULL);
@@ -280,4 +270,20 @@ void menuFeatureSettings(void)
   }
 
   saveSettings();  // save settings
+}
+
+//TG 1/4/24 Added to support Filament Width ON/OFF in Feature Settings screen
+void setFilamentWidthState(void)
+{
+    if(infoSettings.fil_width == 1)     // ** ON
+    {
+      mustStoreCmd("M200 D1.75 S0\n");  //TG - Set the filament’s current diameter and disable volumetric extrusion. 
+      mustStoreCmd("M404 W1.75\n");     //TG - This value is used to determine the percentage difference when auto-adjusting flow
+                                        //     in response to the measured filament width. Set to same as slicer default.
+      mustStoreCmd("M405 D14\n");       //TG turn fil width ON and set dist from nozzle to filament sensor measure point in cm.
+    }                                   //TG start using it to adjust flow
+    else
+    {                                   // ** OFF
+      mustStoreCmd("M406\n");           //TG turn fil width OFF, stop using it to adjust flow
+    }
 }

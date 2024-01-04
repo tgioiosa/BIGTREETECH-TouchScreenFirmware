@@ -964,7 +964,13 @@ void showLiveInfo(uint8_t index, const LIVE_INFO * liveicon, bool redrawIcon)
   }
 
   GUI_RestoreColorDefault();
-}  // showLiveInfo
+
+  //TG 1/4/24 Since liveicon lines[2] is optional and only used occssaionally, it should be turned on by the user
+  //and turned off here after use, so it doesn't print extra lines on other icon positions that don't use lines[2]
+  LIVE_INFO * mycopy = liveicon;  // need a copy that is not declared 'const' to be able to write 
+  mycopy->enabled[2] = false;    
+
+}  // showLiveInfo 
 
 void displayExhibitHeader(const char * titleStr, const char * unitStr)
 {

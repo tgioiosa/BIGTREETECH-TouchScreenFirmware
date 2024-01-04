@@ -292,6 +292,10 @@ void setupMachine(FW_TYPE fwType)
 
   if (infoSettings.led_always_on == 1)
     LED_SendColor(&ledColor);  // set (neopixel) LED light to current color (initialized in HW_Init function)
+
+  //TG 1/4/24 Area here for any custom machine setup that needs to be performed at start-up
+  setFilamentWidthState();    // send filament width controlON/OFF to Marlin
+
 }
 
 float flashUsedPercentage(void)

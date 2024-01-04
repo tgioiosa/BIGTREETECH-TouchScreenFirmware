@@ -58,6 +58,7 @@ const char *const speedID[2] = SPEED_ID;
 // text position rectangles for Live icons
 const GUI_POINT ss_title_point = {SS_ICON_WIDTH - BYTE_WIDTH / 2, SS_ICON_NAME_Y0};
 const GUI_POINT ss_val_point   = {SS_ICON_WIDTH / 2, SS_ICON_VAL_Y0};
+const GUI_POINT ss_mid_point   = {SS_ICON_WIDTH - BYTE_WIDTH / 2, 41};   //TG 1/4/24 new position on middle of icon for lines[2].text
 #ifdef TFT70_V3_0
   const GUI_POINT ss_val_point_2 = {SS_ICON_WIDTH / 2, SS_ICON_VAL_Y0_2};
 #endif
@@ -99,8 +100,16 @@ void drawStatus(void)
   lvIcon.lines[1].fn_color = SS_VAL_COLOR;
   lvIcon.lines[1].text_mode = GUI_TEXTMODE_TRANS;  // default value
 
+  //lvIcon.enabled[2] = true;       //TG 1/4/24 only enable this as needed where need then disable
+  lvIcon.lines[2].h_align = RIGHT;
+  lvIcon.lines[2].v_align = CENTER;
+  lvIcon.lines[2].pos = ss_mid_point;
+  lvIcon.lines[2].font = SS_ICON_VAL_FONT_SIZE;
+  lvIcon.lines[2].fn_color = SS_NAME_COLOR;
+  lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;
+
   #ifndef TFT70_V3_0
-    lvIcon.enabled[2] = false;
+    //lvIcon.enabled[2] = false;  //TG 1/4/24
   #else
     lvIcon.enabled[2] = true;
     lvIcon.lines[2].h_align = CENTER;
@@ -151,11 +160,14 @@ void drawStatus(void)
 
   // FAN
   //TG 8/12/23 changed, was always ICON_STATUS_FAN, now it toggles between FAN and FIL_WIDTH
-  if(currentSpeedID == 1 && infoSettings.fil_width == 1) //TG if fil_width=1 and currentSpeedID=1
+  if(currentSpeedID == 1) //TG 1/0 toggle between Fan/FilWidth.
   {
+    lvIcon.enabled[2] = true;  //TG 1/4/24 enable to show a middle text line, it gets disabled by showLiveInfo() after showing
     lvIcon.iconIndex = fanIcons[1];
-    lvIcon.lines[0].text = (uint8_t *)" FilW";
-    sprintf(tempstr, "%4.3f", fil_width_meas);
+    lvIcon.lines[0].text = (uint8_t *)" FilW"; 
+    lvIcon.lines[2].text = infoSettings.fil_width ? (uint8_t*)"  on" : (uint8_t*)" off";  //TG 1/4/24 shows if FilWidth is ON or OFF
+    //infoSettings.fil_width controls whether actual measured or machine setting is shown for Fil Width value
+    sprintf(tempstr, "%4.3f", infoSettings.fil_width ? fil_width_meas :infoParameters.FilamentSetting[NOZZLE1]);
   }
   else //TG always true if fil_width=0 or currentSpeedID=0 
   {  
@@ -169,7 +181,7 @@ void drawStatus(void)
 
   lvIcon.lines[1].text = (uint8_t *)tempstr;
   showLiveInfo(2, &lvIcon, true);
-
+  
   #ifdef TFT70_V3_0
     // SPEED
     lvIcon.iconIndex = ICON_STATUS_SPEED;

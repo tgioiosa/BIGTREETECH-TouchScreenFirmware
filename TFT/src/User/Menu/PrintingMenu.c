@@ -199,7 +199,7 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
     lvIcon.iconIndex = printingIcon2nd[0]; //TG Chamber
   else if (icon_pos == ICON_POS_SPD && currentSpeedID != 0)  // Speed & Flow
     lvIcon.iconIndex = printingIcon2nd[1]; //TG Flow
-  else if (icon_pos == ICON_POS_FAN && currentSpeedID != 0 && infoSettings.fil_width != 0)   //TG 8/12/23 Fan & Filament  
+  else if (icon_pos == ICON_POS_FAN && currentSpeedID != 0)   //TG 8/12/23 Fan & Filament 1/4/24 - always toggle regardless of filwidth on or off 
     lvIcon.iconIndex = printingIcon2nd[2]; //TG Filament Width 
   else
     lvIcon.iconIndex = printingIcon[icon_pos];
@@ -226,8 +226,8 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
         break;
 
       case ICON_POS_FAN:
-        if(currentSpeedID == 1 && infoSettings.fil_width == 1)  //TG 1,1 equals filament width display
-          sprintf((char*)lvIcon.lines[0].text, "%4.3f", fil_width_meas);   //TG 8/12/23 added
+        if(currentSpeedID == 1)  //TG 1/0 toggle between Fan/FilWidth. infoSettings.fil_width controls whether actual measured or machine setting is shown for Fil Width value
+          sprintf((char*)lvIcon.lines[0].text, "%4.3f", infoSettings.fil_width ? fil_width_meas :infoParameters.FilamentSetting[NOZZLE1]);   //TG 8/12/23 added, modified 1/4/24
         else
           lvIcon.lines[0].text = (uint8_t *)fanID[currentFan];
         break;
@@ -285,8 +285,8 @@ static void reDrawPrintingValue(uint8_t icon_pos, uint8_t draw_type)
         break;
 
       case ICON_POS_FAN:
-        //TG 8/12/23 added for toggling between fan and filament width
-        if(currentSpeedID == 1 && infoSettings.fil_width == 1)  // 1,1 = show filament width status  
+        //TG 8/12/23 added for toggling between fan and filament extruder volume
+        if(currentSpeedID == 1)
         {
           sprintf(tempstrBottom, "%4.1f", fil_vol);   //TG 8/12/23 added
         }        

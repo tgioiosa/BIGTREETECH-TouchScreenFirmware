@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void menuFeatureSettings(void);
+void setFilamentWidthState(void); //TG 1/4/24 added
 
 #ifdef __cplusplus
 }
